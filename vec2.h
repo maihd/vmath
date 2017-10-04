@@ -25,10 +25,47 @@ typedef union
     float s, t;
   };
   float data[2];
-  float64_t simd; 
 } vec2_t;
 
-#define vec2(x, y) (vec2_t){ { x, y } }
+
+/***********
+ * Contants
+ */
+#define VEC2_ZERO  vec2(0, 0)
+#define VEC2_UNIT  vec2(1, 1)
+#define VEC2_UNITX vec2(1, 0)
+#define VEC2_UNITY vec2(0, 1)
+#define VEC2_LEFT  vec2(-1, 0)
+#define VEC2_RIGHT vec2(1, 0)
+#define VEC2_UP    vec2(0, 1)
+#define VEC2_DOWN  vec2(0, -1)
+
+
+/**
+ * Create vector2d
+ */
+static inline vec2_t vec2(float x, float y)
+{
+  return (vec2_t){ .x = x, .y = y };
+}
+
+
+/**
+ * Compare two vector2d is equal or not
+ */
+static inline int    eql2(vec2_t a, vec2_t b)
+{
+  return a.x == b.x && a.y == b.y;
+}
+
+
+/**
+ *
+ */
+static inline vec2_t neg2(vec2_t v)
+{
+  return vec2(-v.x, -v.y);
+}
 
 
 /**
@@ -90,7 +127,7 @@ static inline float  lensqr2(vec2_t v)
  */
 static inline float  len2(vec2_t v)
 {
-  return sqrt(lensqr2(v));
+  return sqrtf(lensqr2(v));
 }
 
 
@@ -117,7 +154,7 @@ static inline float  distsqr2(vec2_t a, vec2_t b)
  */
 static inline float  angle2(vec2_t v)
 {
-  return atan2(v.y, v.x);
+  return atan2f(v.y, v.x);
 }
 
 
@@ -127,7 +164,7 @@ static inline float  angle2(vec2_t v)
 static inline vec2_t normalize2(vec2_t v)
 {
   float length = lensqr2(v);
-  if (length != 1.0f && (length = sqrt(length)) > 0) {
+  if (length != 1.0f && (length = sqrtf(length)) > 0) {
     vec2_t r;
     r.x = v.x / length;
     r.y = v.y / length;

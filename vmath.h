@@ -9,6 +9,11 @@
 #ifndef __VMATH_H__
 #define __VMATH_H__
 
+#include <math.h>
+#include <float.h>
+#include <limits.h>
+#include <stdint.h>
+
 /**
  * Custom modifier
  */
@@ -20,14 +25,17 @@
 #define inline _inline
 #endif
 
-typedef __m64  float64_t;
-typedef __m128 float128_t;
-
 #include "vec2.h"
 #include "vec3.h"
 #include "vec4.h"
 #include "quat.h"
 #include "rect.h"
+#include "mat3.h"
 #include "mat4.h"
+
+#ifndef _Generic
+#include <tgmath.h>
+#include "tgvmath.h"
+#endif
 
 #endif /* __VMATH_H__ */

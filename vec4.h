@@ -10,7 +10,7 @@
 /**
  * Vector4D data structure
  */
-typedef struct
+typedef union
 {
   struct
   {
@@ -54,19 +54,82 @@ typedef struct
     vec3_t axis;
     float  angle;
   };
-  float      data[4];
-  float128_t simd;
+  float  data[4];
+  
+#ifdef SIMD_ENABLE
+  __m128 simd;
+#endif
 } vec4_t, color4f_t;
 
-#define vec4(x, y, z, w)    (vec4_t){ { x, y, z, w } }
-#define color4f(r, g, b, a) (vec4_t){ { r, g, b, a } }
+
+/***********
+ * Contants
+ */
+#define VEC4_ZERO  vec4(0, 0, 0, 0)
+#define VEC4_UNIT  vec4(1, 1, 1, 1)
+#define VEC4_UNITX vec4(1, 0, 0, 0)
+#define VEC4_UNITY vec4(0, 1, 0, 0)
+#define VEC4_UNITZ vec4(0, 0, 1, 0)
+#define VEC4_UNITW vec4(0, 0, 0, 1)
+#define VEC4_LEFT  vec4(-1, 0, 0, 0)
+#define VEC4_RIGHT vec4(1, 0, 0, 0)
+#define VEC4_UP    vec4(0, 1, 0, 0)
+#define VEC4_DOWN  vec4(0, -1, 0, 0)
+#define VEC4_BACK  vec4(0, 0, -1, 0)
+#define VEC4_FORE  vec4(0, 0, 1, 0)
+
 
 /**
- * Addition of two vector4d
+ * Create vector4d
+ */
+static inline vec4_t vec4(float x, float y, float z, float w)
+{
+  return (vec4_t){ .x = x, .y = y, .z = z, .w = w };
+}
+
+
+/**
+ * Create color with 4 float members
+ */
+static inline color4f_t color4f(float r, float g, float b, float a)
+{
+  return (color4f_t){ .r = r, .g = g, .b = b, .a = a };
+}
+
+
+/**
+ * Compare two vector4d is equal or not
+ */
+static inline int    eql4(vec4_t a, vec4_t b)
+{
+#ifdef VMATH_SIMB_ENABLE
+  return _mm_eq_ps(a.simd, b.simd);
+#else
+  return a.x == b.x && a.y == b.y;
+#endif
+}
+
+
+/**
+ * Negative version of a Vector4D
+ */
+static inline vec4_t neg4(vec4_t v)
+{
+  return vec4(-v.x, -v.y, -v.z, -v.w);
+}
+
+
+/**
+ * Addition of two Vector4D
  */
 static inline vec4_t add4(vec4_t a, vec4_t b)
 {
+#ifdef VMATH_SIMD_ENABLE
+  a.simd = _mm_add_ps(a.simd, b.simd);
+  return a;
+#else
   return vec4(a.x + b.x, a.y + b.y, a.z + b.z, a.w + b.w);
+#endif
 }
 
 
@@ -75,7 +138,12 @@ static inline vec4_t add4(vec4_t a, vec4_t b)
  */
 static inline vec4_t sub4(vec4_t a, vec4_t b)
 {
+#ifdef VMATH_SIMD_ENABLE
+  a.simd = _mm_sub_ps(a.simd, b.simd);
+  return a;
+#else
   return vec4(a.x - b.x, a.y - b.y, a.z - b.z, a.w - b.w);
+#endif
 }
 
 
@@ -120,7 +188,7 @@ static inline float  lensqr4(vec4_t v)
  */
 static inline float  len4(vec4_t v)
 {
-  return sqrt(lensqr4(v));
+  return sqrtf(lensqr4(v));
 }
 
 
@@ -148,7 +216,7 @@ static inline float  distsqr4(vec4_t a, vec4_t b)
 static inline vec4_t normalize4(vec4_t v)
 {
   float length = lensqr4(v);
-  if (length != 1.0f && (length = sqrt(length)) > 0) {
+  if (length != 1.0f && (length = sqrtf(length)) > 0) {
     vec4_t r;
     r.x = v.x / length;
     r.y = v.y / length;

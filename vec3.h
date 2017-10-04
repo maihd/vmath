@@ -31,11 +31,52 @@ typedef union
   {
     float r, g, b;
   };
-  float data[3];
+  float  data[3];
 } vec3_t;
 
 
-#define vec3(x, y, z)      (vec3_t){ { x, y, z } }
+/***********
+ * Contants
+ */
+#define VEC3_ZERO  vec3(0, 0, 0)
+#define VEC3_UNIT  vec3(1, 1, 1)
+#define VEC3_UNITX vec3(1, 0, 0)
+#define VEC3_UNITY vec3(0, 1, 0)
+#define VEC3_UNITZ vec3(0, 0, 1)
+#define VEC3_LEFT  vec3(-1, 0, 0)
+#define VEC3_RIGHT vec3(1, 0, 0)
+#define VEC3_UP    vec3(0, 1, 0)
+#define VEC3_DOWN  vec3(0, -1, 0)
+#define VEC3_BACK  vec3(0, 0, -1)
+#define VEC3_FORE  vec3(0, 0, 1)
+
+
+/**
+ * Create vector3d
+ */
+static inline vec3_t vec3(float x, float y, float z)
+{
+  return (vec3_t){ .x = x, .y = y, .z = z };
+}
+
+
+/**
+ * Compare two vector3d is equal or not
+ */
+static inline int    eql3(vec3_t a, vec3_t b)
+{
+  return a.x == b.x && a.y == b.y && a.z == b.z;
+}
+
+
+/**
+ * Negative version of a Vector3D
+ */
+static inline vec3_t neg3(vec3_t v)
+{
+  return vec3(-v.x, -v.y, -v.z);
+}
+
 
 /**
  * Addition of two vector 3d
@@ -107,7 +148,7 @@ static inline float lensqr3(vec3_t v)
  */
 static inline float len3(vec3_t v)
 {
-  return sqrt(lensqr3(v));
+  return sqrtf(lensqr3(v));
 }
 
 
@@ -136,7 +177,7 @@ static inline vec3_t normalize3(vec3_t v)
 {
   vec3_t r = v;
   float length = lensqr3(r);
-  if (length != 1.0f && (length = sqrt(length)) > 0) {
+  if (length != 1.0f && (length = sqrtf(length)) > 0) {
     r.x /= length;
     r.y /= length;
     r.z /= length;
