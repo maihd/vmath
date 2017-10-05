@@ -44,7 +44,7 @@ typedef union
 /**
  * Create vector2d
  */
-static inline vec2_t vec2(float x, float y)
+__vmath__ vec2_t vec2(float x, float y)
 {
   return (vec2_t){ .x = x, .y = y };
 }
@@ -53,16 +53,16 @@ static inline vec2_t vec2(float x, float y)
 /**
  * Compare two vector2d is equal or not
  */
-static inline int    eql2(vec2_t a, vec2_t b)
+__vmath__ int    eql2(vec2_t a, vec2_t b)
 {
   return a.x == b.x && a.y == b.y;
 }
 
 
 /**
- *
+ * Create a negative vector
  */
-static inline vec2_t neg2(vec2_t v)
+__vmath__ vec2_t neg2(vec2_t v)
 {
   return vec2(-v.x, -v.y);
 }
@@ -71,7 +71,7 @@ static inline vec2_t neg2(vec2_t v)
 /**
  * Addition of two vector2d
  */
-static inline vec2_t add2(vec2_t a, vec2_t b)
+__vmath__ vec2_t add2(vec2_t a, vec2_t b)
 {
   return vec2(a.x + b.x, a.y + b.y);
 }
@@ -80,7 +80,7 @@ static inline vec2_t add2(vec2_t a, vec2_t b)
 /**
  * Subtraction of two vector2d
  */
-static inline vec2_t sub2(vec2_t a, vec2_t b)
+__vmath__ vec2_t sub2(vec2_t a, vec2_t b)
 {
   return vec2(a.x - b.x, a.y - b.y);
 }
@@ -89,7 +89,7 @@ static inline vec2_t sub2(vec2_t a, vec2_t b)
 /**
  * Multiply of a vector2d with a scalar
  */
-static inline vec2_t mul2(vec2_t v, float s)
+__vmath__ vec2_t mul2(vec2_t v, float s)
 {
   return vec2(v.x * s, v.y * s);
 }
@@ -98,7 +98,7 @@ static inline vec2_t mul2(vec2_t v, float s)
 /**
  * Division of a vector2d with a scalar
  */
-static inline vec2_t div2(vec2_t v, float s)
+__vmath__ vec2_t div2(vec2_t v, float s)
 {
   return vec2(v.x / s, v.y / s);
 }
@@ -107,7 +107,7 @@ static inline vec2_t div2(vec2_t v, float s)
 /**
  * Dot product of two vector 2d
  */
-static inline float  dot2(vec2_t a, vec2_t b)
+__vmath__ float  dot2(vec2_t a, vec2_t b)
 {
   return a.x * b.x + a.y * b.y;
 }
@@ -116,7 +116,7 @@ static inline float  dot2(vec2_t a, vec2_t b)
 /**
  * Squared length of vector 2d
  */
-static inline float  lensqr2(vec2_t v)
+__vmath__ float  lensqr2(vec2_t v)
 {
   return v.x * v.x + v.y * v.y;
 }
@@ -125,7 +125,7 @@ static inline float  lensqr2(vec2_t v)
 /**
  * Length of vector 2d
  */
-static inline float  len2(vec2_t v)
+__vmath__ float  len2(vec2_t v)
 {
   return sqrtf(lensqr2(v));
 }
@@ -134,7 +134,7 @@ static inline float  len2(vec2_t v)
 /**
  * Distance of two vector 2d
  */
-static inline float  dist2(vec2_t a, vec2_t b)
+__vmath__ float  dist2(vec2_t a, vec2_t b)
 {
   return len2(sub2(b, a));
 }
@@ -143,7 +143,7 @@ static inline float  dist2(vec2_t a, vec2_t b)
 /**
  * Squared distance of two vector 2d
  */
-static inline float  distsqr2(vec2_t a, vec2_t b)
+__vmath__ float  distsqr2(vec2_t a, vec2_t b)
 {
   return lensqr2(sub2(b, a));
 }
@@ -152,7 +152,7 @@ static inline float  distsqr2(vec2_t a, vec2_t b)
 /**
  * Angle of vector 2d
  */
-static inline float  angle2(vec2_t v)
+__vmath__ float  angle2(vec2_t v)
 {
   return atan2f(v.y, v.x);
 }
@@ -161,14 +161,12 @@ static inline float  angle2(vec2_t v)
 /**
  * Normalize vector 2d, force direction only and unit length
  */
-static inline vec2_t normalize2(vec2_t v)
+__vmath__ vec2_t normalize2(vec2_t v)
 {
-  float length = lensqr2(v);
-  if (length != 1.0f && (length = sqrtf(length)) > 0) {
-    vec2_t r;
-    r.x = v.x / length;
-    r.y = v.y / length;
-    return r;
+  const float lsqr = lensqr2(v);
+  if (lsqr != 1.0f && lsqr > 0) {
+    const float l = sqrtf(lsqr);
+    return vec2(v.x / l, v.y / l);
   }
   return v;
 }

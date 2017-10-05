@@ -67,6 +67,20 @@
 	   )(a, b)
 
 
+#define eql(a, b)				\
+  _Generic((a, b),				\
+	   vec2_t: eql2,			\
+	   vec3_t: eql3,			\
+	   vec4_t: eql4				\
+	   )(a, b)
+
+#define neg(x)					\
+  _Genric((x),					\
+	  vec2_t: neg2,				\
+	  vec3_t: neg3,				\
+	  vec4_t: neg4,				\
+	  )(x)					\
+
 #define cross(a, b)				\
   _Generic((a, b),				\
 	   vec3_t: cross3			\
@@ -77,7 +91,7 @@
   _Generic((v),					\
 	   vec2_t: len2,			\
 	   vec3_t: len3,			\
-	   vec4_t: len4			\
+	   vec4_t: len4				\
 	   )(v)
 
 

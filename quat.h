@@ -13,7 +13,7 @@ typedef vec4_t quat_t;
 /**
  * Create quaternion
  */
-static inline quat_t quat(float x, float y, float z, float w)
+__vmath__ quat_t quat(float x, float y, float z, float w)
 {
   return vec4(x, y, z, w);
 }
@@ -22,7 +22,7 @@ static inline quat_t quat(float x, float y, float z, float w)
 /**
  * Create euler quaternion
  */
-static inline quat_t euler(float y, float p, float r)
+__vmath__ quat_t euler(float y, float p, float r)
 {
   y *= 0.5f;
   p *= 0.5f;
@@ -44,7 +44,7 @@ static inline quat_t euler(float y, float p, float r)
 /**
  * Create euler quaternion
  */
-static inline quat_t eulerv3(vec3_t e)
+__vmath__ quat_t eulerv3(vec3_t e)
 {
   return euler(e.x, e.y, e.z);
 }
@@ -53,7 +53,7 @@ static inline quat_t eulerv3(vec3_t e)
 /**
  * Convert to an axis-angle representation.
  */
-static inline vec4_t toaxis(quat_t quat)
+__vmath__ vec4_t toaxis(quat_t quat)
 {
   quat_t q = quat;
   if (fabsf(q.w) > 0) {
@@ -74,23 +74,23 @@ static inline vec4_t toaxis(quat_t quat)
 /**
  * Convert axis-angle representation to quaternion 
  */
-static inline quat_t toquat(vec3_t axis, float angle)
+__vmath__ quat_t toquat(vec3_t axis, float angle)
 {
   if (lensqr3(axis) == 0.0f) {
     return QUAT_IDENTITY;
   }
 
-  quat_t r;
-  r.xyz = mul3(normalize3(axis), sinf(angle * 0.5f));
-  r.w   = cosf(angle * 0.5f);
-  return r;
+  return (quat_t){
+    .xyz = mul3(normalize3(axis), sinf(angle * 0.5f)),
+    ._w_ = cosf(angle * 0.5f),
+  };
 }
 
 
 /**
  * Get invert quaternion
  */
-static inline quat_t inverseq(quat_t q)
+__vmath__ quat_t inverseq(quat_t q)
 {
   return quat(q.x, q.y, q.z, -q.w);
 }
@@ -99,7 +99,7 @@ static inline quat_t inverseq(quat_t q)
 /**
  * Get conjugate quaternion
  */
-static inline quat_t conjq(quat_t q)
+__vmath__ quat_t conjq(quat_t q)
 {
   return quat(-q.x, -q.y, -q.z, q.w);
 }
@@ -108,12 +108,11 @@ static inline quat_t conjq(quat_t q)
 /**
  * Multiplication of two quaternions 
  */
-static inline quat_t mulq(quat_t a, quat_t b)
+__vmath__ quat_t mulq(quat_t a, quat_t b)
 {
-  quat_t r = (quat_t){
+  return (quat_t){
     .xyz = add3(add3(mul3(a.xyz, b.w), mul3(b.xyz, a.w)),
 		cross3(a.xyz, b.xyz)),
-    ._w_ = a.w* b.w - dot3(a.xyz, b.xyz),
+    ._w_ = a.w * b.w - dot3(a.xyz, b.xyz),
   };
-  return r;
 }

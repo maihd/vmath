@@ -29,7 +29,7 @@ typedef union
 /**
  * Create a identity matrix 4x4
  */
-static inline mat4_t mat4()
+__vmath__ mat4_t mat4()
 {
   return (mat4_t){
     .data = {
@@ -45,7 +45,7 @@ static inline mat4_t mat4()
 /**
  *
  */
-static inline mat3_t tomat3(mat4_t m)
+__vmath__ mat3_t tomat3(mat4_t m)
 {
   return (mat3_t){
     .data = {
@@ -60,7 +60,7 @@ static inline mat3_t tomat3(mat4_t m)
 /**
  *
  */
-static inline mat4_t tomat4(mat3_t m)
+__vmath__ mat4_t tomat4(mat3_t m)
 {
   return (mat4_t){
     .data = {
@@ -76,7 +76,7 @@ static inline mat4_t tomat4(mat3_t m)
 /**
  * Create translate matrix
  */
-static inline mat4_t translate3f(float x, float y, float z)
+__vmath__ mat4_t translate3f(float x, float y, float z)
 {									
   return (mat4_t){
     .data = {
@@ -89,19 +89,19 @@ static inline mat4_t translate3f(float x, float y, float z)
 }
 
 
-static inline mat4_t translatev2(vec2_t v)
+__vmath__ mat4_t translatev2(vec2_t v)
 {
   return translate3f(v.x, v.y, 0.0);
 }
 
 
-static inline mat4_t translatev3(vec3_t v)
+__vmath__ mat4_t translatev3(vec3_t v)
 {
   return translate3f(v.x, v.y, v.z);
 }
 
 
-static inline mat4_t translate2f(float x, float y)
+__vmath__ mat4_t translate2f(float x, float y)
 {
   return translate3f(x, y, 0);
 }
@@ -110,7 +110,7 @@ static inline mat4_t translate2f(float x, float y)
 /**
  * Create scale matrix
  */
-static inline mat4_t scale3f(float x, float y, float z)
+__vmath__ mat4_t scale3f(float x, float y, float z)
 {
   return (mat4_t){
     .data = {
@@ -123,25 +123,25 @@ static inline mat4_t scale3f(float x, float y, float z)
 }
 
 
-static inline mat4_t scale1f(float s) 
+__vmath__ mat4_t scale1f(float s)
 {
   return scale3f(s, s, s);
 }
 
 
-static inline mat4_t scale2f(float x, float y)
+__vmath__ mat4_t scale2f(float x, float y)
 {
   return scale3f(x, y, 1.0);
 }
 
 
-static inline mat4_t scalev2(vec2_t v)
+__vmath__ mat4_t scalev2(vec2_t v)
 {
   return scale3f(v.x, v.y, 1.0);
 }
 
 
-static inline mat4_t scalev3(vec3_t v)
+__vmath__ mat4_t scalev3(vec3_t v)
 {
   return scale3f(v.x, v.y, v.z);
 }
@@ -149,10 +149,10 @@ static inline mat4_t scalev3(vec3_t v)
 /**
  * Create mat4 rotate in X-axis matrix
  */
-static inline mat4_t rotatex(float angle)
+__vmath__ mat4_t rotatex(float angle)
 {
-  float c = cosf(angle);
-  float s = sinf(angle);
+  const float c = cosf(angle);
+  const float s = sinf(angle);
   return (mat4_t){
     .data = {
       1,  0, 0, 0,
@@ -167,10 +167,10 @@ static inline mat4_t rotatex(float angle)
 /**
  * Create mat4 rotate in Y-axis matrix
  */
-static inline mat4_t rotatey(float angle)
+__vmath__ mat4_t rotatey(float angle)
 {
-  float c = cosf(angle);
-  float s = sinf(angle);
+  const float c = cosf(angle);
+  const float s = sinf(angle);
   return (mat4_t){
     .data = {
        c,  0, s, 0,
@@ -185,10 +185,10 @@ static inline mat4_t rotatey(float angle)
 /**
  * Create mat4 rotate in Z-axis matrix
  */
-static inline mat4_t rotatez(float angle)
+__vmath__ mat4_t rotatez(float angle)
 {
-  float c = cosf(angle);
-  float s = sinf(angle);
+  const float c = cosf(angle);
+  const float s = sinf(angle);
   return (mat4_t){
     .data = {
        c, s, 0, 0,
@@ -204,11 +204,11 @@ static inline mat4_t rotatez(float angle)
 /**
  * Create mat4 rotate matrix
  */
-static inline mat4_t rotate3f(float x, float y, float z, float angle)
+__vmath__ mat4_t rotate3f(float x, float y, float z, float angle)
 {
-  float c = cosf(-angle);
-  float s = sinf(-angle);
-  float t = 1.0f - c;
+  const float c = cosf(-angle);
+  const float s = sinf(-angle);
+  const float t = 1.0f - c;
   
   return (mat4_t){
     .data = {
@@ -238,7 +238,7 @@ static inline mat4_t rotate3f(float x, float y, float z, float angle)
 /**
  * Create rotate matrix with axis and angle
  */
-static inline mat4_t rotatev(vec3_t v, float angle)
+__vmath__ mat4_t rotatev(vec3_t v, float angle)
 {
   return rotate3f(v.x, v.y, v.z, angle);
 }
@@ -247,9 +247,9 @@ static inline mat4_t rotatev(vec3_t v, float angle)
 /**
  * Create rotation matrix from quaternion
  */
-static inline mat4_t rotateq(quat_t q)
+__vmath__ mat4_t rotateq(quat_t q)
 {
-  vec4_t aa = toaxis(q); /* axis-angle form of quaternion */
+  const vec4_t aa = toaxis(q); /* axis-angle form of quaternion */
   return rotatev(aa.axis, aa.angle);
 }
 
@@ -257,7 +257,7 @@ static inline mat4_t rotateq(quat_t q)
 /**
  * Addidtion of two matrix4x4
  */
-static inline mat4_t addm4(mat4_t a, mat4_t b)
+__vmath__ mat4_t addm4(mat4_t a, mat4_t b)
 {
 #ifdef VMATH_SIMD_ENABLE
   return (mat4_t){
@@ -284,7 +284,7 @@ static inline mat4_t addm4(mat4_t a, mat4_t b)
 /**
  * Subtraction of two matrix4x4
  */
-static inline mat4_t subm4(mat4_t a, mat4_t b)
+__vmath__ mat4_t subm4(mat4_t a, mat4_t b)
 {
 #ifdef VMATH_SIMD_ENABLE
   return (mat4_t){
@@ -311,7 +311,7 @@ static inline mat4_t subm4(mat4_t a, mat4_t b)
 /**
  * Multiplication of two matrix4x4
  */
-static inline mat4_t mulm4(mat4_t a, mat4_t b)
+__vmath__ mat4_t mulm4(mat4_t a, mat4_t b)
 {
   return (mat4_t){
     .data = {
@@ -342,7 +342,7 @@ static inline mat4_t mulm4(mat4_t a, mat4_t b)
 /**
  * Transpose matrix4x4
  */
-static inline mat4_t transpose4(mat4_t m)
+__vmath__ mat4_t transpose4(mat4_t m)
 {
   return (mat4_t){
     .data = {
@@ -358,7 +358,7 @@ static inline mat4_t transpose4(mat4_t m)
 /**
  * Create orthographic projection matrix
  */
-static inline mat4_t ortho(float l, float r, float b, float t, float n, float f)
+__vmath__ mat4_t ortho(float l, float r, float b, float t, float n, float f)
 {
   return (mat4_t){
     .data = {
@@ -374,7 +374,7 @@ static inline mat4_t ortho(float l, float r, float b, float t, float n, float f)
 /**
  * Create frustum matrix
  */
-static inline mat4_t frustum(float l, float r, float b, float t, float n, float f)
+__vmath__ mat4_t frustum(float l, float r, float b, float t, float n, float f)
 {
   return (mat4_t){
     .data = {
@@ -390,7 +390,7 @@ static inline mat4_t frustum(float l, float r, float b, float t, float n, float 
 /**
  * Create perspective projection matrix
  */
-static inline mat4_t perspective(float fov, float aspect, float near, float far)
+__vmath__ mat4_t perspective(float fov, float aspect, float near, float far)
 {
   const float a = 1.0f / tanf(fov * 0.5f);
   const float b = far / (near - far);
@@ -408,11 +408,11 @@ static inline mat4_t perspective(float fov, float aspect, float near, float far)
 /**
  * Create view matrix when focus on the position
  */
-static inline mat4_t lookat(vec3_t eye, vec3_t target, vec3_t up)
+__vmath__ mat4_t lookat(vec3_t eye, vec3_t target, vec3_t up)
 {
-  vec3_t z = normalize3(sub3(eye, target));
-  vec3_t x = normalize3(cross3(up, z));
-  vec3_t y = normalize3(cross3(z, x));
+  const vec3_t z = normalize3(sub3(eye, target));
+  const vec3_t x = normalize3(cross3(up, z));
+  const vec3_t y = normalize3(cross3(z, x));
   return (mat4_t){
     .data = {
       x.x, y.x, z.x, 0,

@@ -54,7 +54,7 @@ typedef union
 /**
  * Create vector3d
  */
-static inline vec3_t vec3(float x, float y, float z)
+__vmath__ vec3_t vec3(float x, float y, float z)
 {
   return (vec3_t){ .x = x, .y = y, .z = z };
 }
@@ -63,7 +63,7 @@ static inline vec3_t vec3(float x, float y, float z)
 /**
  * Compare two vector3d is equal or not
  */
-static inline int    eql3(vec3_t a, vec3_t b)
+__vmath__ int    eql3(vec3_t a, vec3_t b)
 {
   return a.x == b.x && a.y == b.y && a.z == b.z;
 }
@@ -72,7 +72,7 @@ static inline int    eql3(vec3_t a, vec3_t b)
 /**
  * Negative version of a Vector3D
  */
-static inline vec3_t neg3(vec3_t v)
+__vmath__ vec3_t neg3(vec3_t v)
 {
   return vec3(-v.x, -v.y, -v.z);
 }
@@ -81,7 +81,7 @@ static inline vec3_t neg3(vec3_t v)
 /**
  * Addition of two vector 3d
  */
-static inline vec3_t add3(vec3_t a, vec3_t b)
+__vmath__ vec3_t add3(vec3_t a, vec3_t b)
 {
   return vec3(a.x + b.x, a.y + b.y, a.z + b.z);
 }
@@ -90,7 +90,7 @@ static inline vec3_t add3(vec3_t a, vec3_t b)
 /**
  * subtraction of two vector 3d
  */
-static inline vec3_t sub3(vec3_t a, vec3_t b)
+__vmath__ vec3_t sub3(vec3_t a, vec3_t b)
 {
   return vec3(a.x - b.x, a.y - b.y, a.z - b.z);
 }
@@ -99,7 +99,7 @@ static inline vec3_t sub3(vec3_t a, vec3_t b)
 /**
  * Multiply of a vector 3d with a scalar, also called as scale
  */
-static inline vec3_t mul3(vec3_t v, float s)
+__vmath__ vec3_t mul3(vec3_t v, float s)
 {
   return vec3(v.x * s, v.y * s, v.z * s);
 }
@@ -108,7 +108,7 @@ static inline vec3_t mul3(vec3_t v, float s)
 /**
  * Division of a vector 3d with a scalar, also called as scale down 
  */
-static inline vec3_t div3(vec3_t v, float s)
+__vmath__ vec3_t div3(vec3_t v, float s)
 {
   return mul3(v, 1.0f / s);
 }
@@ -117,7 +117,7 @@ static inline vec3_t div3(vec3_t v, float s)
 /**
  * Dot product of two vector 3d
  */
-static inline float dot3(vec3_t a, vec3_t b)
+__vmath__ float dot3(vec3_t a, vec3_t b)
 {
   return a.x * b.x + a.y * b.y + a.z * b.z;
 }
@@ -126,7 +126,7 @@ static inline float dot3(vec3_t a, vec3_t b)
 /**
  * Cross product of two vector 3d
  */
-static inline vec3_t cross3(vec3_t a, vec3_t b)
+__vmath__ vec3_t cross3(vec3_t a, vec3_t b)
 {
   return vec3(a.y * b.z - a.z * b.y,					
 	      a.z * b.x - a.x * b.z,		
@@ -137,7 +137,7 @@ static inline vec3_t cross3(vec3_t a, vec3_t b)
 /**
  * Squared length of vector 3d
  */
-static inline float lensqr3(vec3_t v)
+__vmath__ float lensqr3(vec3_t v)
 {
   return v.x * v.x + v.y * v.y + v.z * v.z;
 }
@@ -146,7 +146,7 @@ static inline float lensqr3(vec3_t v)
 /**
  * Length of vector 3d
  */
-static inline float len3(vec3_t v)
+__vmath__ float len3(vec3_t v)
 {
   return sqrtf(lensqr3(v));
 }
@@ -155,7 +155,7 @@ static inline float len3(vec3_t v)
 /**
  * Distance of two vector 3d
  */
-static inline float dist3(vec3_t a, vec3_t b)
+__vmath__ float dist3(vec3_t a, vec3_t b)
 {
   return len3(sub3(b, a));
 }
@@ -164,7 +164,7 @@ static inline float dist3(vec3_t a, vec3_t b)
 /**
  * Squared distance of two vector 3d
  */
-static inline float distsqr3(vec3_t a, vec3_t b)
+__vmath__ float distsqr3(vec3_t a, vec3_t b)
 {
   return lensqr3(sub3(b, a));
 }
@@ -173,14 +173,12 @@ static inline float distsqr3(vec3_t a, vec3_t b)
 /**
  * Normalize vector 3d (force to direction only, unit length)
  */
-static inline vec3_t normalize3(vec3_t v)
+__vmath__ vec3_t normalize3(vec3_t v)
 {
-  vec3_t r = v;
-  float length = lensqr3(r);
-  if (length != 1.0f && (length = sqrtf(length)) > 0) {
-    r.x /= length;
-    r.y /= length;
-    r.z /= length;
+  const float lsqr = lensqr3(v);
+  if (lsqr != 1.0f && lsqr > 0) {
+    const float l = sqrtf(lsqr);
+    return vec3(v.x / l, v.y / l, v.z / l);
   }
-  return r;
+  return v;
 }

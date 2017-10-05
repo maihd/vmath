@@ -19,6 +19,7 @@ typedef struct
     float m20, m21, m22;
   };
   vec3_t rows[3];
+  float  m[3][3];
   float  data[9];
 } mat3_t;
 
@@ -32,7 +33,7 @@ typedef struct
 /**
  * Create a identify matrix 3x3
  */
-static inline mat3_t mat3()
+__vmath__ mat3_t mat3()
 {
   return (mat3_t){
     .data = {
@@ -47,7 +48,7 @@ static inline mat3_t mat3()
 /**
  * Transpose matrix3x3
  */
-static inline mat3_t transpose3(mat3_t m)
+__vmath__ mat3_t transpose3(mat3_t m)
 {
   return (mat3_t){
     .data = {
@@ -62,7 +63,7 @@ static inline mat3_t transpose3(mat3_t m)
 /**
  * Addition of two matrix 3x3
  */
-static inline mat3_t addm3(mat3_t a, mat3_t b)
+__vmath__ mat3_t addm3(mat3_t a, mat3_t b)
 {
   return (mat3_t){
     .rows = {
@@ -77,7 +78,7 @@ static inline mat3_t addm3(mat3_t a, mat3_t b)
 /**
  * Subtraction of two matrix 3x3
  */
-static inline mat3_t subm3(mat3_t a, mat3_t b)
+__vmath__ mat3_t subm3(mat3_t a, mat3_t b)
 {
   return (mat3_t){
     .rows = {
@@ -92,7 +93,7 @@ static inline mat3_t subm3(mat3_t a, mat3_t b)
 /**
  * Multiplication of two matrix 3x3
  */
-static inline mat3_t mulm3(mat3_t a, mat3_t b)
+__vmath__ mat3_t mulm3(mat3_t a, mat3_t b)
 {
   return (mat3_t){
     .data = {

@@ -9,23 +9,37 @@
 /**
  * Rectangle data structure
  */
-typedef vec4_t rect_t;
+typedef struct
+{
+  vec2_t min;
+  vec2_t max;
+} rect_t;
 
-#define rect(x, y, w, h) vec4(x, y, w, h)
 
 /**
- * Get min position of rectangle
+ * Create rectangle
  */
-static inline vec2_t rectmin(rect_t rect)
+__vmath__ rect_t rect(vec2_t min, vec2_t max)
 {
-  return rect.pos;
+  return (rect_t){ .min = min, .max = max };
 }
 
 
 /**
- * Get max position of rectangle
+ * Get rectangle's size
  */
-static inline vec2_t rectmax(rect_t rect)
+__vmath__ vec2_t rectsize(rect_t r)
 {
-  return add2(rect.pos, rect.zw);
+  return sub2(r.max, r.min);
 }
+
+
+/**
+ * Is rectangle contains the given point
+ * @return 1 if contains, 0 otherwise
+ */
+__vmath__ int    rectctn(rect_t r, vec2_t p)
+{
+  return !(p.x < r.min.x || p.y < r.min.y || p.x > r.max.x || p.y > r.max.y);
+}
+

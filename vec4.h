@@ -82,7 +82,7 @@ typedef union
 /**
  * Create vector4d
  */
-static inline vec4_t vec4(float x, float y, float z, float w)
+__vmath__ vec4_t vec4(float x, float y, float z, float w)
 {
   return (vec4_t){ .x = x, .y = y, .z = z, .w = w };
 }
@@ -91,7 +91,7 @@ static inline vec4_t vec4(float x, float y, float z, float w)
 /**
  * Create color with 4 float members
  */
-static inline color4f_t color4f(float r, float g, float b, float a)
+__vmath__ color4f_t color4f(float r, float g, float b, float a)
 {
   return (color4f_t){ .r = r, .g = g, .b = b, .a = a };
 }
@@ -100,7 +100,7 @@ static inline color4f_t color4f(float r, float g, float b, float a)
 /**
  * Compare two vector4d is equal or not
  */
-static inline int    eql4(vec4_t a, vec4_t b)
+__vmath__ int    eql4(vec4_t a, vec4_t b)
 {
 #ifdef VMATH_SIMB_ENABLE
   return _mm_eq_ps(a.simd, b.simd);
@@ -113,7 +113,7 @@ static inline int    eql4(vec4_t a, vec4_t b)
 /**
  * Negative version of a Vector4D
  */
-static inline vec4_t neg4(vec4_t v)
+__vmath__ vec4_t neg4(vec4_t v)
 {
   return vec4(-v.x, -v.y, -v.z, -v.w);
 }
@@ -122,7 +122,7 @@ static inline vec4_t neg4(vec4_t v)
 /**
  * Addition of two Vector4D
  */
-static inline vec4_t add4(vec4_t a, vec4_t b)
+__vmath__ vec4_t add4(vec4_t a, vec4_t b)
 {
 #ifdef VMATH_SIMD_ENABLE
   a.simd = _mm_add_ps(a.simd, b.simd);
@@ -136,7 +136,7 @@ static inline vec4_t add4(vec4_t a, vec4_t b)
 /**
  * Subtraction of two vector4d
  */
-static inline vec4_t sub4(vec4_t a, vec4_t b)
+__vmath__ vec4_t sub4(vec4_t a, vec4_t b)
 {
 #ifdef VMATH_SIMD_ENABLE
   a.simd = _mm_sub_ps(a.simd, b.simd);
@@ -150,7 +150,7 @@ static inline vec4_t sub4(vec4_t a, vec4_t b)
 /**
  * Multiplication of a vector4d with a scalar
  */
-static inline vec4_t mul4(vec4_t v, float s)
+__vmath__ vec4_t mul4(vec4_t v, float s)
 {
   return vec4(v.x * s, v.y * s, v.z * s, v.w * s);
 }
@@ -159,7 +159,7 @@ static inline vec4_t mul4(vec4_t v, float s)
 /**
  * Division of a vector4d with a scalar
  */
-static inline vec4_t div4(vec4_t v, float s)
+__vmath__ vec4_t div4(vec4_t v, float s)
 {
   return vec4(v.x / s, v.y / s, v.z / s, v.w / s);
 }
@@ -168,7 +168,7 @@ static inline vec4_t div4(vec4_t v, float s)
 /**
  * Dot product of two vector4d
  */
-static inline float  dot4(vec4_t a, vec4_t b)
+__vmath__ float  dot4(vec4_t a, vec4_t b)
 {
   return a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w;
 }
@@ -177,7 +177,7 @@ static inline float  dot4(vec4_t a, vec4_t b)
 /**
  * Squared length of vector4d
  */
-static inline float  lensqr4(vec4_t v)
+__vmath__ float  lensqr4(vec4_t v)
 {
   return v.x * v.x + v.y * v.y + v.z * v.z + v.w * v.w;
 }
@@ -186,7 +186,7 @@ static inline float  lensqr4(vec4_t v)
 /**
  * Length of vector4d
  */
-static inline float  len4(vec4_t v)
+__vmath__ float  len4(vec4_t v)
 {
   return sqrtf(lensqr4(v));
 }
@@ -195,7 +195,7 @@ static inline float  len4(vec4_t v)
 /**
  * Distance of two vector4d
  */
-static inline float  dist4(vec4_t a, vec4_t b)
+__vmath__ float  dist4(vec4_t a, vec4_t b)
 {
   return len4(sub4(b, a));
 }
@@ -204,7 +204,7 @@ static inline float  dist4(vec4_t a, vec4_t b)
 /**
  * Squared distance of two vector4d
  */
-static inline float  distsqr4(vec4_t a, vec4_t b)
+__vmath__ float  distsqr4(vec4_t a, vec4_t b)
 {
   return lensqr4(sub4(b, a));
 }
@@ -213,16 +213,12 @@ static inline float  distsqr4(vec4_t a, vec4_t b)
 /**
  * Normalize vector4d, force direction only with unit length
  */
-static inline vec4_t normalize4(vec4_t v)
+__vmath__ vec4_t normalize4(vec4_t v)
 {
-  float length = lensqr4(v);
-  if (length != 1.0f && (length = sqrtf(length)) > 0) {
-    vec4_t r;
-    r.x = v.x / length;
-    r.y = v.y / length;
-    r.z = v.z / length;
-    r.w = v.w / length;
-    return r;
+  const float lsqr = lensqr4(v);
+  if (lsqr != 1.0f && lsqr > 0) {
+    const float l = sqrtf(lsqr);
+    return vec4(v.x / l, v.y / l, v.z / l, v.w / l);
   }
   return v;
 }
