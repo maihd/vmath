@@ -111,3 +111,42 @@ __vmath__ mat3_t mulm3(mat3_t a, mat3_t b)
     }
   };
 }
+
+
+/**
+ * Calculate determinant of a matrix3x3
+ */
+__vmath__ float determinant3(mat3_t m)
+{
+  return m.m00 * m.m11 * m.m22 - m.m00 * m.m12 * m.21
+    + m.m01 * m.m10 * m.m22 - m.m01 * m.m12 * m.20
+    + m.m02 * m.m10 * m.m21 - m.m02 * m.m11 * m.20;
+}
+
+
+/**
+ * Get inverted version of a matrix3x3
+ */
+__vmath__ mat3_t inverse3(mat3_t m)
+{
+  float d = determinant3(m);
+  if (d == 0.0f) {
+    return m;
+  }
+  d = 1.0f / d;
+  return (mat3_t) {
+    .data = {
+      d * (m.m11 * m.m22 - m.m12 * m.m21),
+      d * (m.m02 * m.m21 - m.m01 * m.m22),
+      d * (m.m01 * m.m12 - m.m02 * m.m11),
+
+      d * (m.m12 * m.m20 - m.m10 * m.m22),
+      d * (m.m00 * m.m22 - m.m02 * m.m20),
+      d * (m.m02 * m.m10 - m.m00 * m.m12),
+
+      d * (m.m10 * m.m21 - m.m11 * m.m20),
+      d * (m.m01 * m.m20 - m.m00 * m.m21),
+      d * (m.m00 * m.m11 - m.m01 * m.m10), 
+    }
+  };
+}

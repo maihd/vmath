@@ -444,3 +444,77 @@ __vmath__ mat4_t lookat(vec3_t eye, vec3_t target, vec3_t up)
     }
   };
 }
+
+
+/**
+ * Calculate deternimant value
+ */
+__vmath__ float determinant4(mat4_t m)
+{
+  float s1 = m.m00 * m.m11 - m.m10 * m.m01;
+  float s2 = m.m00 * m.m12 - m.m10 * m.m02;
+  float s3 = m.m00 * m.m13 - m.m10 * m.m03;
+  float s4 = m.m01 * m.m12 - m.m11 * m.m02;
+  float s5 = m.m01 * m.m13 - m.m11 * m.m03;
+  float s6 = m.m02 * m.m13 - m.m12 * m.m03;
+  
+  float c1 = m.m20 * m.m31 - m.m30 * m.m21;
+  float c2 = m.m20 * m.m32 - m.m30 * m.m22;
+  float c3 = m.m20 * m.m33 - m.m30 * m.m23;
+  float c4 = m.m21 * m.m32 - m.m31 * m.m22;
+  float c5 = m.m21 * m.m32 - m.m31 * m.m23;
+  float c6 = m.m22 * m.m33 - m.m32 * m.m23;
+
+  return s1 * c6 - s2 * c5 + s3 * c4 + s4 * c3 - s5 * c2 + s6 * c1;
+}
+
+
+/**
+ * Get inverse version of matrix4x4
+ */
+__vmath__ mat4_t inverse4(mat4_t m)
+{
+  float s1 = m.m00 * m.m11 - m.m10 * m.m01;
+  float s2 = m.m00 * m.m12 - m.m10 * m.m02;
+  float s3 = m.m00 * m.m13 - m.m10 * m.m03;
+  float s4 = m.m01 * m.m12 - m.m11 * m.m02;
+  float s5 = m.m01 * m.m13 - m.m11 * m.m03;
+  float s6 = m.m02 * m.m13 - m.m12 * m.m03;
+  
+  float c1 = m.m20 * m.m31 - m.m30 * m.m21;
+  float c2 = m.m20 * m.m32 - m.m30 * m.m22;
+  float c3 = m.m20 * m.m33 - m.m30 * m.m23;
+  float c4 = m.m21 * m.m32 - m.m31 * m.m22;
+  float c5 = m.m21 * m.m32 - m.m31 * m.m23;
+  float c6 = m.m22 * m.m33 - m.m32 * m.m23;
+  
+  float d = s1 * c6 - s2 * c5 + s3 * c4 + s4 * c3 - s5 * c2 + s6 * c1;
+  if (d == 0.0f) {
+    return m;
+  }
+  d = 1.0f / d;
+  
+  return (mat4_t){
+    .data = {
+      d *  (m.m11 * c6 - m.m12 * c5 + m.m13 * c4),
+      d * -(m.m01 * c6 - m.m02 * c5 + m.m03 * c4),
+      d *  (m.m31 * s6 - m.m32 * s5 + m.m33 * s4),
+      d * -(m.m21 * s6 - m.m22 * s5 + m.m23 * s4),
+      
+      d * -(m.m10 * c6 - m.m12 * c3 + m.m13 * c2),
+      d *  (m.m00 * c6 - m.m02 * c3 + m.m03 * c2),
+      d * -(m.m30 * s6 - m.m32 * s3 + m.m33 * s2),
+      d *  (m.m20 * s6 - m.m22 * s3 + m.m23 * s2),
+      
+      d *  (m.m10 * c5 - m.m11 * c3 + m.m13 * c1),
+      d * -(m.m00 * c5 - m.m01 * c3 + m.m03 * c1),
+      d *  (m.m30 * s5 - m.m31 * s3 + m.m33 * s1),
+      d * -(m.m20 * s5 - m.m21 * s3 + m.m23 * s1),
+
+      d * -(m.m10 * c4 - m.m11 * c2 + m.m12 * c1),
+      d *  (m.m00 * c4 - m.m01 * c2 + m.m02 * c1),
+      d * -(m.m30 * s4 - m.m31 * s2 + m.m32 * s1),
+      d *  (m.m20 * s4 - m.m21 * s2 + m.m22 * s1),
+    }
+  };
+}

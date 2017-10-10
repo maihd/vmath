@@ -141,6 +141,13 @@
 	   )(__VA_ARGS__)
 
 
+#define determinant(m)				\
+  _Generic((m),					\
+	   mat3_t: determinant3,		\
+	   mat4_t: determinant4,		\
+	   )(m)
+
+
 #define inverse(m)				\
   _Generic((m),					\
 	   quat_t: inverseq,			\
