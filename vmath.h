@@ -44,6 +44,26 @@
 #undef VMATH_NEON_ENABLE
 #endif
 
+#if defined(__SSSE3__)
+#define SSE_SUPPORT
+#endif
+#if defined(__SSE__) || defined(__SSE2__) || defined(__SSE3__)
+#define SSE_SUPPORT
+#endif
+#if defined(__SSE4_1__) || defined(__SSE4_2__) || defined(__SSE_VMATH__)
+#define SSE_SUPPORT
+#endif
+#ifdef SSE_SUPPORT
+#include <mmintrin.h>
+#include <xmmintrin.h>
+#include <emmintrin.h>
+#ifndef VMATH_SSE_ENABLE
+#define VMATH_SSE_ENABLE 1
+#endif
+#else
+#undef VMATH_SSE_ENABLE
+#endif
+
 /**
  * Include modules
  */
@@ -66,7 +86,7 @@
 /**
  * Type generic functions
  */
-#ifdef _Generic
+#if __STDC__ == 1 && __STDC_VERSION__ >= 201112L
 #include <tgmath.h>
 #include "tgvmath.h"
 #endif

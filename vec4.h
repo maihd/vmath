@@ -58,6 +58,8 @@ typedef union
   
 #if VMATH_NEON_ENABLE
   float32x4_t simd;
+#elif VMATH_SSE_ENABLE
+  __m128 simd;
 #endif
 } vec4_t, color4f_t;
 
@@ -122,6 +124,8 @@ __vmath__ vec4_t add4(vec4_t a, vec4_t b)
 {
 #if VMATH_NEON_ENABLE
   return (vec4_t){ .simd = vaddq_f32(a.simd, b.simd) };
+#elif VMATH_SSE_ENABLE
+  return (vec4_t){ .simd = _mm_add_ps(a.simd, b.simd) };
 #else
   return vec4(a.x + b.x, a.y + b.y, a.z + b.z, a.w + b.w);
 #endif
@@ -135,6 +139,8 @@ __vmath__ vec4_t sub4(vec4_t a, vec4_t b)
 {
 #if VMATH_NEON_ENABLE
   return (vec4_t){ .simd = vsubq_f32(a.simd, b.simd) };
+#elif VMATH_SSE_ENABLE
+  return (vec4_t){ .simd = _mm_sub_ps(a.simd, b.simd) };
 #else
   return vec4(a.x - b.x, a.y - b.y, a.z - b.z, a.w - b.w);
 #endif
