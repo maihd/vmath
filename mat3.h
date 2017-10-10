@@ -118,9 +118,9 @@ __vmath__ mat3_t mulm3(mat3_t a, mat3_t b)
  */
 __vmath__ float determinant3(mat3_t m)
 {
-  return m.m00 * m.m11 * m.m22 - m.m00 * m.m12 * m.21
-    + m.m01 * m.m10 * m.m22 - m.m01 * m.m12 * m.20
-    + m.m02 * m.m10 * m.m21 - m.m02 * m.m11 * m.20;
+  return m.m00 * m.m11 * m.m22 - m.m00 * m.m12 * m.m21
+    + m.m01 * m.m10 * m.m22 - m.m01 * m.m12 * m.m20
+    + m.m02 * m.m10 * m.m21 - m.m02 * m.m11 * m.m20;
 }
 
 

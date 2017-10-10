@@ -35,6 +35,15 @@
 #include <limits.h>
 #include <stdint.h>
 
+#if defined(__ARM_NEON) || defined(__ARM_NEON__)
+#include <arm_neon.h>
+#ifndef VMATH_NEON_ENABLE
+#define VMATH_NEON_ENABLE 1
+#endif
+#else
+#undef VMATH_NEON_ENABLE
+#endif
+
 /**
  * Include modules
  */
@@ -57,7 +66,7 @@
 /**
  * Type generic functions
  */
-#ifndef _Generic
+#ifdef _Generic
 #include <tgmath.h>
 #include "tgvmath.h"
 #endif

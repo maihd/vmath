@@ -83,7 +83,7 @@ __vmath__ vec3_t neg3(vec3_t v)
  */
 __vmath__ vec3_t add3(vec3_t a, vec3_t b)
 {
-  return vec3(a.x + b.x, a.y + b.y, a.z + b.z);
+  return (vec3_t){ .xy = add2(a.xy, b.xy), ._z = a.z + b.z };
 }
 
 
@@ -92,7 +92,7 @@ __vmath__ vec3_t add3(vec3_t a, vec3_t b)
  */
 __vmath__ vec3_t sub3(vec3_t a, vec3_t b)
 {
-  return vec3(a.x - b.x, a.y - b.y, a.z - b.z);
+  return (vec3_t){ .xy = sub2(a.xy, b.xy), ._z = a.z - b.z };
 }
 
 

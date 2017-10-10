@@ -25,6 +25,9 @@ typedef union
     float s, t;
   };
   float data[2];
+#if VMATH_NEON_ENABLE
+  float32x2_t simd;
+#endif
 } vec2_t;
 
 
@@ -73,7 +76,11 @@ __vmath__ vec2_t neg2(vec2_t v)
  */
 __vmath__ vec2_t add2(vec2_t a, vec2_t b)
 {
+#if VMATH_NEON_ENABLE
+  return (vec2_t){ .simd = vadd_f32(a.simd, b.simd) };
+#else
   return vec2(a.x + b.x, a.y + b.y);
+#endif
 }
 
 
@@ -82,7 +89,11 @@ __vmath__ vec2_t add2(vec2_t a, vec2_t b)
  */
 __vmath__ vec2_t sub2(vec2_t a, vec2_t b)
 {
+#if VMATH_NEON_ENABLE
+  return (vec2_t){ .simd = vsub_s32(a.simd, b.simd) };
+#else
   return vec2(a.x - b.x, a.y - b.y);
+#endif
 }
 
 

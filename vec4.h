@@ -56,8 +56,8 @@ typedef union
   };
   float  data[4];
   
-#ifdef SIMD_ENABLE
-  __m128 simd;
+#if VMATH_NEON_ENABLE
+  float32x4_t simd;
 #endif
 } vec4_t, color4f_t;
 
@@ -102,11 +102,7 @@ __vmath__ color4f_t color4f(float r, float g, float b, float a)
  */
 __vmath__ int    eql4(vec4_t a, vec4_t b)
 {
-#ifdef VMATH_SIMB_ENABLE
-  return _mm_eq_ps(a.simd, b.simd);
-#else
-  return a.x == b.x && a.y == b.y;
-#endif
+  return a.x == b.x && a.y == b.y && a.z == b.z && a.w == b.w;
 }
 
 
@@ -124,9 +120,8 @@ __vmath__ vec4_t neg4(vec4_t v)
  */
 __vmath__ vec4_t add4(vec4_t a, vec4_t b)
 {
-#ifdef VMATH_SIMD_ENABLE
-  a.simd = _mm_add_ps(a.simd, b.simd);
-  return a;
+#if VMATH_NEON_ENABLE
+  return (vec4_t){ .simd = vaddq_f32(a.simd, b.simd) };
 #else
   return vec4(a.x + b.x, a.y + b.y, a.z + b.z, a.w + b.w);
 #endif
@@ -138,9 +133,8 @@ __vmath__ vec4_t add4(vec4_t a, vec4_t b)
  */
 __vmath__ vec4_t sub4(vec4_t a, vec4_t b)
 {
-#ifdef VMATH_SIMD_ENABLE
-  a.simd = _mm_sub_ps(a.simd, b.simd);
-  return a;
+#if VMATH_NEON_ENABLE
+  return (vec4_t){ .simd = vsubq_f32(a.simd, b.simd) };
 #else
   return vec4(a.x - b.x, a.y - b.y, a.z - b.z, a.w - b.w);
 #endif
