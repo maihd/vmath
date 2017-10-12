@@ -119,7 +119,7 @@ __vmath__ vec3_t div3(vec3_t v, float s)
  */
 __vmath__ float dot3(vec3_t a, vec3_t b)
 {
-  return a.x * b.x + a.y * b.y + a.z * b.z;
+  return dot2(a.xy, b.xy) + a.z * b.z;
 }
 
 
@@ -139,7 +139,7 @@ __vmath__ vec3_t cross3(vec3_t a, vec3_t b)
  */
 __vmath__ float lensqr3(vec3_t v)
 {
-  return v.x * v.x + v.y * v.y + v.z * v.z;
+  return lensqr2(v.xy) + v.z * v.z;
 }
 
 

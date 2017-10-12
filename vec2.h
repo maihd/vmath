@@ -126,7 +126,17 @@ __vmath__ vec2_t div2(vec2_t v, float s)
  */
 __vmath__ float  dot2(vec2_t a, vec2_t b)
 {
+#if VMATH_NEON_ENABLE
+  vec2_t v = (vec2_t){ .simd = vmul_f32(a.simd, b.simd) };
+  return v.x + v.y;
+  /*
+#elif VMATH_SSE_ENABLE
+  vec2_t v = (vec2_t){ .simd = _mm_mul_si64(a.simd, b.simd) };
+  return v.x + v.y;
+  */
+#else
   return a.x * b.x + a.y * b.y;
+#endif
 }
 
 
@@ -135,7 +145,17 @@ __vmath__ float  dot2(vec2_t a, vec2_t b)
  */
 __vmath__ float  lensqr2(vec2_t v)
 {
+#if VMATH_NEON_ENABLE
+  v.simd = vmul_f32(v.simd, v.simd);
+  return v.x + v.y;
+  /*
+#elif VMATH_SSE_ENABLE
+  v.simd = _mm_mul_si64(v.simd, v.simd);
+  return v.x + v.y;
+  */
+#else
   return v.x * v.x + v.y * v.y;
+#endif
 }
 
 

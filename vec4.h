@@ -170,7 +170,15 @@ __vmath__ vec4_t div4(vec4_t v, float s)
  */
 __vmath__ float  dot4(vec4_t a, vec4_t b)
 {
+#if VMATH_NEON_ENABLE
+  vec4_t v = (vec4_t){ .simd = vmulq_f32(a.simd, b.simd) };
+  return v.x + v.y + v.z + v.w;
+#elif VMATH_SSE_ENABLE
+  vec4_t v = (vec4_t){ .simd = _mm_mul_ps(a.simd, b.simd) };
+  return v.x + v.y + v.z + v.w;
+#else
   return a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w;
+#endif
 }
 
 
@@ -179,7 +187,15 @@ __vmath__ float  dot4(vec4_t a, vec4_t b)
  */
 __vmath__ float  lensqr4(vec4_t v)
 {
+#if VMATH_NEON_ENABLE
+  v.simd = vmulq_f32(v.simd, v.simd);
+  return v.x + v.y + v.z + v.w;
+#elif VMATH_SSE_ENABLE
+  v.simd = _mm_mul_ps(v.simd, v.simd);
+  return v.x + v.y + v.z + v.w;
+#else
   return v.x * v.x + v.y * v.y + v.z * v.z + v.w * v.w;
+#endif
 }
 
 

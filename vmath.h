@@ -45,15 +45,15 @@
 #endif
 
 #if defined(__SSSE3__)
-#define SSE_SUPPORT
+#define VMATH_SSE_SUPPORT
 #endif
 #if defined(__SSE__) || defined(__SSE2__) || defined(__SSE3__)
-#define SSE_SUPPORT
+#define VMATH_SSE_SUPPORT
 #endif
 #if defined(__SSE4_1__) || defined(__SSE4_2__) || defined(__SSE_VMATH__)
-#define SSE_SUPPORT
+#define VMATH_SSE_SUPPORT
 #endif
-#ifdef SSE_SUPPORT
+#ifdef VMATH_SSE_SUPPORT
 #include <mmintrin.h>
 #include <xmmintrin.h>
 #include <emmintrin.h>
