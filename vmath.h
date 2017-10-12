@@ -65,6 +65,20 @@
 #endif
 
 /**
+ * Boolean type support
+ */
+#if !defined(__cplusplus) && !defined(bool)
+typedef unsigned char bool;
+#endif
+#if !defined(__cplusplus) && !defined(true)
+#define true 1
+#endif
+#if !defined(__cplusplus) && !defined(false)
+#define false 0
+#endif
+
+
+/**
  * Include modules
  */
 

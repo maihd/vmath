@@ -24,21 +24,25 @@ typedef union
 } mat4_t;
 
 
-#define MAT4_IDENTITY mat4()
+/**
+ * Constants
+ */
+static const mat4_t MAT4_IDENTITY = (mat4_t){
+  .data = {
+    1, 0, 0, 0,
+    0, 1, 0, 0,
+    0, 0, 1, 0,
+    0, 0, 0, 1,
+  }
+};
+
 
 /**
  * Create a identity matrix 4x4
  */
 __vmath__ mat4_t mat4()
 {
-  return (mat4_t){
-    .data = {
-      1, 0, 0, 0,
-      0, 1, 0, 0,
-      0, 0, 1, 0,
-      0, 0, 0, 1,
-    }
-  };
+  return MAT4_IDENTITY;
 }
 
 

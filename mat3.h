@@ -27,7 +27,13 @@ typedef struct
 /******
  * Constants
  */
-#define MAT3_IDENTITY mat3()
+static const mat3_t MAT3_IDENTITY = {
+  .data = {
+    1, 0, 0,
+    0, 1, 0,
+    0, 0, 1,
+  }
+};
 
 
 /**
@@ -35,13 +41,7 @@ typedef struct
  */
 __vmath__ mat3_t mat3()
 {
-  return (mat3_t){
-    .data = {
-      1, 0, 0,
-      0, 1, 0,
-      0, 0, 1,
-    }
-  };
+  return MAT3_IDENTITY;
 }
 
 

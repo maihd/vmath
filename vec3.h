@@ -38,17 +38,17 @@ typedef union
 /***********
  * Contants
  */
-#define VEC3_ZERO  vec3(0, 0, 0)
-#define VEC3_UNIT  vec3(1, 1, 1)
-#define VEC3_UNITX vec3(1, 0, 0)
-#define VEC3_UNITY vec3(0, 1, 0)
-#define VEC3_UNITZ vec3(0, 0, 1)
-#define VEC3_LEFT  vec3(-1, 0, 0)
-#define VEC3_RIGHT vec3(1, 0, 0)
-#define VEC3_UP    vec3(0, 1, 0)
-#define VEC3_DOWN  vec3(0, -1, 0)
-#define VEC3_BACK  vec3(0, 0, -1)
-#define VEC3_FORE  vec3(0, 0, 1)
+static const vec3_t VEC3_ZERO  = { .x =  0, .y =  0, .z =  0 };
+static const vec3_t VEC3_UNIT  = { .x =  1, .y =  1, .z =  1 };
+static const vec3_t VEC3_UNITX = { .x =  1, .y =  0, .z =  0 };
+static const vec3_t VEC3_UNITY = { .x =  0, .y =  1, .z =  0 };
+static const vec3_t VEC3_UNITZ = { .x =  0, .y =  0, .z =  1 };
+static const vec3_t VEC3_LEFT  = { .x = -1, .y =  0, .z =  0 };
+static const vec3_t VEC3_RIGHT = { .x =  1, .y =  0, .z =  0 };
+static const vec3_t VEC3_UP    = { .x =  0, .y =  1, .z =  0 };
+static const vec3_t VEC3_DOWN  = { .x =  0, .y = -1, .z =  0 };
+static const vec3_t VEC3_BACK  = { .x =  0, .y =  0, .z = -1 };
+static const vec3_t VEC3_FORE  = { .x =  0, .y =  0, .z =  1 };
 
 
 /**
@@ -57,24 +57,6 @@ typedef union
 __vmath__ vec3_t vec3(float x, float y, float z)
 {
   return (vec3_t){ .x = x, .y = y, .z = z };
-}
-
-
-/**
- * Compare two vector3d is equal or not
- */
-__vmath__ int    eql3(vec3_t a, vec3_t b)
-{
-  return a.x == b.x && a.y == b.y && a.z == b.z;
-}
-
-
-/**
- * Negative version of a Vector3D
- */
-__vmath__ vec3_t neg3(vec3_t v)
-{
-  return vec3(-v.x, -v.y, -v.z);
 }
 
 
@@ -101,7 +83,7 @@ __vmath__ vec3_t sub3(vec3_t a, vec3_t b)
  */
 __vmath__ vec3_t mul3(vec3_t v, float s)
 {
-  return vec3(v.x * s, v.y * s, v.z * s);
+  return (vec3_t){ .xy = mul2(v.xy, s), ._z = v.z * s };
 }
 
 
@@ -111,6 +93,24 @@ __vmath__ vec3_t mul3(vec3_t v, float s)
 __vmath__ vec3_t div3(vec3_t v, float s)
 {
   return mul3(v, 1.0f / s);
+}
+
+
+/**
+ * Compare two vector3d is equal or not
+ */
+__vmath__ bool   eql3(vec3_t a, vec3_t b)
+{
+  return eql2(a.xy, b.xy) && a.z == b.z;
+}
+
+
+/**
+ * Negative version of a Vector3D
+ */
+__vmath__ vec3_t neg3(vec3_t v)
+{
+  return (vec3_t) { .xy = neg2(v.xy), ._z = -v.z };
 }
 
 

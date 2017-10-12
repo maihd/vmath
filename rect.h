@@ -38,7 +38,7 @@ __vmath__ vec2_t rectsize(rect_t r)
  * Is rectangle contains the given point
  * @return 1 if contains, 0 otherwise
  */
-__vmath__ int    rectctn(rect_t r, vec2_t p)
+__vmath__ bool   rectctn(rect_t r, vec2_t p)
 {
   return !(p.x < r.min.x || p.y < r.min.y || p.x > r.max.x || p.y > r.max.y);
 }

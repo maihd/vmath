@@ -25,6 +25,7 @@ typedef union
     float s, t;
   };
   float data[2];
+  uint64_t    pure; /* Pure data for compare */
 #if VMATH_NEON_ENABLE
   float32x2_t simd;
 #elif VMATH_SSE_ENABLE
@@ -33,17 +34,19 @@ typedef union
 } vec2_t;
 
 
+
+
 /***********
  * Contants
  */
-#define VEC2_ZERO  vec2(0, 0)
-#define VEC2_UNIT  vec2(1, 1)
-#define VEC2_UNITX vec2(1, 0)
-#define VEC2_UNITY vec2(0, 1)
-#define VEC2_LEFT  vec2(-1, 0)
-#define VEC2_RIGHT vec2(1, 0)
-#define VEC2_UP    vec2(0, 1)
-#define VEC2_DOWN  vec2(0, -1)
+static const vec2_t VEC2_ZERO  = { .x =  0, .y =  0 };
+static const vec2_t VEC2_UNIT  = { .x =  1, .y =  1 };
+static const vec2_t VEC2_UNITX = { .x =  1, .y =  1 };
+static const vec2_t VEC2_UNITY = { .x =  0, .y =  1 };
+static const vec2_t VEC2_LEFT  = { .x = -1, .y =  0 };
+static const vec2_t VEC2_RIGHT = { .x =  1, .y =  0 };
+static const vec2_t VEC2_UP    = { .x =  0, .y =  1 };
+static const vec2_t VEC2_DOWN  = { .x =  0, .y = -1 };
 
 
 /**
@@ -52,24 +55,6 @@ typedef union
 __vmath__ vec2_t vec2(float x, float y)
 {
   return (vec2_t){ .x = x, .y = y };
-}
-
-
-/**
- * Compare two vector2d is equal or not
- */
-__vmath__ int    eql2(vec2_t a, vec2_t b)
-{
-  return a.x == b.x && a.y == b.y;
-}
-
-
-/**
- * Create a negative vector
- */
-__vmath__ vec2_t neg2(vec2_t v)
-{
-  return vec2(-v.x, -v.y);
 }
 
 
@@ -108,7 +93,11 @@ __vmath__ vec2_t sub2(vec2_t a, vec2_t b)
  */
 __vmath__ vec2_t mul2(vec2_t v, float s)
 {
+#if VMATH_NEON_ENABLE
+  return (vec2_t){ .simd = vmul_n_f32(v.simd, s) };
+#else
   return vec2(v.x * s, v.y * s);
+#endif
 }
 
 
@@ -117,7 +106,35 @@ __vmath__ vec2_t mul2(vec2_t v, float s)
  */
 __vmath__ vec2_t div2(vec2_t v, float s)
 {
-  return vec2(v.x / s, v.y / s);
+  return mul2(v, 1.0f / s);
+}
+
+
+/**
+ * Compare two vector2d is equal or not
+ */
+__vmath__ bool   eql2(vec2_t a, vec2_t b)
+{
+#if VMATH_NEON_ENABLE
+  return sub2(a, b).pure == VEC2_ZERO.pure;
+#elif VMATH_SSE_ENABLE
+  return sub2(a, b).pure == VEC2_ZERO.pure;
+#else
+  return a.x == b.x && a.y == b.y;
+#endif
+}
+
+
+/**
+ * Create a negative vector
+ */
+__vmath__ vec2_t neg2(vec2_t v)
+{
+#if VMATH_NEON_ENABLE
+  return (vec2_t){ .simd = vneg_f32(v.simd) };
+#else
+  return vec2(-v.x, -v.y);
+#endif
 }
 
 
@@ -146,8 +163,8 @@ __vmath__ float  dot2(vec2_t a, vec2_t b)
 __vmath__ float  lensqr2(vec2_t v)
 {
 #if VMATH_NEON_ENABLE
-  v.simd = vmul_f32(v.simd, v.simd);
-  return v.x + v.y;
+  vec2_t r = (vec2_t){ .simd = vmul_f32(v.simd, v.simd) };
+  return r.x + r.y;
   /*
 #elif VMATH_SSE_ENABLE
   v.simd = _mm_mul_si64(v.simd, v.simd);

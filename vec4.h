@@ -61,25 +61,25 @@ typedef union
 #elif VMATH_SSE_ENABLE
   __m128 simd;
 #endif
-} vec4_t, color4f_t;
+} vec4_t;
+typedef vec4_t color4f_t;
 
 
 /***********
  * Contants
  */
-#define VEC4_ZERO  vec4(0, 0, 0, 0)
-#define VEC4_UNIT  vec4(1, 1, 1, 1)
-#define VEC4_UNITX vec4(1, 0, 0, 0)
-#define VEC4_UNITY vec4(0, 1, 0, 0)
-#define VEC4_UNITZ vec4(0, 0, 1, 0)
-#define VEC4_UNITW vec4(0, 0, 0, 1)
-#define VEC4_LEFT  vec4(-1, 0, 0, 0)
-#define VEC4_RIGHT vec4(1, 0, 0, 0)
-#define VEC4_UP    vec4(0, 1, 0, 0)
-#define VEC4_DOWN  vec4(0, -1, 0, 0)
-#define VEC4_BACK  vec4(0, 0, -1, 0)
-#define VEC4_FORE  vec4(0, 0, 1, 0)
-
+static const vec4_t VEC4_ZERO  = { .x =  0, .y =  0, .z =  0, .w = 0 };
+static const vec4_t VEC4_UNIT  = { .x =  1, .y =  1, .z =  1, .w = 1 };
+static const vec4_t VEC4_UNITX = { .x =  1, .y =  0, .z =  0, .w = 0 };
+static const vec4_t VEC4_UNITY = { .x =  0, .y =  1, .z =  0, .w = 0 };
+static const vec4_t VEC4_UNITZ = { .x =  0, .y =  0, .z =  1, .w = 0 };
+static const vec4_t VEC4_UNITW = { .x =  0, .y =  0, .z =  0, .w = 1 };
+static const vec4_t VEC4_LEFT  = { .x = -1, .y =  0, .z =  0, .w = 0 };
+static const vec4_t VEC4_RIGHT = { .x =  1, .y =  0, .z =  0, .w = 0 };
+static const vec4_t VEC4_UP    = { .x =  0, .y =  1, .z =  0, .w = 0 };
+static const vec4_t VEC4_DOWN  = { .x =  0, .y = -1, .z =  0, .w = 0 };
+static const vec4_t VEC4_BACK  = { .x =  0, .y =  0, .z = -1, .w = 0 };
+static const vec4_t VEC4_FORE  = { .x =  0, .y =  0, .z =  1, .w = 0 };
 
 /**
  * Create vector4d
@@ -96,24 +96,6 @@ __vmath__ vec4_t vec4(float x, float y, float z, float w)
 __vmath__ color4f_t color4f(float r, float g, float b, float a)
 {
   return (color4f_t){ .r = r, .g = g, .b = b, .a = a };
-}
-
-
-/**
- * Compare two vector4d is equal or not
- */
-__vmath__ int    eql4(vec4_t a, vec4_t b)
-{
-  return a.x == b.x && a.y == b.y && a.z == b.z && a.w == b.w;
-}
-
-
-/**
- * Negative version of a Vector4D
- */
-__vmath__ vec4_t neg4(vec4_t v)
-{
-  return vec4(-v.x, -v.y, -v.z, -v.w);
 }
 
 
@@ -152,7 +134,11 @@ __vmath__ vec4_t sub4(vec4_t a, vec4_t b)
  */
 __vmath__ vec4_t mul4(vec4_t v, float s)
 {
+#if VMATH_NEON_ENABLE
+  return (vec4_t){ .simd = vmulq_n_f32(v.simd, s) };
+#else
   return vec4(v.x * s, v.y * s, v.z * s, v.w * s);
+#endif
 }
 
 
@@ -161,7 +147,37 @@ __vmath__ vec4_t mul4(vec4_t v, float s)
  */
 __vmath__ vec4_t div4(vec4_t v, float s)
 {
-  return vec4(v.x / s, v.y / s, v.z / s, v.w / s);
+  return mul4(v, 1.0f / s);
+}
+
+
+/**
+ * Compare two vector4d is equal or not
+ */
+__vmath__ bool   eql4(vec4_t a, vec4_t b)
+{
+#if VMATH_NEON_ENABLE
+  /* return sub4(a, b).simd == VEC4_ZERO.simd;
+   */
+  return eql2(a.xy, b.xy) && eql2(a.zw, b.zw);
+#elif VMATH_SSE_ENABLE
+  return (_mm_movemask_ps(_mm_cmpeq_ps(a.simd, b.simd)) & 7) == 7;
+#else
+  return a.x == b.x && a.y == b.y && a.z == b.z && a.w == b.w;
+#endif
+}
+
+
+/**
+ * Negative version of a Vector4D
+ */
+__vmath__ vec4_t neg4(vec4_t v)
+{
+#if VMATH_NEON_ENABLE
+  return (vec4_t){ .simd = vnegq_f32(v.simd) };
+#else
+  return vec4(-v.x, -v.y, -v.z, -v.w);
+#endif
 }
 
 
@@ -188,11 +204,11 @@ __vmath__ float  dot4(vec4_t a, vec4_t b)
 __vmath__ float  lensqr4(vec4_t v)
 {
 #if VMATH_NEON_ENABLE
-  v.simd = vmulq_f32(v.simd, v.simd);
-  return v.x + v.y + v.z + v.w;
+  vec4_t r = (vec4_t){ .simd = vmulq_f32(v.simd, v.simd) };
+  return r.x + r.y + r.z + r.w;
 #elif VMATH_SSE_ENABLE
-  v.simd = _mm_mul_ps(v.simd, v.simd);
-  return v.x + v.y + v.z + v.w;
+  vec4_t r = (vec4_t){ .simd = _mm_mul_ps(v.simd, v.simd) };
+  return r.x + r.y + r.z + r.w;
 #else
   return v.x * v.x + v.y * v.y + v.z * v.z + v.w * v.w;
 #endif

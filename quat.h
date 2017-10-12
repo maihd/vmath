@@ -8,7 +8,7 @@
 
 typedef vec4_t quat_t;
 
-#define QUAT_IDENTITY    quat(0, 0, 0, 1) 
+static const quat_t QUAT_IDENTITY = { .x = 0, .y = 0, .z = 0, .w = 1 }; 
 
 /**
  * Create quaternion

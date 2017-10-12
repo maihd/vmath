@@ -5,6 +5,7 @@
 2. C inline pure functions
 3. Type generic functions (C11)
 4. Multi-platform (MacOS, Android tested)
+5. NEON/SSE support
 
 ## Metadata
 1. License: NULL
