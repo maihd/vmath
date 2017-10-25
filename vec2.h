@@ -18,15 +18,11 @@ typedef union
   };
   struct
   {
-    float width, height;
-  };
-  struct
-  {
     float s, t;
   };
   float data[2];
-  uint64_t    pure; /* Pure data for compare */
 #if VMATH_NEON_ENABLE
+  uint32_t pure; /* Pure data for compare */
   float32x2_t simd;
 #elif VMATH_SSE_ENABLE
   __m64 simd;
@@ -65,8 +61,8 @@ __vmath__ vec2_t add2(vec2_t a, vec2_t b)
 {
 #if VMATH_NEON_ENABLE
   return (vec2_t){ .simd = vadd_f32(a.simd, b.simd) };
-#elif VMATH_SSE_ENABLE
-  return (vec2_t){ .simd = _mm_add_si64(a.simd, b.simd) };
+  //#elif VMATH_SSE_ENABLE
+  //return (vec2_t){ .simd = _mm_add_si64(a.simd, b.simd) };
 #else
   return vec2(a.x + b.x, a.y + b.y);
 #endif
@@ -80,8 +76,8 @@ __vmath__ vec2_t sub2(vec2_t a, vec2_t b)
 {
 #if VMATH_NEON_ENABLE
   return (vec2_t){ .simd = vsub_s32(a.simd, b.simd) };
-#elif VMATH_SSE_ENABLE
-  return (vec2_t){ .simd = _mm_sub_si64(a.simd, b.simd) };
+  //#elif VMATH_SSE_ENABLE
+  //return (vec2_t){ .simd = _mm_sub_si64(a.simd, b.simd) };
 #else
   return vec2(a.x - b.x, a.y - b.y);
 #endif
@@ -117,8 +113,8 @@ __vmath__ bool   eql2(vec2_t a, vec2_t b)
 {
 #if VMATH_NEON_ENABLE
   return sub2(a, b).pure == VEC2_ZERO.pure;
-#elif VMATH_SSE_ENABLE
-  return sub2(a, b).pure == VEC2_ZERO.pure;
+  //#elif VMATH_SSE_ENABLE
+  //return sub2(a, b).pure == VEC2_ZERO.pure;
 #else
   return a.x == b.x && a.y == b.y;
 #endif

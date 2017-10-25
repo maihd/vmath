@@ -62,7 +62,6 @@ typedef union
   __m128 simd;
 #endif
 } vec4_t;
-typedef vec4_t color4f_t;
 
 
 /***********
@@ -82,20 +81,11 @@ static const vec4_t VEC4_BACK  = { .x =  0, .y =  0, .z = -1, .w = 0 };
 static const vec4_t VEC4_FORE  = { .x =  0, .y =  0, .z =  1, .w = 0 };
 
 /**
- * Create vector4d
+ * Create a Vector4D
  */
 __vmath__ vec4_t vec4(float x, float y, float z, float w)
 {
   return (vec4_t){ .x = x, .y = y, .z = z, .w = w };
-}
-
-
-/**
- * Create color with 4 float members
- */
-__vmath__ color4f_t color4f(float r, float g, float b, float a)
-{
-  return (color4f_t){ .r = r, .g = g, .b = b, .a = a };
 }
 
 

@@ -114,6 +114,19 @@ __vmath__ mat3_t mulm3(mat3_t a, mat3_t b)
 
 
 /**
+ * Compare if two matrices is equal or not
+ * @return: true is equal, false otherwise
+ */
+__vmath__ bool eqlm3(mat3_t a, mat3_t b)
+{
+  return
+    eql3(a.rows[0], b.rows[0]) &&
+    eql3(a.rows[1], b.rows[1]) &&
+    eql3(a.rows[2], b.rows[2]);
+}
+
+
+/**
  * Calculate determinant of a matrix3x3
  */
 __vmath__ float determinant3(mat3_t m)

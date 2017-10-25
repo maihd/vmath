@@ -322,6 +322,20 @@ __vmath__ mat4_t mulm4(mat4_t a, mat4_t b)
 
 
 /**
+ * Compare if two matrix is equal or not
+ * @return: true if equal, false otherwise
+ */
+__vmath__ bool eqlm4(mat4_t a, mat4_t b)
+{
+  return
+    eql4(a.rows[0], b.rows[0]) &&
+    eql4(a.rows[1], b.rows[1]) &&
+    eql4(a.rows[2], b.rows[2]) &&
+    eql4(a.rows[3], b.rows[3]);
+}
+
+
+/**
  * Transpose matrix4x4
  */
 __vmath__ mat4_t transpose4(mat4_t m)

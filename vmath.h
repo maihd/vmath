@@ -10,19 +10,19 @@
 #define __VMATH_H__
 
 #define VMATH_LIBNAME "libvmath"
-#define VMATH_VERSION "v1.0.2"
+#define VMATH_VERSION "v1.0.3"
 
 /**
  * Custom modifier
  */
 #ifdef __GNUC__ /* GCC */
-#ifdef __STRICT_ANSI__
-#define inline __inline__
-#endif
-#define __attr__ __attribute__((nothrow, pure, const))
+# ifdef __STRICT_ANSI__
+#  define inline __inline__
+# endif
+# define __attr__ __attribute__((nothrow, pure, const))
 #else /* Windows MSVC */
-#define inline _inline
-#define __attr__ __declspec(const)
+# define inline _inline
+# define __attr__ __declspec(const) __vectorcall
 #endif
 #define __vmath__ static inline __attr__
 
@@ -35,34 +35,44 @@
 #include <limits.h>
 #include <stdint.h>
 
+
+/**
+ * ARM NEON support checking
+ */
 #if defined(__ARM_NEON) || defined(__ARM_NEON__)
-#include <arm_neon.h>
-#ifndef VMATH_NEON_ENABLE
-#define VMATH_NEON_ENABLE 1
-#endif
+# include <arm_neon.h>
+# ifndef VMATH_NEON_ENABLE
+#  define VMATH_NEON_ENABLE 1
+# endif
 #else
-#undef VMATH_NEON_ENABLE
+# undef VMATH_NEON_ENABLE
 #endif
 
+
+/**
+ * SSE support checking
+ */
 #if defined(__SSSE3__)
-#define VMATH_SSE_SUPPORT
+# define VMATH_SSE_SUPPORT
 #endif
 #if defined(__SSE__) || defined(__SSE2__) || defined(__SSE3__)
-#define VMATH_SSE_SUPPORT
+# define VMATH_SSE_SUPPORT
 #endif
 #if defined(__SSE4_1__) || defined(__SSE4_2__) || defined(__SSE_VMATH__)
-#define VMATH_SSE_SUPPORT
+# define VMATH_SSE_SUPPORT
 #endif
+
 #ifdef VMATH_SSE_SUPPORT
-#include <mmintrin.h>
-#include <xmmintrin.h>
-#include <emmintrin.h>
-#ifndef VMATH_SSE_ENABLE
-#define VMATH_SSE_ENABLE 1
-#endif
+# include <mmintrin.h>
+# include <xmmintrin.h>
+# include <emmintrin.h>
+# ifndef VMATH_SSE_ENABLE
+#  define VMATH_SSE_ENABLE 1
+# endif
 #else
-#undef VMATH_SSE_ENABLE
+# undef VMATH_SSE_ENABLE
 #endif
+
 
 /**
  * Boolean type support
@@ -71,16 +81,20 @@
 typedef unsigned char bool;
 #endif
 #if !defined(__cplusplus) && !defined(true)
-#define true 1
+# define true 1
 #endif
 #if !defined(__cplusplus) && !defined(false)
-#define false 0
+# define false 0
 #endif
 
 
 /**
  * Include modules
  */
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #include "vec2.h"
 #include "vec3.h"
@@ -100,9 +114,12 @@ typedef unsigned char bool;
 /**
  * Type generic functions
  */
-#if __STDC__ == 1 && __STDC_VERSION__ >= 201112L
-#include <tgmath.h>
-#include "tgvmath.h"
+#ifdef __cplusplus
+# include "operators.h"
+}
+#elif __STDC__ == 1 && __STDC_VERSION__ >= 201112L
+# include <tgmath.h>
+# include "tgvmath.h"
 #endif
 
 #endif /* __VMATH_H__ */
