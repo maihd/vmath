@@ -6,6 +6,8 @@
  * @copyright: MaiHD @ ${HOME}, 2017
  */
 
+ #pragma once
+
 /**
  * Rectangle data structure
  */

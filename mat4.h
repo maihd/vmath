@@ -6,10 +6,12 @@
  * @copyright: MaiHD @ ${HOME}, 2017
  */
 
+ #pragma once
+
 /**
  * Matrix4x4 data structure
  */
-typedef union
+typedef union __vmath_mat4__
 {
   struct
   {

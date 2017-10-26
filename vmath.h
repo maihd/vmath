@@ -54,7 +54,6 @@
 # undef VMATH_NEON_ENABLE
 #endif
 
-
 /**
  * SSE support checking
  */
@@ -66,6 +65,13 @@
 #endif
 #if defined(__SSE4_1__) || defined(__SSE4_2__) || defined(__SSE_VMATH__)
 # define VMATH_SSE_SUPPORT
+#endif
+#if _MSC_VER && (defined(_M_IX86) || defined(_M_IX64))
+# if defined(_M_HYBRID_X86_ARM64)
+#  undef VMATH_SSE_SUPPORT
+# else
+#  define VMATH_SSE_SUPPORT
+# endif
 #endif
 
 #ifdef VMATH_SSE_SUPPORT
@@ -103,9 +109,9 @@ extern "C" {
 #endif
 
 #if __GNUC__
-#pragma GCC diagsnotic ignored "-Wmissing-braces"
+# pragma GCC diagnostic ignored "-Wmissing-braces"
 #else
-#pragma warning(disable : 4141)
+# pragma warning(disable : 4141)
 #endif
 
 #include "vec2.h"

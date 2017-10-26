@@ -6,6 +6,7 @@
  * @copyright: MaiHD @ ${HOME}, 2017
  */
 
+ #pragma once
 
 /**
  * Vector4D data structure
@@ -98,7 +99,9 @@ __vmath__ vec4_t add4(vec4_t a, vec4_t b)
 #if VMATH_NEON_ENABLE
   return (vec4_t){ .simd = vaddq_f32(a.simd, b.simd) };
 #elif VMATH_SSE_ENABLE
-  return (vec4_t){ .simd = _mm_add_ps(a.simd, b.simd) };
+  vec4_t r;
+  r.simd = _mm_add_ps(a.simd, b.simd);
+  return r;
 #else
   return vec4(a.x + b.x, a.y + b.y, a.z + b.z, a.w + b.w);
 #endif
@@ -113,7 +116,9 @@ __vmath__ vec4_t sub4(vec4_t a, vec4_t b)
 #if VMATH_NEON_ENABLE
   return (vec4_t){ .simd = vsubq_f32(a.simd, b.simd) };
 #elif VMATH_SSE_ENABLE
-  return (vec4_t){ .simd = _mm_sub_ps(a.simd, b.simd) };
+  vec4_t r;
+  r.simd = _mm_sub_ps(a.simd, b.simd);
+  return r;
 #else
   return vec4(a.x - b.x, a.y - b.y, a.z - b.z, a.w - b.w);
 #endif
@@ -181,7 +186,8 @@ __vmath__ float  dot4(vec4_t a, vec4_t b)
   vec4_t v = (vec4_t){ .simd = vmulq_f32(a.simd, b.simd) };
   return v.x + v.y + v.z + v.w;
 #elif VMATH_SSE_ENABLE
-  vec4_t v = (vec4_t){ .simd = _mm_mul_ps(a.simd, b.simd) };
+  vec4_t v;
+  v.simd = _mm_mul_ps(a.simd, b.simd);
   return v.x + v.y + v.z + v.w;
 #else
   return a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w;
@@ -198,7 +204,8 @@ __vmath__ float  lensqr4(vec4_t v)
   vec4_t r = (vec4_t){ .simd = vmulq_f32(v.simd, v.simd) };
   return r.x + r.y + r.z + r.w;
 #elif VMATH_SSE_ENABLE
-  vec4_t r = (vec4_t){ .simd = _mm_mul_ps(v.simd, v.simd) };
+  vec4_t r;
+  r.simd = _mm_mul_ps(v.simd, v.simd);
   return r.x + r.y + r.z + r.w;
 #else
   return v.x * v.x + v.y * v.y + v.z * v.z + v.w * v.w;
