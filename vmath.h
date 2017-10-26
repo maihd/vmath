@@ -15,16 +15,22 @@
 /**
  * Custom modifier
  */
-#ifdef __GNUC__ /* GCC */
-# ifdef __STRICT_ANSI__
-#  define inline __inline__
+#if !defined(__cplusplus) 
+# ifdef __GNUC__ /* GCC */
+#  define __vmath_inline__ __inline__
+# else /* Windows MSVC */
+# define __vmath_inline__ __inline
 # endif
-# define __attr__ __attribute__((nothrow, pure, const))
-#else /* Windows MSVC */
-# define inline _inline
-# define __attr__ __declspec(const) __vectorcall
+#else
+# define __vmath_inline__ inline
 #endif
-#define __vmath__ static inline __attr__
+
+#ifdef __GNUC__ /* GCC */
+# define __vmath_attr__ __attribute__((nothrow, pure, const))
+#else /* Windows MSVC */
+# define __vmath_attr__ __forceinline __nothrow
+#endif
+#define __vmath__ __vmath_attr__ static __vmath_inline__
 
 
 /**
@@ -96,6 +102,12 @@ typedef unsigned char bool;
 extern "C" {
 #endif
 
+#if __GNUC__
+#pragma GCC diagsnotic ignored "-Wmissing-braces"
+#else
+#pragma warning(disable : 4141)
+#endif
+
 #include "vec2.h"
 #include "vec3.h"
 #include "vec4.h"
@@ -115,8 +127,8 @@ extern "C" {
  * Type generic functions
  */
 #ifdef __cplusplus
-# include "operators.h"
 }
+# include "operators.h"
 #elif __STDC__ == 1 && __STDC_VERSION__ >= 201112L
 # include <tgmath.h>
 # include "tgvmath.h"

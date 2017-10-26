@@ -8,7 +8,7 @@
 
 typedef vec4_t quat_t;
 
-static const quat_t QUAT_IDENTITY = { .x = 0, .y = 0, .z = 0, .w = 1 }; 
+static const quat_t QUAT_IDENTITY = { 0, 0, 0, 1 }; 
 
 /**
  * Create quaternion
@@ -61,7 +61,7 @@ __vmath__ vec4_t toaxis(quat_t quat)
   }
   vec4_t r;
   r.angle = 2.0f * cosf(q.w);
-  float den = sqrtf(1.0 - q.w * q.w);
+  float den = sqrtf(1.0f - q.w * q.w);
   if (den > 0.0001f) {
     r.axis = div3(r.axis, den);
   } else {
@@ -79,11 +79,10 @@ __vmath__ quat_t toquat(vec3_t axis, float angle)
   if (lensqr3(axis) == 0.0f) {
     return QUAT_IDENTITY;
   }
-
-  return (quat_t){
-    .xyz = mul3(normalize3(axis), sinf(angle * 0.5f)),
-    ._w_ = cosf(angle * 0.5f),
-  };
+  quat_t q;
+  q.xyz = mul3(normalize3(axis), sinf(angle * 0.5f));
+  q._w_ = cosf(angle * 0.5f);
+  return q;
 }
 
 
@@ -110,9 +109,9 @@ __vmath__ quat_t conjq(quat_t q)
  */
 __vmath__ quat_t mulq(quat_t a, quat_t b)
 {
-  return (quat_t){
-    .xyz = add3(add3(mul3(a.xyz, b.w), mul3(b.xyz, a.w)),
-		cross3(a.xyz, b.xyz)),
-    ._w_ = a.w * b.w - dot3(a.xyz, b.xyz),
-  };
+  quat_t q;
+  q.xyz = add3(add3(mul3(a.xyz, b.w), mul3(b.xyz, a.w)),
+               cross3(a.xyz, b.xyz));
+  q._w_ = a.w * b.w - dot3(a.xyz, b.xyz);
+  return q;
 }

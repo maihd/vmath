@@ -21,7 +21,8 @@ typedef struct
  */
 __vmath__ rect_t rect(vec2_t min, vec2_t max)
 {
-  return (rect_t){ .min = min, .max = max };
+  rect_t r = { min, max };
+  return r;
 }
 
 

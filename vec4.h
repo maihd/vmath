@@ -10,7 +10,7 @@
 /**
  * Vector4D data structure
  */
-typedef union
+typedef union __vmath_vec4__
 {
   struct
   {
@@ -67,25 +67,26 @@ typedef union
 /***********
  * Contants
  */
-static const vec4_t VEC4_ZERO  = { .x =  0, .y =  0, .z =  0, .w = 0 };
-static const vec4_t VEC4_UNIT  = { .x =  1, .y =  1, .z =  1, .w = 1 };
-static const vec4_t VEC4_UNITX = { .x =  1, .y =  0, .z =  0, .w = 0 };
-static const vec4_t VEC4_UNITY = { .x =  0, .y =  1, .z =  0, .w = 0 };
-static const vec4_t VEC4_UNITZ = { .x =  0, .y =  0, .z =  1, .w = 0 };
-static const vec4_t VEC4_UNITW = { .x =  0, .y =  0, .z =  0, .w = 1 };
-static const vec4_t VEC4_LEFT  = { .x = -1, .y =  0, .z =  0, .w = 0 };
-static const vec4_t VEC4_RIGHT = { .x =  1, .y =  0, .z =  0, .w = 0 };
-static const vec4_t VEC4_UP    = { .x =  0, .y =  1, .z =  0, .w = 0 };
-static const vec4_t VEC4_DOWN  = { .x =  0, .y = -1, .z =  0, .w = 0 };
-static const vec4_t VEC4_BACK  = { .x =  0, .y =  0, .z = -1, .w = 0 };
-static const vec4_t VEC4_FORE  = { .x =  0, .y =  0, .z =  1, .w = 0 };
+static const vec4_t VEC4_ZERO  = {  0,  0,  0, 0 };
+static const vec4_t VEC4_UNIT  = {  1,  1,  1, 1 };
+static const vec4_t VEC4_UNITX = {  1,  0,  0, 0 };
+static const vec4_t VEC4_UNITY = {  0,  1,  0, 0 };
+static const vec4_t VEC4_UNITZ = {  0,  0,  1, 0 };
+static const vec4_t VEC4_UNITW = {  0,  0,  0, 1 };
+static const vec4_t VEC4_LEFT  = { -1,  0,  0, 0 };
+static const vec4_t VEC4_RIGHT = {  1,  0,  0, 0 };
+static const vec4_t VEC4_UP    = {  0,  1,  0, 0 };
+static const vec4_t VEC4_DOWN  = {  0, -1,  0, 0 };
+static const vec4_t VEC4_BACK  = {  0,  0, -1, 0 };
+static const vec4_t VEC4_FORE  = {  0,  0,  1, 0 };
 
 /**
  * Create a Vector4D
  */
 __vmath__ vec4_t vec4(float x, float y, float z, float w)
 {
-  return (vec4_t){ .x = x, .y = y, .z = z, .w = w };
+  vec4_t v = { x, y, z, w };
+  return v;
 }
 
 

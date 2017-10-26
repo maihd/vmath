@@ -6,11 +6,12 @@
  * @copyright: MaiHD @ ${HOME}, 2017
  */
 
+#pragma once
 
 /**
  * Vector2D data structure
  */
-typedef union
+typedef union __vmath_vec2__
 {
   struct
   {
@@ -35,14 +36,14 @@ typedef union
 /***********
  * Contants
  */
-static const vec2_t VEC2_ZERO  = { .x =  0, .y =  0 };
-static const vec2_t VEC2_UNIT  = { .x =  1, .y =  1 };
-static const vec2_t VEC2_UNITX = { .x =  1, .y =  1 };
-static const vec2_t VEC2_UNITY = { .x =  0, .y =  1 };
-static const vec2_t VEC2_LEFT  = { .x = -1, .y =  0 };
-static const vec2_t VEC2_RIGHT = { .x =  1, .y =  0 };
-static const vec2_t VEC2_UP    = { .x =  0, .y =  1 };
-static const vec2_t VEC2_DOWN  = { .x =  0, .y = -1 };
+static const vec2_t VEC2_ZERO  = {  0,  0 };
+static const vec2_t VEC2_UNIT  = {  1,  1 };
+static const vec2_t VEC2_UNITX = {  1,  1 };
+static const vec2_t VEC2_UNITY = {  0,  1 };
+static const vec2_t VEC2_LEFT  = { -1,  0 };
+static const vec2_t VEC2_RIGHT = {  1,  0 };
+static const vec2_t VEC2_UP    = {  0,  1 };
+static const vec2_t VEC2_DOWN  = {  0, -1 };
 
 
 /**
@@ -50,7 +51,8 @@ static const vec2_t VEC2_DOWN  = { .x =  0, .y = -1 };
  */
 __vmath__ vec2_t vec2(float x, float y)
 {
-  return (vec2_t){ .x = x, .y = y };
+  vec2_t v = { x, y };
+  return v;
 }
 
 
@@ -62,7 +64,7 @@ __vmath__ vec2_t add2(vec2_t a, vec2_t b)
 #if VMATH_NEON_ENABLE
   return (vec2_t){ .simd = vadd_f32(a.simd, b.simd) };
   //#elif VMATH_SSE_ENABLE
-  //return (vec2_t){ .simd = _mm_add_si64(a.simd, b.simd) };
+  //return (vec2_t){ _mm_add_si64(a.simd, b.simd) };
 #else
   return vec2(a.x + b.x, a.y + b.y);
 #endif
@@ -77,7 +79,7 @@ __vmath__ vec2_t sub2(vec2_t a, vec2_t b)
 #if VMATH_NEON_ENABLE
   return (vec2_t){ .simd = vsub_s32(a.simd, b.simd) };
   //#elif VMATH_SSE_ENABLE
-  //return (vec2_t){ .simd = _mm_sub_si64(a.simd, b.simd) };
+  //return (vec2_t){ _mm_sub_si64(a.simd, b.simd) };
 #else
   return vec2(a.x - b.x, a.y - b.y);
 #endif
@@ -144,7 +146,7 @@ __vmath__ float  dot2(vec2_t a, vec2_t b)
   return v.x + v.y;
   /*
 #elif VMATH_SSE_ENABLE
-  vec2_t v = (vec2_t){ .simd = _mm_mul_si64(a.simd, b.simd) };
+  vec2_t v = (vec2_t){ _mm_mul_si64(a.simd, b.simd) };
   return v.x + v.y;
   */
 #else

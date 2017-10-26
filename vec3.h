@@ -6,12 +6,13 @@
  * @copyright: MaiHD @ ${HOME}, 2017
  */
 
+#pragma once
 
 /**
  * Vector3D data structures definition
  * It's also defined some handler for get Vector2D from its
  */
-typedef union
+typedef union __vmath_vec3__
 {
   struct
   {
@@ -38,25 +39,26 @@ typedef union
 /***********
  * Contants
  */
-static const vec3_t VEC3_ZERO  = { .x =  0, .y =  0, .z =  0 };
-static const vec3_t VEC3_UNIT  = { .x =  1, .y =  1, .z =  1 };
-static const vec3_t VEC3_UNITX = { .x =  1, .y =  0, .z =  0 };
-static const vec3_t VEC3_UNITY = { .x =  0, .y =  1, .z =  0 };
-static const vec3_t VEC3_UNITZ = { .x =  0, .y =  0, .z =  1 };
-static const vec3_t VEC3_LEFT  = { .x = -1, .y =  0, .z =  0 };
-static const vec3_t VEC3_RIGHT = { .x =  1, .y =  0, .z =  0 };
-static const vec3_t VEC3_UP    = { .x =  0, .y =  1, .z =  0 };
-static const vec3_t VEC3_DOWN  = { .x =  0, .y = -1, .z =  0 };
-static const vec3_t VEC3_BACK  = { .x =  0, .y =  0, .z = -1 };
-static const vec3_t VEC3_FORE  = { .x =  0, .y =  0, .z =  1 };
+static const vec3_t VEC3_ZERO  = {  0,  0,  0 };
+static const vec3_t VEC3_UNIT  = {  1,  1,  1 };
+static const vec3_t VEC3_UNITX = {  1,  0,  0 };
+static const vec3_t VEC3_UNITY = {  0,  1,  0 };
+static const vec3_t VEC3_UNITZ = {  0,  0,  1 };
+static const vec3_t VEC3_LEFT  = { -1,  0,  0 };
+static const vec3_t VEC3_RIGHT = {  1,  0,  0 };
+static const vec3_t VEC3_UP    = {  0,  1,  0 };
+static const vec3_t VEC3_DOWN  = {  0, -1,  0 };
+static const vec3_t VEC3_BACK  = {  0,  0, -1 };
+static const vec3_t VEC3_FORE  = {  0,  0,  1 };
 
 
 /**
- * Create vector3d
+ * Create a Vector3D
  */
 __vmath__ vec3_t vec3(float x, float y, float z)
 {
-  return (vec3_t){ .x = x, .y = y, .z = z };
+  vec3_t v = { x, y, z };
+  return v;
 }
 
 
@@ -65,7 +67,10 @@ __vmath__ vec3_t vec3(float x, float y, float z)
  */
 __vmath__ vec3_t add3(vec3_t a, vec3_t b)
 {
-  return (vec3_t){ .xy = add2(a.xy, b.xy), ._z = a.z + b.z };
+  vec3_t v;
+  v.xy = add2(a.xy, b.xy);
+  v._z = a.z + b.z;
+  return v;
 }
 
 
@@ -74,7 +79,10 @@ __vmath__ vec3_t add3(vec3_t a, vec3_t b)
  */
 __vmath__ vec3_t sub3(vec3_t a, vec3_t b)
 {
-  return (vec3_t){ .xy = sub2(a.xy, b.xy), ._z = a.z - b.z };
+  vec3_t v;
+  v.xy = sub2(a.xy, b.xy);
+  v._z = a.z + b.z;
+  return v;
 }
 
 
@@ -83,7 +91,10 @@ __vmath__ vec3_t sub3(vec3_t a, vec3_t b)
  */
 __vmath__ vec3_t mul3(vec3_t v, float s)
 {
-  return (vec3_t){ .xy = mul2(v.xy, s), ._z = v.z * s };
+  vec3_t r;
+  r.xy = mul2(v.xy, s);
+  r._z = v.z + v.z;
+  return r;
 }
 
 
@@ -110,7 +121,10 @@ __vmath__ bool   eql3(vec3_t a, vec3_t b)
  */
 __vmath__ vec3_t neg3(vec3_t v)
 {
-  return (vec3_t) { .xy = neg2(v.xy), ._z = -v.z };
+  vec3_t r;
+  r.xy = neg2(v.xy);
+  r._z = -v.z;
+  return r;
 }
 
 
