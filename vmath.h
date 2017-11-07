@@ -134,7 +134,8 @@ extern "C" {
  */
 #ifdef __cplusplus
 }
-# include "operators.h"
+# include "generics.hpp"
+# include "operators.hpp"
 #elif __STDC__ == 1 && __STDC_VERSION__ >= 201112L
 # include <tgmath.h>
 # include "tgvmath.h"

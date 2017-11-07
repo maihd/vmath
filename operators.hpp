@@ -7,6 +7,8 @@
  */
 
 
+#pragma once
+
 #ifndef __cplusplus
 # error "Attempt to overload operators on non-C++ language"
 #endif
@@ -18,49 +20,49 @@
 
 __vmath__ vec2_t operator+(vec2_t a, vec2_t b)
 {
-  return add2(a, b);
+    return add2(a, b);
 }
 
 
 __vmath__ vec2_t operator-(vec2_t a, vec2_t b)
 {
-  return sub2(a, b);
-}
-
-
-__vmath__ vec2_t operator*(vec2_t v, float s)
-{
-  return mul2(v, s);
-}
-
-
-__vmath__ vec2_t operator+(float s, vec2_t v)
-{
-  return mul2(v, s);
-}
-
-
-__vmath__ vec2_t operator/(vec2_t v, float s)
-{
-  return div2(v, s);
+    return sub2(a, b);
 }
 
 
 __vmath__ vec2_t operator-(vec2_t v)
 {
-  return neg2(v);
+    return neg2(v);
+}
+
+
+__vmath__ vec2_t operator*(vec2_t v, float s)
+{
+    return mul2(v, s);
+}
+
+
+__vmath__ vec2_t operator+(float s, vec2_t v)
+{
+    return mul2(v, s);
+}
+
+
+__vmath__ vec2_t operator/(vec2_t v, float s)
+{
+    return div2(v, s);
 }
 
 
 __vmath__ bool operator==(vec2_t a, vec2_t b)
 {
-  return eql2(a, b);
+    return eql2(a, b);
 }
 
 
 __vmath__ bool operator!=(vec2_t a, vec2_t b)
 {
-  return !eql2(a, b);
+    return !eql2(a, b);
 }
 
 
@@ -70,49 +72,50 @@ __vmath__ bool operator!=(vec2_t a, vec2_t b)
 
 __vmath__ vec3_t operator+(vec3_t a, vec3_t b)
 {
-  return add3(a, b);
+    return add3(a, b);
 }
 
 
 __vmath__ vec3_t operator-(vec3_t a, vec3_t b)
 {
-  return sub3(a, b);
-}
-
-
-__vmath__ vec3_t operator*(vec3_t v, float s)
-{
-  return mul3(v, s);
-}
-
-
-__vmath__ vec3_t operator*(float s, vec3_t v)
-{
-  return mul3(v, s);
-}
-
-
-__vmath__ vec3_t operator/(vec3_t v, float s)
-{
-  return div3(v, s);
+    return sub3(a, b);
 }
 
 
 __vmath__ vec3_t operator-(vec3_t v)
 {
-  return neg3(v);
+    return neg3(v);
+}
+
+
+
+__vmath__ vec3_t operator*(vec3_t v, float s)
+{
+    return mul3(v, s);
+}
+
+
+__vmath__ vec3_t operator*(float s, vec3_t v)
+{
+    return mul3(v, s);
+}
+
+
+__vmath__ vec3_t operator/(vec3_t v, float s)
+{
+    return div3(v, s);
 }
 
 
 __vmath__ bool operator==(vec3_t a, vec3_t b)
 {
-  return eql3(a, b);
+    return eql3(a, b);
 }
 
 
 __vmath__ bool operator!=(vec3_t a, vec3_t b)
 {
-  return !eql3(a, b);
+    return !eql3(a, b);
 }
 
 
@@ -122,49 +125,49 @@ __vmath__ bool operator!=(vec3_t a, vec3_t b)
 
 __vmath__ vec4_t operator+(vec4_t a, vec4_t b)
 {
-  return add4(a, b);
+    return add4(a, b);
 }
 
 
 __vmath__ vec4_t operator-(vec4_t a, vec4_t b)
 {
-  return sub4(a, b);
-}
-
-
-__vmath__ vec4_t operator*(vec4_t v, float s)
-{
-  return mul4(v, s);
-}
-
-
-__vmath__ vec4_t operator*(float s, vec4_t v)
-{
-  return mul4(v, s);
-}
-
-
-__vmath__ vec4_t operator/(vec4_t v, float s)
-{
-  return div4(v, s);
+    return sub4(a, b);
 }
 
 
 __vmath__ vec4_t operator-(vec4_t v)
 {
-  return neg4(v);
+    return neg4(v);
+}
+
+
+__vmath__ vec4_t operator*(vec4_t v, float s)
+{
+    return mul4(v, s);
+}
+
+
+__vmath__ vec4_t operator*(float s, vec4_t v)
+{
+    return mul4(v, s);
+}
+
+
+__vmath__ vec4_t operator/(vec4_t v, float s)
+{
+    return div4(v, s);
 }
 
 
 __vmath__ bool operator==(vec4_t a, vec4_t b)
 {
-  return eql4(a, b);
+    return eql4(a, b);
 }
 
 
 __vmath__ bool operator!=(vec4_t a, vec4_t b)
 {
-  return !eql4(a, b);
+    return !eql4(a, b);
 }
 
 
@@ -174,7 +177,7 @@ __vmath__ bool operator!=(vec4_t a, vec4_t b)
 
 __vmath__ quat_t operator~(quat_t q)
 {
-  return inverseq(q);
+    return inverseq(q);
 }
 
 
@@ -185,37 +188,37 @@ __vmath__ quat_t operator~(quat_t q)
 
 __vmath__ mat3_t operator-(mat3_t a, mat3_t b)
 {
-  return addm3(a, b);
+    return addm3(a, b);
 }
 
 
 __vmath__ mat3_t operator+(mat3_t a, mat3_t b)
 {
-  return subm3(a, b);
+    return subm3(a, b);
 }
 
 
 __vmath__ mat3_t operator*(mat3_t a, mat3_t b)
 {
-  return mulm3(a, b);
+    return mulm3(a, b);
 }
 
 
 __vmath__ bool operator==(mat3_t a, mat3_t b)
 {
-  return eqlm3(a, b);
+    return eqlm3(a, b);
 }
 
 
 __vmath__ bool operator!=(mat3_t a, mat3_t b)
 {
-  return !eqlm3(a, b);
+    return !eqlm3(a, b);
 }
 
 
 __vmath__ mat3_t operator~(mat3_t m)
 {
-  return inverse3(m);
+    return inverse3(m);
 }
 
 
@@ -225,35 +228,35 @@ __vmath__ mat3_t operator~(mat3_t m)
 
 __vmath__ mat4_t operator-(mat4_t a, mat4_t b)
 {
-  return addm4(a, b);
+    return addm4(a, b);
 }
 
 
 __vmath__ mat4_t operator+(mat4_t a, mat4_t b)
 {
-  return subm4(a, b);
+    return subm4(a, b);
 }
 
 
 __vmath__ mat4_t operator*(mat4_t a, mat4_t b)
 {
-  return mulm4(a, b);
+    return mulm4(a, b);
 }
 
 
 __vmath__ bool operator==(mat4_t a, mat4_t b)
 {
-  return eqlm4(a, b);
+    return eqlm4(a, b);
 }
 
 
 __vmath__ bool operator!=(mat4_t a, mat4_t b)
 {
-  return !eqlm4(a, b);
+    return !eqlm4(a, b);
 }
 
 
 __vmath__ mat4_t operator~(mat4_t m)
 {
-  return inverse4(m);
+    return inverse4(m);
 }

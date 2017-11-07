@@ -6,15 +6,17 @@
  * @copyright: MaiHD @ ${HOME}, 2017
  */
 
- #pragma once
+
+#pragma once
+
 
 /**
  * Rectangle data structure
  */
 typedef struct
 {
-  vec2_t min;
-  vec2_t max;
+    vec2_t min;
+    vec2_t max;
 } rect_t;
 
 
@@ -23,8 +25,8 @@ typedef struct
  */
 __vmath__ rect_t rect(vec2_t min, vec2_t max)
 {
-  rect_t r = { min, max };
-  return r;
+    rect_t r = { min, max };
+    return r;
 }
 
 
@@ -33,7 +35,7 @@ __vmath__ rect_t rect(vec2_t min, vec2_t max)
  */
 __vmath__ vec2_t rectsize(rect_t r)
 {
-  return sub2(r.max, r.min);
+    return sub2(r.max, r.min);
 }
 
 
@@ -41,8 +43,11 @@ __vmath__ vec2_t rectsize(rect_t r)
  * Is rectangle contains the given point
  * @return 1 if contains, 0 otherwise
  */
-__vmath__ bool   rectctn(rect_t r, vec2_t p)
+__vmath__ bool   rcontains(rect_t r, vec2_t p)
 {
-  return !(p.x < r.min.x || p.y < r.min.y || p.x > r.max.x || p.y > r.max.y);
+    return !(p.x < r.min.x ||
+	     p.y < r.min.y ||
+	     p.x > r.max.x ||
+	     p.y > r.max.y);
 }
 
