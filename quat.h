@@ -68,7 +68,7 @@ __vmath__ vec4_t toaxis(quat_t quat)
     }
     vec4_t r;
     r.angle = 2.0f * cosf(q.w);
-    float den = sqrtf(1.0 - q.w * q.w);
+    float den = sqrtf(1.0f - q.w * q.w);
     if (den > 0.0001f) {
 	r.axis = div3(r.axis, den);
     } else {

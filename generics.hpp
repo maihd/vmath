@@ -16,6 +16,89 @@
 namespace vmath
 {
     /*****************************
+     * Constructors
+     *****************************/
+
+    __vmath__ vec2_t vec2(float x = 0.0f, float y = 0.0f)
+    {
+	return ::vec2(x, y);
+    }
+
+
+    __vmath__ vec3_t vec3(float x = 0.0f, float y = 0.0f, float z = 0.0f)
+    {
+	return ::vec3(x, y);
+    }
+
+
+    __vmath__ vec3_t vec3(vec2_t v, float z = 0.0f)
+    {
+	return ::vec3(v.x, v.y, z);
+    }
+
+
+    __vmath__ vec4_t vec4(float x = 0.0f, float y = 0.0f,
+			  float z = 0.0f, float w = 0.0f)
+    {
+	return ::vec4(x, y, z, w);
+    }
+
+
+    __vmath__ vec4_t vec4(vec2_t v, float z = 0.0f, float w = 0.0f)
+    {
+	return ::vec4(v.x, v.y, z, w);
+    }
+
+
+    __vmath__ vec4_t vec4(vec3_t v, float w = 0.0f)
+    {
+	return ::vec4(v.x, v.y, v.z, w);
+    }
+
+
+    __vmath__ mat3_t mat3(float m = 1.0f)
+    {
+        mat3_t r = {
+	    m, 0, 0,
+	    0, m, 0,
+	    0, 0, m,
+	};
+	return r;
+    }
+
+
+    __vmath__ mat4_t mat4(float m = 1.0f)
+    {
+	mat4_t r = {
+	    m, 0, 0, 0,
+	    0, m, 0, 0,
+	    0, 0, m, 0,
+	    0, 0, 0, m,
+	};
+	return r;
+    }
+    
+
+    __vmath__ quat_t quat(float x = 0.0f, float y = 0.0f,
+			  float z = 0.0f, float w = 0.0f)
+    { 
+	return ::quat(x, y, z, w);
+    }
+
+
+    __vmath__ rect_t rect(float x, float y, float w, float h)
+    {
+	return ::rect(::vec2(x, y), ::vec2(x + w, y + h));
+    }
+
+
+    __vmath__ rect_t rect(vec2_t min, vec2_t max)
+    {
+	return ::rect(min, max);
+    }
+    
+    
+    /*****************************
      * Normalization
      *****************************/
     
