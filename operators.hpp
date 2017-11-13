@@ -66,28 +66,28 @@ __vmath__ bool operator!=(vec2_t a, vec2_t b)
 }
 
 
-__vmath__ vec2_t operator+=(vec2_t& a, vec2_t b)
+inline vec2_t operator+=(vec2_t& a, vec2_t b)
 {
     a = a + b;
     return a;
 }
 
 
-__vmath__ vec2_t operator-=(vec2_t& a, vec2_t b)
+inline vec2_t operator-=(vec2_t& a, vec2_t b)
 {
     a = a - b;
     return a;
 }
 
 
-__vmath__ vec2_t operator*=(vec2_t& v, float s)
+inline vec2_t operator*=(vec2_t& v, float s)
 {
     v = v * s;
     return v;
 }
 
 
-__vmath__ vec2_t operator/=(vec2_t& v, float s)
+inline vec2_t operator/=(vec2_t& v, float s)
 {
     v = v / s;
     return v;
@@ -147,6 +147,34 @@ __vmath__ bool operator!=(vec3_t a, vec3_t b)
 }
 
 
+inline vec3_t operator+=(vec3_t& a, vec3_t b)
+{
+    a = a + b;
+    return a;
+}
+
+
+inline vec3_t operator-=(vec3_t& a, vec3_t b)
+{
+    a = a - b;
+    return a;
+}
+
+
+inline vec3_t operator*=(vec3_t& v, float s)
+{
+    v = v * s;
+    return v;
+}
+
+
+inline vec3_t operator/=(vec3_t& v, float s)
+{
+    v = v / s;
+    return v;
+}
+
+
 /************************
  * Vector4D
  */
@@ -196,6 +224,34 @@ __vmath__ bool operator==(vec4_t a, vec4_t b)
 __vmath__ bool operator!=(vec4_t a, vec4_t b)
 {
     return !eql4(a, b);
+}
+
+
+inline vec4_t operator+=(vec4_t& a, vec4_t b)
+{
+    a = a + b;
+    return a;
+}
+
+
+inline vec4_t operator-=(vec4_t& a, vec4_t b)
+{
+    a = a - b;
+    return a;
+}
+
+
+inline vec4_t operator*=(vec4_t& v, float s)
+{
+    v = v * s;
+    return v;
+}
+
+
+inline vec4_t operator/=(vec4_t& v, float s)
+{
+    v = v / s;
+    return v;
 }
 
 
@@ -250,6 +306,27 @@ __vmath__ mat3_t operator~(mat3_t m)
 }
 
 
+inline mat3_t operator+=(mat3_t& a, mat3_t b)
+{
+    a = a + b;
+    return a;
+}
+
+
+inline mat3_t operator-=(mat3_t& a, mat3_t b)
+{
+    a = a - b;
+    return a;
+}
+
+
+inline mat3_t operator*=(mat3_t& b, mat3_t b)
+{
+    a = a * b;
+    return a;
+}
+
+
 /************************
  * Matrix4x4
  */
@@ -287,4 +364,25 @@ __vmath__ bool operator!=(mat4_t a, mat4_t b)
 __vmath__ mat4_t operator~(mat4_t m)
 {
     return inverse4(m);
+}
+
+
+inline mat4_t operator+=(mat4_t& a, mat4_t b)
+{
+    a = a + b;
+    return a;
+}
+
+
+inline mat4_t operator-=(mat4_t& a, mat4_t b)
+{
+    a = a - b;
+    return a;
+}
+
+
+inline mat4_t operator*=(mat4_t& b, mat4_t b)
+{
+    a = a * b;
+    return a;
 }
