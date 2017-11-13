@@ -320,7 +320,7 @@ inline mat3_t operator-=(mat3_t& a, mat3_t b)
 }
 
 
-inline mat3_t operator*=(mat3_t& b, mat3_t b)
+inline mat3_t operator*=(mat3_t& a, mat3_t b)
 {
     a = a * b;
     return a;
@@ -381,7 +381,7 @@ inline mat4_t operator-=(mat4_t& a, mat4_t b)
 }
 
 
-inline mat4_t operator*=(mat4_t& b, mat4_t b)
+inline mat4_t operator*=(mat4_t& a, mat4_t b)
 {
     a = a * b;
     return a;
