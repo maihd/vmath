@@ -66,6 +66,34 @@ __vmath__ bool operator!=(vec2_t a, vec2_t b)
 }
 
 
+__vmath__ vec2_t operator+=(vec2_t& a, vec2_t b)
+{
+    a = a + b;
+    return a;
+}
+
+
+__vmath__ vec2_t operator-=(vec2_t& a, vec2_t b)
+{
+    a = a - b;
+    return a;
+}
+
+
+__vmath__ vec2_t operator*=(vec2_t& v, float s)
+{
+    v = v * s;
+    return v;
+}
+
+
+__vmath__ vec2_t operator/=(vec2_t& v, float s)
+{
+    v = v / s;
+    return v;
+}
+
+
 /************************
  * Vector3D
  */
