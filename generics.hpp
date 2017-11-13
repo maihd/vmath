@@ -27,7 +27,7 @@ namespace vmath
 
     __vmath__ vec3_t vec3(float x = 0.0f, float y = 0.0f, float z = 0.0f)
     {
-	return ::vec3(x, y);
+	return ::vec3(x, y, z);
     }
 
 
