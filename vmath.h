@@ -110,6 +110,8 @@ extern "C" {
 
 #if __GNUC__
 # pragma GCC diagnostic ignored "-Wmissing-braces"
+#elif __clang__
+# pragma clang diagnostic ignored "-Wmissing-braces"
 #else
 # pragma warning(disable : 4141)
 #endif
