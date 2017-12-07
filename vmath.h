@@ -90,7 +90,7 @@
  * Boolean type support
  */
 #if !defined(__cplusplus) && !defined(bool)
-typedef unsigned char bool;
+# define bool unsigned char
 #endif
 #if !defined(__cplusplus) && !defined(true)
 # define true 1

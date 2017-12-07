@@ -187,12 +187,12 @@ __vmath__ float distsqr3(vec3_t a, vec3_t b)
 /**
  * Normalize vector 3d (force to direction only, unit length)
  */
-__vmath__ vec3_t normalize3(vec3_t v)
+__vmath__ vec3_t norm3(vec3_t v)
 {
     const float lsqr = lensqr3(v);
     if (lsqr != 1.0f && lsqr > 0) {
-	const float l = sqrtf(lsqr);
-	return vec3(v.x / l, v.y / l, v.z / l);
+	const float l = 1.0f / sqrtf(lsqr);
+	return vec3(v.x * l, v.y * l, v.z * l);
     }
     return v;
 }

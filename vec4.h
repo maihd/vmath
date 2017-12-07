@@ -47,14 +47,6 @@ typedef union __vmath_vec4__
 	float  _x_;
 	vec3_t yzw;
     };
-    /**
-     * Quaternion axis angle result
-     */
-    struct
-    {
-	vec3_t axis;
-	float  angle;
-    };
     float  data[4];
   
 #if VMATH_NEON_ENABLE
@@ -243,12 +235,12 @@ __vmath__ float  distsqr4(vec4_t a, vec4_t b)
 /**
  * Normalize vector4d, force direction only with unit length
  */
-__vmath__ vec4_t normalize4(vec4_t v)
+__vmath__ vec4_t norm4(vec4_t v)
 {
     const float lsqr = lensqr4(v);
     if (lsqr != 1.0f && lsqr > 0) {
-	const float l = sqrtf(lsqr);
-	return vec4(v.x / l, v.y / l, v.z / l, v.w / l);
+	const float l = 1.0f / sqrtf(lsqr);
+	return vec4(v.x * l, v.y * l, v.z * l, v.w * l);
     }
     return v;
 }

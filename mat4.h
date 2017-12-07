@@ -472,3 +472,21 @@ __vmath__ mat4_t inverse4(mat4_t m)
     };
     return r;
 }
+
+
+/**
+ * Apply transform (Matrix4x4) for Vector4D
+ */
+__vmath__ vec4_t transform4(mat4_t m, vec4_t v)
+{
+    const vec4_t c0 = vec4(m.m00, m.m10, m.m20, m.m30);
+    const vec4_t c1 = vec4(m.m01, m.m11, m.m21, m.m31);
+    const vec4_t c2 = vec4(m.m02, m.m12, m.m22, m.m32);
+    const vec4_t c3 = vec4(m.m03, m.m13, m.m23, m.m33);
+
+    const float x = dot4(c0, v);
+    const float y = dot4(c1, v);
+    const float z = dot4(c2, v);
+    const float w = dot4(c3, v);
+    return vec4(x, y, z, w);
+}

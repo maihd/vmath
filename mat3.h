@@ -156,3 +156,19 @@ __vmath__ mat3_t inverse3(mat3_t m)
     };
     return r;
 }
+
+
+/**
+ * Apply transform (Matrix3x3) for Vector3D
+ */
+__vmath__ mat3_t transform3(mat3_t m, vec3_t v)
+{
+    const vec3_t c0 = vec3(m.m00, m.m10, m.m20);
+    const vec3_t c1 = vec3(m.m01, m.m11, m.m21);
+    const vec3_t c2 = vec3(m.m02, m.m12, m.m22);
+
+    const float x = dot3(c0, v);
+    const float y = dot3(c1, v);
+    const float z = dot3(c2, v);
+    return vec3(x, y, z);
+}

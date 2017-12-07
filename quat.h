@@ -67,13 +67,13 @@ __vmath__ vec4_t toaxis(quat_t quat)
 	q = normalize4(quat);
     }
     vec4_t r;
-    r.angle = 2.0f * cosf(q.w);
     float den = sqrtf(1.0f - q.w * q.w);
     if (den > 0.0001f) {
-	r.axis = div3(r.axis, den);
+	r.xyz = div3(r.xyz, den);
     } else {
-	r.axis = vec3(1, 0, 0);
+	r.xyz = vec3(1, 0, 0);
     }
+    r.w = 2.0f * cosf(q.w);
     return r;
 }
 
@@ -88,8 +88,8 @@ __vmath__ quat_t toquat(vec3_t axis, float angle)
     }
 
     quat_t r;
+    r.w   = cosf(angle * 0.5f);
     r.xyz = mul3(normalize3(axis), sinf(angle * 0.5f));
-    r._w_ = cosf(angle * 0.5f);
     return r;
 }
 
@@ -118,8 +118,8 @@ __vmath__ quat_t conjq(quat_t q)
 __vmath__ quat_t mulq(quat_t a, quat_t b)
 {
     quat_t r;
+    r.w   = a.w * b.w - dot3(a.xyz, b.xyz);
     r.xyz = add3(add3(mul3(a.xyz, b.w), mul3(b.xyz, a.w)),
 		 cross3(a.xyz, b.xyz));
-    r._w_ = a.w * b.w - dot3(a.xyz, b.xyz);
     return r;
 }

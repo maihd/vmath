@@ -213,12 +213,12 @@ __vmath__ float  angle2(vec2_t v)
 /**
  * Normalize vector 2d, force direction only and unit length
  */
-__vmath__ vec2_t normalize2(vec2_t v)
+__vmath__ vec2_t norm2(vec2_t v)
 {
     const float lsqr = lensqr2(v);
     if (lsqr != 1.0f && lsqr > 0) {
-	const float l = sqrtf(lsqr);
-	return vec2(v.x / l, v.y / l);
+	const float l = 1.0f / sqrtf(lsqr);
+	return vec2(v.x * l, v.y * l);
     }
     return v;
 }
