@@ -444,9 +444,9 @@ __vmath__ float  angle2(vec2_t v)
 
 
 /**
- * Normalize vector 2d, force direction only and unit length
+ * Get normalized Vector2D, force direction only and unit length
  */
-__vmath__ vec2_t norm2(vec2_t v)
+__vmath__ vec2_t normal2(vec2_t v)
 {
     const float lsqr = lensqr2(v);
     if (lsqr != 1.0f && lsqr > 0) {
@@ -588,9 +588,9 @@ __vmath__ float distsqr3(vec3_t a, vec3_t b)
 
 
 /**
- * Normalize vector 3d (force to direction only, unit length)
+ * Get normalized vector3D (force to direction only, unit length)
  */
-__vmath__ vec3_t norm3(vec3_t v)
+__vmath__ vec3_t normal3(vec3_t v)
 {
     const float lsqr = lensqr3(v);
     if (lsqr != 1.0f && lsqr > 0) {
@@ -759,9 +759,9 @@ __vmath__ float  distsqr4(vec4_t a, vec4_t b)
 
 
 /**
- * Normalize vector4d, force direction only with unit length
+ * Get normalized Vector4D, force direction only with unit length
  */
-__vmath__ vec4_t norm4(vec4_t v)
+__vmath__ vec4_t normal4(vec4_t v)
 {
     const float lsqr = lensqr4(v);
     if (lsqr != 1.0f && lsqr > 0) {
@@ -823,7 +823,7 @@ __vmath__ vec4_t toaxis(quat_t quat)
 {
     quat_t q = quat;
     if (fabsf(q.w) > 0) {
-	q = norm4(quat);
+	q = normal4(quat);
     }
     vec4_t r;
     float den = sqrtf(1.0f - q.w * q.w);
@@ -847,7 +847,7 @@ __vmath__ quat_t toquat(vec3_t axis, float angle)
     }
 
     quat_t r;
-    r.xyz = mul3(norm3(axis), sinf(angle * 0.5f));
+    r.xyz = mul3(normal3(axis), sinf(angle * 0.5f));
     r.w   = cosf(angle * 0.5f);
     return r;
 }
@@ -1393,9 +1393,9 @@ __vmath__ mat4_t perspective(float fov, float aspect, float near, float far)
  */
 __vmath__ mat4_t lookat(vec3_t eye, vec3_t target, vec3_t up)
 {
-    const vec3_t z = norm3(sub3(eye, target));
-    const vec3_t x = norm3(cross3(up, z));
-    const vec3_t y = norm3(cross3(z, x));
+    const vec3_t z = normal3(sub3(eye, target));
+    const vec3_t x = normal3(cross3(up, z));
+    const vec3_t y = normal3(cross3(z, x));
     mat4_t r = {
 	x.x, y.x, z.x, 0,
 	x.y, y.y, z.y, 0,
