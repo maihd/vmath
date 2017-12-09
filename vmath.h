@@ -76,8 +76,9 @@
 
 #ifdef VMATH_SSE_SUPPORT
 # include <mmintrin.h>
-# include <xmmintrin.h>
-# include <emmintrin.h>
+# include <smmintrin.h>
+//# include <xmmintrin.h>
+//# include <emmintrin.h>
 # ifndef VMATH_SSE_ENABLE
 #  define VMATH_SSE_ENABLE 1
 # endif
@@ -127,6 +128,7 @@ typedef float32x4_t float4;
 typedef __m64       float2;
 typedef __m128      float3;
 typedef __m128      float4;
+static const __m128 VMATH_SIGN_MASK = _mm_set1_epi32(0x80000000);
 #else
 typedef float       float2[2];
 typedef float       float3[3];
@@ -455,6 +457,8 @@ __vmath__ vec2_t normal2(vec2_t v)
     }
     return v;
 }
+
+
 /**
  * Create a Vector3D
  */
@@ -470,10 +474,15 @@ __vmath__ vec3_t vec3(float x, float y, float z)
  */
 __vmath__ vec3_t add3(vec3_t a, vec3_t b)
 {
-    vec3_t v;
-    v.xy = add2(a.xy, b.xy);
-    v.z  = a.z + b.z;
-    return v;
+#if VMATH_NEON_ENABLE
+    return (vec3_t){ .data = vaddq_f32(a.data, b.data) };
+#elif VMATH_SSE_ENABLE
+    vec3_t r;
+    r.data = _mm_add_ps(a.data, b.data);
+    return r;
+#else
+    return vec3(a.x + b.x, a.y + b.y, a.z + b.z);
+#endif
 }
 
 
@@ -482,10 +491,15 @@ __vmath__ vec3_t add3(vec3_t a, vec3_t b)
  */
 __vmath__ vec3_t sub3(vec3_t a, vec3_t b)
 {
-    vec3_t v;
-    v.xy = sub2(a.xy, b.xy);
-    v.z  = a.z + b.z;
-    return v;
+#if VMATH_NEON_ENABLE
+    return (vec3_t){ .data = vsubq_f32(a.data, b.data) };
+#elif VMATH_SSE_ENABLE
+    vec3_t r;
+    r.data = _mm_sub_ps(a.data, b.data);
+    return r;
+#else
+    return vec3(a.x - b.x, a.y - b.y, a.z - b.z);
+#endif
 }
 
 
@@ -494,10 +508,15 @@ __vmath__ vec3_t sub3(vec3_t a, vec3_t b)
  */
 __vmath__ vec3_t mul3(vec3_t v, float s)
 {
+#if VMATH_NEON_ENABLE
+    return (vec3_t){ .data = vmulq_n_f32(v.data, s) };
+#elif VMATH_SSE_ENABLE
     vec3_t r;
-    r.xy = mul2(v.xy, s);
-    r.z  = v.z + v.z;
+    r.data = _mm_mul_ps(v.data, _mm_set1_ps(s));
     return r;
+#else
+    return vec3(v.x * s, v.y * s, v.z * s);
+#endif
 }
 
 
@@ -515,7 +534,11 @@ __vmath__ vec3_t div3(vec3_t v, float s)
  */
 __vmath__ bool   eql3(vec3_t a, vec3_t b)
 {
+#if VMATH_SSE_ENABLE
+    return ((_mm_movemask_ps(_mm_cmpeq_ps(a.data, b.data))) & 0x7) == 0x7;
+#else
     return eql2(a.xy, b.xy) && a.z == b.z;
+#endif
 }
 
 
@@ -524,10 +547,15 @@ __vmath__ bool   eql3(vec3_t a, vec3_t b)
  */
 __vmath__ vec3_t neg3(vec3_t v)
 {
+#if VMATH_NEON_ENABLE
+    return (vec3_t){ .data = vnegq_f32(v.data) };
+#elif VMATH_SSE_ENABLE
     vec3_t r;
-    r.xy = neg2(v.xy);
-    r.z  = -v.z;
+    r.data = _mm_xor_ps(v.data, VMATH_SIGN_MASK);
     return r;
+#else
+    return vec3(-v.x, -v.y, -v.z);
+#endif
 }
 
 
@@ -536,7 +564,11 @@ __vmath__ vec3_t neg3(vec3_t v)
  */
 __vmath__ float dot3(vec3_t a, vec3_t b)
 {
-    return dot2(a.xy, b.xy) + a.z * b.z;
+#if VMATH_SSE_ENABLE
+    return _mm_cvtss_f32(_mm_sqrt_ss(_mm_dp_ps(a.data, b.data, 0x71)));
+#else
+    return a.x * b.x + a.y * b.y + a.z * b.z;
+#endif
 }
 
 
@@ -545,9 +577,20 @@ __vmath__ float dot3(vec3_t a, vec3_t b)
  */
 __vmath__ vec3_t cross3(vec3_t a, vec3_t b)
 {
+#if VMATH_SSE_ENABLE
+    vec3_t r;
+    r.data = _mm_sub_ps(
+	_mm_mul_ps(_mm_shuffle_ps(a.data, a.data, _MM_SHUFFLE(3, 0, 2, 1)),
+		   _mm_shuffle_ps(b.data, b.data, _MM_SHUFFLE(3, 1, 0, 2))),
+	_mm_mul_ps(_mm_shuffle_ps(a.data, a.data, _MM_SHUFFLE(3, 1, 0, 2)),
+		   _mm_shuffle_ps(b.data, b.data, _MM_SHUFFLE(3, 0, 2, 1)))
+	);
+    return r;
+#else
     return vec3(a.y * b.z - a.z * b.y,					
 		a.z * b.x - a.x * b.z,		
 		a.x * b.y - a.y * b.x);
+#endif
 }
 
 
@@ -556,7 +599,11 @@ __vmath__ vec3_t cross3(vec3_t a, vec3_t b)
  */
 __vmath__ float lensqr3(vec3_t v)
 {
+#if VMATH_SSE_ENABLE
+    return _mm_cvtss_f32(_mm_dp_ps(v.data, v.data, 0x71));
+#else
     return lensqr2(v.xy) + v.z * v.z;
+#endif
 }
 
 
@@ -565,7 +612,11 @@ __vmath__ float lensqr3(vec3_t v)
  */
 __vmath__ float len3(vec3_t v)
 {
+#if VMATH_SSE_ENABLE
+    return _mm_cvtss_f32(_mm_sqrt_ss(_mm_dp_ps(v.data, v.data, 0x71)));
+#else
     return sqrtf(lensqr3(v));
+#endif
 }
 
 
@@ -592,12 +643,19 @@ __vmath__ float distsqr3(vec3_t a, vec3_t b)
  */
 __vmath__ vec3_t normal3(vec3_t v)
 {
+#if VMATH_SSE_ENABLE
+    vec3_t r;
+    r.data = _mm_div_ps(v.data,
+			_mm_sqrt_ps(_mm_dp_ps(v.data, v.data, 0xff)));
+    return r;
+#else
     const float lsqr = lensqr3(v);
     if (lsqr != 1.0f && lsqr > 0) {
 	const float l = 1.0f / sqrtf(lsqr);
 	return vec3(v.x * l, v.y * l, v.z * l);
     }
     return v;
+#endif
 }
 
 
@@ -689,6 +747,10 @@ __vmath__ vec4_t neg4(vec4_t v)
 {
 #if VMATH_NEON_ENABLE
     return (vec4_t){ .data = vnegq_f32(v.data) };
+#elif VMATH_SSE_ENABLE
+    vec4_t r;
+    r.data = _mm_xor_ps(v.data, VMATH_SIGN_MASK);
+    return r;
 #else
     return vec4(-v.x, -v.y, -v.z, -v.w);
 #endif
