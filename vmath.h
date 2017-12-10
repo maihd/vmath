@@ -717,6 +717,10 @@ __vmath__ vec4_t mul4(vec4_t v, float s)
 {
 #if VMATH_NEON_ENABLE
     return (vec4_t){ .data = vmulq_n_f32(v.data, s) };
+#elif VMATH_SSE_ENABLE
+    vec4_t r;
+    r.data = _mm_mul_ps(v.data, _mm_set1_ps(s));
+    return r;
 #else
     return vec4(v.x * s, v.y * s, v.z * s, v.w * s);
 #endif
@@ -1313,6 +1317,24 @@ __vmath__ mat4_t rotateq(quat_t q)
 
 
 /**
+ * Apply transform (Matrix4x4) for Vector4D
+ */
+__vmath__ vec4_t transform4(mat4_t m, vec4_t v)
+{
+    const vec4_t c0 = vec4(m.m00, m.m10, m.m20, m.m30);
+    const vec4_t c1 = vec4(m.m01, m.m11, m.m21, m.m31);
+    const vec4_t c2 = vec4(m.m02, m.m12, m.m22, m.m32);
+    const vec4_t c3 = vec4(m.m03, m.m13, m.m23, m.m33);
+
+    const float x = dot4(c0, v);
+    const float y = dot4(c1, v);
+    const float z = dot4(c2, v);
+    const float w = dot4(c3, v);
+    return vec4(x, y, z, w);
+}
+
+
+/**
  * Addidtion of two matrix4x4
  */
 __vmath__ mat4_t addm4(mat4_t a, mat4_t b)
@@ -1345,6 +1367,12 @@ __vmath__ mat4_t subm4(mat4_t a, mat4_t b)
  */
 __vmath__ mat4_t mulm4(mat4_t a, mat4_t b)
 {
+    mat4_t r;
+    r.rows[0] = transform4(a, b.rows[0]);
+    r.rows[1] = transform4(a, b.rows[1]);
+    r.rows[2] = transform4(a, b.rows[2]);
+    r.rows[3] = transform4(a, b.rows[3]);
+    /* 
     mat4_t r = {
 	b.m00 * a.m00 + b.m01 * a.m10 + b.m02 * a.m20 + b.m03 * a.m30,
 	b.m00 * a.m01 + b.m01 * a.m11 + b.m02 * a.m21 + b.m03 * a.m31,
@@ -1366,6 +1394,7 @@ __vmath__ mat4_t mulm4(mat4_t a, mat4_t b)
 	b.m30 * a.m02 + b.m31 * a.m12 + b.m32 * a.m22 + b.m33 * a.m32,
 	b.m30 * a.m03 + b.m31 * a.m13 + b.m32 * a.m23 + b.m33 * a.m33,
     };
+    */   
     return r;
 }
 
@@ -1545,24 +1574,6 @@ __vmath__ mat4_t inverse4(mat4_t m)
 	d *  (m.m20 * s4 - m.m21 * s2 + m.m22 * s1),
     };
     return r;
-}
-
-
-/**
- * Apply transform (Matrix4x4) for Vector4D
- */
-__vmath__ vec4_t transform4(mat4_t m, vec4_t v)
-{
-    const vec4_t c0 = vec4(m.m00, m.m10, m.m20, m.m30);
-    const vec4_t c1 = vec4(m.m01, m.m11, m.m21, m.m31);
-    const vec4_t c2 = vec4(m.m02, m.m12, m.m22, m.m32);
-    const vec4_t c3 = vec4(m.m03, m.m13, m.m23, m.m33);
-
-    const float x = dot4(c0, v);
-    const float y = dot4(c1, v);
-    const float z = dot4(c2, v);
-    const float w = dot4(c3, v);
-    return vec4(x, y, z, w);
 }
 /********
  * @endregion: Functions define
