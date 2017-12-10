@@ -448,7 +448,7 @@ __vmath__ float  angle2(vec2_t v)
 /**
  * Get normalized Vector2D, force direction only and unit length
  */
-__vmath__ vec2_t normal2(vec2_t v)
+__vmath__ vec2_t normalize2(vec2_t v)
 {
     const float lsqr = lensqr2(v);
     if (lsqr != 1.0f && lsqr > 0) {
@@ -641,7 +641,7 @@ __vmath__ float distsqr3(vec3_t a, vec3_t b)
 /**
  * Get normalized vector3D (force to direction only, unit length)
  */
-__vmath__ vec3_t normal3(vec3_t v)
+__vmath__ vec3_t normalize3(vec3_t v)
 {
 #if VMATH_SSE_ENABLE
     vec3_t r;
@@ -823,7 +823,7 @@ __vmath__ float  distsqr4(vec4_t a, vec4_t b)
 /**
  * Get normalized Vector4D, force direction only with unit length
  */
-__vmath__ vec4_t normal4(vec4_t v)
+__vmath__ vec4_t normalize4(vec4_t v)
 {
     const float lsqr = lensqr4(v);
     if (lsqr != 1.0f && lsqr > 0) {
