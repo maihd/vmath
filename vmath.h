@@ -27,8 +27,10 @@
 
 #ifdef __GNUC__ /* GCC */
 # define __vmath_attr__ __attribute__((nothrow, pure, const))
+# define __vmath_align__(x) __attribute__((aligned(x)))
 #else /* Windows MSVC */
 # define __vmath_attr__ __forceinline __nothrow
+# define __vmath_align__(x) __declspec(align(x))
 #endif
 #define __vmath__ __vmath_attr__ static __vmath_inline__
 
@@ -139,6 +141,7 @@ typedef float       float4[4];
 /**
  * Vector2D data structure
  */
+__vmath_align__(8)
 typedef union __vmath_vec2__
 {
     struct
@@ -155,6 +158,9 @@ typedef union __vmath_vec2__
  * @note: In SIMD enable, sizeof(vec3_t) == 4 * sizeof(float)
  *        instead sizeof(vec3_t) == 3 * sizeof(float)
  */
+#if VMATH_SSE_ENABLE || VMATH_NEON_ENABLE
+__vmath_align__(16)
+#endif
 typedef union __vmath_vec3__
 {
     struct
@@ -176,6 +182,7 @@ typedef union __vmath_vec3__
  * @note: 'yzw' member is rarely use, 
  *        and it is impossile to provide in SIMD enable
  */
+__vmath_align__(16)
 typedef union __vmath_vec4__
 {
     struct
@@ -885,7 +892,7 @@ __vmath__ vec4_t toaxis(quat_t quat)
 {
     quat_t q = quat;
     if (fabsf(q.w) > 0) {
-	q = normal4(quat);
+	q = normalize4(quat);
     }
     vec4_t r;
     float den = sqrtf(1.0f - q.w * q.w);
@@ -909,7 +916,7 @@ __vmath__ quat_t toquat(vec3_t axis, float angle)
     }
 
     quat_t r;
-    r.xyz = mul3(normal3(axis), sinf(angle * 0.5f));
+    r.xyz = mul3(normalize3(axis), sinf(angle * 0.5f));
     r.w   = cosf(angle * 0.5f);
     return r;
 }
@@ -1455,9 +1462,9 @@ __vmath__ mat4_t perspective(float fov, float aspect, float near, float far)
  */
 __vmath__ mat4_t lookat(vec3_t eye, vec3_t target, vec3_t up)
 {
-    const vec3_t z = normal3(sub3(eye, target));
-    const vec3_t x = normal3(cross3(up, z));
-    const vec3_t y = normal3(cross3(z, x));
+    const vec3_t z = normalize3(sub3(eye, target));
+    const vec3_t x = normalize3(cross3(up, z));
+    const vec3_t y = normalize3(cross3(z, x));
     mat4_t r = {
 	x.x, y.x, z.x, 0,
 	x.y, y.y, z.y, 0,
