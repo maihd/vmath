@@ -196,7 +196,7 @@ typedef float32x4_t float4;
 typedef __m64       float2;
 typedef __m128      float3;
 typedef __m128      float4;
-static const __m128 SSE_SIGN_MASK = _mm_cvtepi32_ps(_mm_set1_epi32(0x80000000));
+static const __m128 __M128_ZERO = _mm_set_ps1(0);
 #else
 typedef float       float2[2];
 typedef float       float3[3];
@@ -297,6 +297,7 @@ typedef union vmath_mat2
         float m10, m11;
     };
     vec2_t rows[2];
+    vec4_t vec4;
     float4 data;
 } mat2_t;
 
@@ -343,6 +344,7 @@ typedef union vmath_mat4
  * Contants define
  ********************/
 #if VMATH_CONSTANTS
+
 static const vec2_t VEC2_ZERO  = {  0,  0 };
 static const vec2_t VEC2_UNIT  = {  1,  1 };
 static const vec2_t VEC2_UNITX = {  1,  1 };
@@ -377,20 +379,35 @@ static const vec4_t VEC4_DOWN  = {  0, -1,  0, 0 };
 static const vec4_t VEC4_BACK  = {  0,  0, -1, 0 };
 static const vec4_t VEC4_FORE  = {  0,  0,  1, 0 };
 
+static const quat_t QUAT_ZERO     = { 0, 0, 0, 0 };
+static const quat_t QUAT_IDENTITY = { 0, 0, 0, 1 };
+
+static const mat2_t MAT2_ZERO     = { 1, 0, 0, 1 };
+static const mat2_t MAT2_IDENTITY = { 1, 0, 0, 1 };
+
+static const mat3_t MAT3_ZERO     = {
+    0, 0, 0,
+    0, 0, 0,
+    0, 0, 0,
+};
 static const mat3_t MAT3_IDENTITY = {
     1, 0, 0,
     0, 1, 0,
     0, 0, 1,
 };
 
+static const mat4_t MAT4_ZERO     = {
+    0, 0, 0, 0,
+    0, 0, 0, 0,
+    0, 0, 0, 0,
+    0, 0, 0, 0,
+};
 static const mat4_t MAT4_IDENTITY = {
     1, 0, 0, 0,
     0, 1, 0, 0,
     0, 0, 1, 0,
     0, 0, 0, 1,
 };
-
-static const quat_t QUAT_IDENTITY = { 0, 0, 0, 1 };
 
 /* END OF VMATH_CONSTANTS */
 #endif
@@ -756,7 +773,7 @@ __vmath__ vec3_t vec3_divf(vec3_t v, float s)
 __vmath__ bool   vec3_eql(vec3_t a, vec3_t b)
 {
 #if VMATH_SSE_ENABLE
-    return ((_mm_movemask_ps(_mm_cmpeq_ps(a.data, b.data))) & 0x7) == 0x7;
+    return (_mm_movemask_ps(_mm_cmpeq_ps(a.data, b.data)) & 0x7) == 0x7;
 #else
     return a.x == b.x && a.y == b.y && a.z == b.z;
 #endif
@@ -772,7 +789,7 @@ __vmath__ vec3_t vec3_neg(vec3_t v)
     return (vec3_t){ .data = vnegq_f32(v.data) };
 #elif VMATH_SSE_ENABLE
     vec3_t r;
-    r.data = _mm_xor_ps(v.data, SSE_SIGN_MASK);
+    r.data = _mm_sub_ps(__M128_ZERO, v.data);
     return r;
 #else
     return vec3(-v.x, -v.y, -v.z);
@@ -1026,7 +1043,7 @@ __vmath__ bool   vec4_eql(vec4_t a, vec4_t b)
 #if VMATH_NEON_ENABLE
     return eql2(a.xy, b.xy) && eql2(a.zw, b.zw);
 #elif VMATH_SSE_ENABLE
-    return (_mm_movemask_ps(_mm_cmpeq_ps(a.data, b.data)) & 0xf) == 0xf;
+    return _mm_movemask_ps(_mm_cmpeq_ps(a.data, b.data)) == 0xf;
 #else
     return a.x == b.x && a.y == b.y && a.z == b.z && a.w == b.w;
 #endif
@@ -1042,7 +1059,7 @@ __vmath__ vec4_t vec4_neg(vec4_t v)
     return (vec4_t){ .data = vnegq_f32(v.data) };
 #elif VMATH_SSE_ENABLE
     vec4_t r;
-    r.data = _mm_xor_ps(v.data, SSE_SIGN_MASK);
+    r.data = _mm_sub_ps(__M128_ZERO, v.data);
     return r;
 #else
     return vec4(-v.x, -v.y, -v.z, -v.w);
@@ -1322,6 +1339,15 @@ __vmath__ quat_t quat_mul(quat_t a, quat_t b)
 **************************/
 #if VMATH_BUILD_MAT2
 
+/**
+ * Create a matrix 2x2 with 4 components of its
+ *
+ * @param m00 component at [0, 0]
+ * @param m01 component at [0, 1]
+ * @param m10 component at [1, 0]
+ * @param m11 component at [1, 1]
+ * @return result matrix
+ */
 __vmath__ mat2_t mat2(float m00, float m01, float m10, float m11)
 {
 #if VMATH_SSE_ENABLE
@@ -1334,6 +1360,127 @@ __vmath__ mat2_t mat2(float m00, float m01, float m10, float m11)
     };
 #endif
     return r;
+}
+
+/**
+ *
+ */
+__vmath__ mat2_t mat2_neg(mat2_t m)
+{
+    mat2_t r;
+    r.vec4 = vec4_neg(m.vec4);
+    return r;
+}
+
+/**
+ * Addition of 2 matrix 2x2
+ */
+__vmath__ mat2_t mat2_add(mat2_t a, mat2_t b)
+{
+    mat2_t r;
+    r.vec4 = vec4_add(a.vec4, a.vec4);
+    return r;
+}
+
+/**
+ * Subtraction of 2 matrix 2x2
+ */
+__vmath__ mat2_t mat2_sub(mat2_t a, mat2_t b)
+{
+    mat2_t r;
+    r.vec4 = vec4_sub(a.vec4, a.vec4);
+    return r;
+}
+
+/**
+ * Multiplication of 2 matrix 2x2
+ */
+__vmath__ mat2_t mat2_mul(mat2_t a, mat2_t b)
+{
+#if VMATH_SSE_ENABLE
+    mat2_t r;
+    const __m128 tmp  = _mm_shuffle_ps(a.data, a.data, _MM_SHUFFLE(3, 1, 2, 0)); // Transpose the matrix
+    r.data = _mm_hadd_ps(
+        _mm_mul_ps(tmp, _mm_shuffle_ps(b.data, b.data, _MM_SHUFFLE(1, 0, 1, 0))),
+        _mm_mul_ps(tmp, _mm_shuffle_ps(b.data, b.data, _MM_SHUFFLE(3, 2, 3, 2))));
+    return r;
+#else
+    return mat2(
+        a.m00 * b.m00 + a.m10 * b.m01, 
+        a.m01 * b.m00 + a.m11 * b.m01, 
+        a.m00 * b.m10 + a.m10 * b.m11, 
+        a.m01 * b.m10 + a.m11 * b.m11
+    );
+#endif
+}
+
+/**
+ * Multiplication of a matrix 2x2 with a scalar (scaling the components)
+ */
+__vmath__ mat2_t mat2_mulf(mat2_t m, float s)
+{
+    mat2_t r;
+    r.vec4 = vec4_mulf(m.vec4, s);
+    return r;
+}
+
+/**
+* Division of a matrix 2x2 with a scalar (invert scaling the components)
+*/
+__vmath__ mat2_t mat2_divf(mat2_t m, float s)
+{
+    mat2_t r;
+    r.vec4 = vec4_divf(m.vec4, s);
+    return r;
+}
+
+/**
+ * Test if 2 matrix 2x2 is equal
+ */                             
+__vmath__ bool   mat2_eql(mat2_t a, mat2_t b)
+{
+    return vec4_eql(a.vec4, b.vec4);
+}
+
+/**
+ * Get the transpose version of the given matrix 2x2 (rotate left the matrix)
+ */
+__vmath__ mat2_t mat2_transpose(mat2_t m)
+{
+#if VMATH_SSE_ENABLE
+    mat2_t r;
+    r.data = _mm_shuffle_ps(m.data, m.data, _MM_SHUFFLE(3, 1, 2, 0));
+    return r;
+#else
+    return mat2(m.m00, m.m10, m.m01, m.m11);
+#endif
+}
+
+/**
+ *
+ */
+__vmath__ float  mat2_det(mat2_t m)
+{
+    return 0.0f;
+}
+
+/**
+ *
+ */
+__vmath__ mat2_t mat2_inverse(mat2_t m)
+{
+    return MAT2_IDENTITY;
+}
+
+/**
+ *
+ */
+__vmath__ vec2_t mat2_transform(mat2_t m, vec2_t v)
+{
+    return vec2(
+        vec2_dot(vec2(m.m00, m.m01), v),
+        vec2_dot(vec2(m.m10, m.m11), v)
+    );
 }
 
 /* END OF VMATH_BUILD_MAT2 */
@@ -1371,7 +1518,7 @@ __vmath__ mat4_t mat3_tomat4(mat3_t m)
         m.m00, m.m01, m.m02, 0,
         m.m20, m.m11, m.m12, 0,
         m.m10, m.m21, m.m22, 0,
-        0,     0,     0, 0,
+            0,     0,     0, 0,
     };
     return r;
 }
@@ -1383,9 +1530,9 @@ __vmath__ mat4_t mat3_tomat4(mat3_t m)
 __vmath__ mat3_t mat3_transpose(mat3_t m)
 {
     mat3_t r = {
-    m.m00, m.m10, m.m20,
-    m.m01, m.m11, m.m21,
-    m.m02, m.m12, m.m22,
+        m.m00, m.m10, m.m20,
+        m.m01, m.m11, m.m21,
+        m.m02, m.m12, m.m22,
     };
     return r;
 }
@@ -1397,9 +1544,9 @@ __vmath__ mat3_t mat3_transpose(mat3_t m)
 __vmath__ mat3_t mat3_add(mat3_t a, mat3_t b)
 {
     mat3_t r = {
-	a.m00 + b.m00, a.m10 + b.m10, a.m20 + b.m20,
-	a.m01 + b.m01, a.m11 + b.m11, a.m21 + b.m21,
-	a.m02 + b.m02, a.m12 + b.m12, a.m22 + b.m22,
+	    a.m00 + b.m00, a.m10 + b.m10, a.m20 + b.m20,
+	    a.m01 + b.m01, a.m11 + b.m11, a.m21 + b.m21,
+	    a.m02 + b.m02, a.m12 + b.m12, a.m22 + b.m22,
     };
     return r;
 }
@@ -1411,9 +1558,9 @@ __vmath__ mat3_t mat3_add(mat3_t a, mat3_t b)
 __vmath__ mat3_t mat3_sub(mat3_t a, mat3_t b)
 {
     mat3_t r = {
-	a.m00 - b.m00, a.m10 - b.m10, a.m20 - b.m20,
-	a.m01 - b.m01, a.m11 - b.m11, a.m21 - b.m21,
-	a.m02 - b.m02, a.m12 - b.m12, a.m22 - b.m22,
+	    a.m00 - b.m00, a.m10 - b.m10, a.m20 - b.m20,
+	    a.m01 - b.m01, a.m11 - b.m11, a.m21 - b.m21,
+	    a.m02 - b.m02, a.m12 - b.m12, a.m22 - b.m22,
     };
     return r;
 }
@@ -1425,21 +1572,41 @@ __vmath__ mat3_t mat3_sub(mat3_t a, mat3_t b)
 __vmath__ mat3_t mat3_mul(mat3_t a, mat3_t b)
 {
     mat3_t r = {
-	a.m00 * b.m00 + a.m10 * b.m01 + a.m20 * b.m02,
-	a.m01 * b.m00 + a.m11 * b.m01 + a.m21 * b.m02,
-	a.m02 * b.m00 + a.m12 * b.m01 + a.m22 * b.m02,
+	    a.m00 * b.m00 + a.m10 * b.m01 + a.m20 * b.m02,
+	    a.m01 * b.m00 + a.m11 * b.m01 + a.m21 * b.m02,
+	    a.m02 * b.m00 + a.m12 * b.m01 + a.m22 * b.m02,
 
-	a.m00 * b.m10 + a.m10 * b.m11 + a.m20 * b.m12,
-	a.m01 * b.m10 + a.m11 * b.m11 + a.m21 * b.m12,
-	a.m02 * b.m10 + a.m12 * b.m11 + a.m22 * b.m12,
+	    a.m00 * b.m10 + a.m10 * b.m11 + a.m20 * b.m12,
+	    a.m01 * b.m10 + a.m11 * b.m11 + a.m21 * b.m12,
+	    a.m02 * b.m10 + a.m12 * b.m11 + a.m22 * b.m12,
       
-	a.m00 * b.m20 + a.m10 * b.m21 + a.m20 * b.m22,
-	a.m01 * b.m20 + a.m11 * b.m21 + a.m21 * b.m22,
-	a.m02 * b.m20 + a.m12 * b.m21 + a.m22 * b.m22,
+	    a.m00 * b.m20 + a.m10 * b.m21 + a.m20 * b.m22,
+	    a.m01 * b.m20 + a.m11 * b.m21 + a.m21 * b.m22,
+	    a.m02 * b.m20 + a.m12 * b.m21 + a.m22 * b.m22,
     };
     return r;
 }
 
+/**
+ *
+ */
+__vmath__ mat3_t mat3_mulf(mat3_t m, float s)
+{
+    mat3_t r = {
+        m.m00 * s, m.m01 * s, m.m02 * s,
+        m.m10 * s, m.m11 * s, m.m12 * s,
+        m.m20 * s, m.m21 * s, m.m22 * s,
+    };
+    return r;
+}
+
+/**
+*
+*/
+__vmath__ mat3_t mat3_divf(mat3_t m, float s)
+{
+    return mat3_mulf(m, 1.0f / s);
+}
 
 /**
  * Compare if two matrices is equal or not
@@ -1453,11 +1620,23 @@ __vmath__ bool mat3_eql(mat3_t a, mat3_t b)
         a.m20 == b.m20 && a.m21 == b.m21 && a.m22 == b.m22;
 }
 
+/**
+ *
+ */
+__vmath__ mat3_t mat3_neg(mat3_t m)
+{
+    mat3_t r = {
+        -m.m00, -m.m01, -m.m02,
+        -m.m10, -m.m11, -m.m12,
+        -m.m20, -m.m21, -m.m22,
+    };
+    return r;
+}
 
 /**
  * Calculate determinant of a matrix3x3
  */
-__vmath__ float mat3_determinant(mat3_t m)
+__vmath__ float mat3_det(mat3_t m)
 {
     return 
           m.m00 * m.m11 * m.m22 - m.m00 * m.m12 * m.m21
@@ -1471,7 +1650,7 @@ __vmath__ float mat3_determinant(mat3_t m)
  */
 __vmath__ mat3_t mat3_inverse(mat3_t m)
 {
-    float d = mat3_determinant(m);
+    float d = mat3_det(m);
     if (d == 0.0f)
     {
         return m;
@@ -1479,17 +1658,17 @@ __vmath__ mat3_t mat3_inverse(mat3_t m)
 
     d = 1.0f / d;
     mat3_t r = {
-    d * (m.m11 * m.m22 - m.m12 * m.m21),
-    d * (m.m02 * m.m21 - m.m01 * m.m22),
-	d * (m.m01 * m.m12 - m.m02 * m.m11),
+        d * (m.m11 * m.m22 - m.m12 * m.m21),
+        d * (m.m02 * m.m21 - m.m01 * m.m22),
+	    d * (m.m01 * m.m12 - m.m02 * m.m11),
 
-	d * (m.m12 * m.m20 - m.m10 * m.m22),
-	d * (m.m00 * m.m22 - m.m02 * m.m20),
-	d * (m.m02 * m.m10 - m.m00 * m.m12),
+	    d * (m.m12 * m.m20 - m.m10 * m.m22),
+	    d * (m.m00 * m.m22 - m.m02 * m.m20),
+	    d * (m.m02 * m.m10 - m.m00 * m.m12),
 
-	d * (m.m10 * m.m21 - m.m11 * m.m20),
-	d * (m.m01 * m.m20 - m.m00 * m.m21),
-	d * (m.m00 * m.m11 - m.m01 * m.m10), 
+	    d * (m.m10 * m.m21 - m.m11 * m.m20),
+	    d * (m.m01 * m.m20 - m.m00 * m.m21),
+	    d * (m.m00 * m.m11 - m.m01 * m.m10), 
     };
     return r;
 }
@@ -1546,9 +1725,9 @@ __vmath__ mat2_t mat4_tomat2(mat4_t m)
 __vmath__ mat3_t mat4_tomat3(mat4_t m)
 {
     mat3_t r = {
-	m.m00, m.m01, m.m02,
-	m.m20, m.m11, m.m12,
-	m.m10, m.m21, m.m22,
+	    m.m00, m.m01, m.m02,
+	    m.m20, m.m11, m.m12,
+	    m.m10, m.m21, m.m22,
     };
     return r;
 }
@@ -1560,10 +1739,10 @@ __vmath__ mat3_t mat4_tomat3(mat4_t m)
 __vmath__ mat4_t mat4_translate3f(float x, float y, float z)
 {				
     mat4_t r = {
-	1, 0, 0, 0,
-	0, 1, 0, 0,
-	0, 0, 1, 0,
-	x, y, z, 1,
+	    1, 0, 0, 0,
+	    0, 1, 0, 0,
+	    0, 0, 1, 0,
+	    x, y, z, 1,
     };
     return r;
 }
@@ -1593,10 +1772,10 @@ __vmath__ mat4_t mat4_translatev3(vec3_t v)
 __vmath__ mat4_t mat4_scale3f(float x, float y, float z)
 {
     mat4_t r = {
-	x, 0, 0, 0,
-	0, y, 0, 0,
-	0, 0, z, 0,
-	0, 0, 0, 1,
+	    x, 0, 0, 0,
+	    0, y, 0, 0,
+	    0, 0, z, 0,
+	    0, 0, 0, 1,
     };
     return r;
 }
@@ -1633,10 +1812,10 @@ __vmath__ mat4_t mat4_rotatex(float angle)
     const float c = cosf(angle);
     const float s = sinf(angle);
     mat4_t r = {
-	1,  0, 0, 0,
-	0,  c, s, 0,
-	0, -s, c, 0,
-	0,  0, 0, 1,
+	    1,  0, 0, 0,
+	    0,  c, s, 0,
+	    0, -s, c, 0,
+	    0,  0, 0, 1,
     };
     return r;
 }
@@ -1650,10 +1829,10 @@ __vmath__ mat4_t mat4_rotatey(float angle)
     const float c = cosf(angle);
     const float s = sinf(angle);
     mat4_t r = {
-	 c, 0, s, 0,
-	 0, 1, 0, 0,
-	-s, 0, c, 0,
-	 0, 0, 0, 1,
+	     c, 0, s, 0,
+	     0, 1, 0, 0,
+	    -s, 0, c, 0,
+	     0, 0, 0, 1,
     };
     return r;
 }
@@ -1667,10 +1846,10 @@ __vmath__ mat4_t mat4_rotatez(float angle)
     const float c = cosf(angle);
     const float s = sinf(angle);
     mat4_t r = {
-	 c, s, 0, 0,
-	-s, c, 0, 0,
-	 0, 0, 1, 0,
-	 0, 0, 0, 1,
+	     c, s, 0, 0,
+	    -s, c, 0, 0,
+	     0, 0, 1, 0,
+	     0, 0, 0, 1,
     };
     return r;
 }
@@ -1686,30 +1865,30 @@ __vmath__ mat4_t mat4_rotate3f(float x, float y, float z, float angle)
     const float t = 1.0f - c;
   
     mat4_t r = {
-	/* Row 1
-	 */
-	t * x * x + c,
-	t * x * y - s * z,
-	t * x * z + s * y,
-	0.0f,
+	    /* Row 1
+	     */
+	    t * x * x + c,
+	    t * x * y - s * z,
+	    t * x * z + s * y,
+	    0.0f,
 
-	/* Row 2
-	 */
-	t * x * y + s * z,
-	t * y * y + c,
-	t * y * z - s * x,
-	0.0f,
+	    /* Row 2
+	     */
+	    t * x * y + s * z,
+	    t * y * y + c,
+	    t * y * z - s * x,
+	    0.0f,
 
-	/* Row 3
-	 */
-	t * x * z - s * y,
-	t * y * z + s * x,
-	t * z * z + c,
-	0.0f,
+	    /* Row 3
+	     */
+	    t * x * z - s * y,
+	    t * y * z + s * x,
+	    t * z * z + c,
+	    0.0f,
 
-	/* Row 4
-	 */
-	0, 0, 0, 1.0f,
+	    /* Row 4
+	     */
+	    0, 0, 0, 1.0f,
     };
     return r;
 }
@@ -1827,6 +2006,14 @@ __vmath__ mat4_t mat4_mulf(mat4_t m, float s)
     r.rows[2] = vec4_mulf(m.rows[2], s);
     r.rows[3] = vec4_mulf(m.rows[3], s);
     return r;
+}         
+
+/**
+* Multiplication of a matrix 4x4 with a scalar
+*/
+__vmath__ mat4_t mat4_divf(mat4_t m, float s)
+{
+    return mat4_mulf(m, 1.0f / s);
 }
 
 /**
@@ -1840,6 +2027,20 @@ __vmath__ bool mat4_eql(mat4_t a, mat4_t b)
         vec4_eql(a.rows[1], b.rows[1]) &&
         vec4_eql(a.rows[2], b.rows[2]) &&
         vec4_eql(a.rows[3], b.rows[3]);
+}
+
+
+/**
+ *
+ */
+__vmath__ mat4_t mat4_neg(mat4_t m)
+{
+    mat4_t r;
+    r.rows[0] = vec4_neg(m.rows[0]);
+    r.rows[1] = vec4_neg(m.rows[1]);
+    r.rows[2] = vec4_neg(m.rows[2]);
+    r.rows[3] = vec4_neg(m.rows[3]);
+    return r;
 }
 
 
@@ -1942,7 +2143,7 @@ __vmath__ mat4_t mat4_lookat(vec3_t eye, vec3_t target, vec3_t up)
 /**
  * Calculate deternimant value
  */
-__vmath__ float mat4_determinant(mat4_t m)
+__vmath__ float mat4_det(mat4_t m)
 {
     const float s1 = m.m00 * m.m11 - m.m10 * m.m01;
     const float s2 = m.m00 * m.m12 - m.m10 * m.m02;
@@ -2129,7 +2330,18 @@ __vmath__ vec4_t vec4(vec2_t xy, vec2_t zw)
     return vec4(xy.x, xy.y, zw.x, zw.y);
 }
 
-__vmath__ vec4_t vec4(vec3_t v, float w = 0.0f)
+__vmath__ vec4_t vec4(vec3_t v)
+{
+#if VMATH_SSE_ENABLE || VMATH_NEON_ENABLE
+    vec4_t r;
+    r.data = r.data;
+    return r;
+#else
+    return vec4(v.x, v.y, v.z, w);
+#endif
+}        
+
+__vmath__ vec4_t vec4(vec3_t v, float w)
 {
     return vec4(v.x, v.y, v.z, w);
 }        
@@ -2294,6 +2506,23 @@ __vmath__ mat4_t mat4_translate(float x, float y, float z)
     return mat4_translate3f(x, y, z);
 }
 
+
+/**
+* Apply transform (Matrix4x4) for Vector3D
+*/
+__vmath__ vec3_t mat4_transform(mat4_t m, vec3_t v)
+{
+    const vec4_t c0 = vec4(m.m00, m.m10, m.m20, m.m30);
+    const vec4_t c1 = vec4(m.m01, m.m11, m.m21, m.m31);
+    const vec4_t c2 = vec4(m.m02, m.m12, m.m22, m.m32);
+    const vec4_t c3 = vec4(m.m03, m.m13, m.m23, m.m33);
+
+    const float x = vec4_dot(c0, vec4(v));
+    const float y = vec4_dot(c1, vec4(v));
+    const float z = vec4_dot(c2, vec4(v));
+    return vec3(x, y, z);
+}
+
 /* END OF VMATH_BUILD_MAT4 */
 #endif
 
@@ -2309,6 +2538,7 @@ __vmath__ mat4_t mat4_translate(float x, float y, float z)
 * Vector2D
 ************************/
 #if VMATH_BUILD_VEC2
+
 __vmath__ vec2_t operator+(vec2_t a, vec2_t b)
 {
     return vec2_add(a, b);
@@ -2357,31 +2587,27 @@ __vmath__ bool operator!=(vec2_t a, vec2_t b)
 }
 
 
-inline vec2_t operator+=(vec2_t& a, vec2_t b)
+__vmath__ vec2_t operator+=(vec2_t& a, vec2_t b)
 {
-    a = a + b;
-    return a;
+    return (a = a + b);
 }
 
 
-inline vec2_t operator-=(vec2_t& a, vec2_t b)
+__vmath__ vec2_t operator-=(vec2_t& a, vec2_t b)
 {
-    a = a - b;
-    return a;
+    return (a = a - b);
 }
 
 
-inline vec2_t operator*=(vec2_t& v, float s)
+__vmath__ vec2_t operator*=(vec2_t& v, float s)
 {
-    v = v * s;
-    return v;
+    return (v = v * s);
 }
 
 
-inline vec2_t operator/=(vec2_t& v, float s)
+__vmath__ vec2_t operator/=(vec2_t& v, float s)
 {
-    v = v / s;
-    return v;
+    return (v = v * s);
 }
 
 /* END OF VMATH_BUILD_MAT4 */
@@ -2391,6 +2617,7 @@ inline vec2_t operator/=(vec2_t& v, float s)
 * Vector3D
 ************************/
 #if VMATH_BUILD_VEC3
+
 __vmath__ vec3_t operator+(vec3_t a, vec3_t b)
 {
     return vec3_add(a, b);
@@ -2439,31 +2666,27 @@ __vmath__ bool operator!=(vec3_t a, vec3_t b)
 }
 
 
-inline vec3_t operator+=(vec3_t& a, vec3_t b)
+__vmath__ vec3_t operator+=(vec3_t& a, vec3_t b)
 {
-    a = a + b;
-    return a;
+    return (a = a + b);
 }
 
 
-inline vec3_t operator-=(vec3_t& a, vec3_t b)
+__vmath__ vec3_t operator-=(vec3_t& a, vec3_t b)
 {
-    a = a - b;
-    return a;
+    return (a = a - b);
 }
 
 
-inline vec3_t operator*=(vec3_t& v, float s)
+__vmath__ vec3_t operator*=(vec3_t& v, float s)
 {
-    v = v * s;
-    return v;
+    return (v = v * s);
 }
 
 
-inline vec3_t operator/=(vec3_t& v, float s)
+__vmath__ vec3_t operator/=(vec3_t& v, float s)
 {
-    v = v / s;
-    return v;
+    return (v = v / s);
 }      
 
 /* END OF VMATH_BUILD_VEC4 */
@@ -2473,6 +2696,7 @@ inline vec3_t operator/=(vec3_t& v, float s)
 * Vector4D
 ************************/    
 #if VMATH_BUILD_VEC4
+
 __vmath__ vec4_t operator-(vec4_t v)
 {
     return vec4_neg(v);
@@ -2521,31 +2745,27 @@ __vmath__ bool operator!=(vec4_t a, vec4_t b)
 }
 
 
-inline vec4_t operator+=(vec4_t& a, vec4_t b)
+__vmath__ vec4_t operator+=(vec4_t& a, vec4_t b)
 {
-    a = a + b;
-    return a;
+    return (a = a + b);
 }
 
 
-inline vec4_t operator-=(vec4_t& a, vec4_t b)
+__vmath__ vec4_t operator-=(vec4_t& a, vec4_t b)
 {
-    a = a - b;
-    return a;
+    return (a = a - b);
 }
 
 
-inline vec4_t operator*=(vec4_t& v, float s)
+__vmath__ vec4_t operator*=(vec4_t& v, float s)
 {
-    v = v * s;
-    return v;
+    return (v = v * s);
 }
 
 
-inline vec4_t operator/=(vec4_t& v, float s)
+__vmath__ vec4_t operator/=(vec4_t& v, float s)
 {
-    v = v / s;
-    return v;
+    return (v = v / s);
 }   
 
 /* END OF VMATH_BUILD_MAT4 */
@@ -2555,10 +2775,18 @@ inline vec4_t operator/=(vec4_t& v, float s)
 * Quaternion
 ************************/
 #if VMATH_BUILD_QUAT
+
 __vmath__ quat_t operator-(quat_t q)
 {
     return quat_neg(q);
 }
+
+
+__vmath__ quat_t operator~(quat_t q)
+{
+    return quat_inverse(q);
+}
+
 
 __vmath__ quat_t operator-(quat_t a, quat_t b)
 {
@@ -2577,12 +2805,20 @@ __vmath__ quat_t operator*(quat_t a, quat_t b)
     return quat_mul(a, b);
 }
 
+
 __vmath__ quat_t operator*(quat_t a, float b)
+{
+    return quat_mulf(a, b);
+}     
+
+
+__vmath__ quat_t operator*(float b, quat_t a)
 {
     return quat_mulf(a, b);
 }
 
-__vmath__ quat_t operator/(quat_t a, float b)
+
+__vmath__ quat_t operator/(float b, quat_t a)
 {
     return quat_divf(a, b);
 }
@@ -2599,18 +2835,165 @@ __vmath__ bool operator!=(quat_t a, quat_t b)
     return !quat_eql(a, b);
 }
 
-__vmath__ quat_t operator~(quat_t q)
+
+__vmath__ quat_t& operator+=(quat_t& a, quat_t b)
 {
-    return quat_inverse(q);
+    return (a = a + b);
+}
+
+
+__vmath__ quat_t& operator-=(quat_t& a, quat_t b)
+{
+    return (a = a - b);
+}
+
+
+__vmath__ quat_t& operator*=(quat_t& a, quat_t b)
+{
+    return (a = a * b);
+}
+
+
+__vmath__ quat_t& operator*=(quat_t& a, float b)
+{
+    return (a = a * b);
+}      
+
+
+__vmath__ quat_t& operator/=(quat_t& a, float b)
+{
+    return (a = a * b);
 }
 
 /* END OF VMATH_BUILD_QUAT */
+#endif                 
+
+/************************
+* Matrix2x2
+************************/
+#if VMATH_BUILD_MAT2    
+
+__vmath__ mat2_t operator-(mat2_t m)
+{
+    return mat2_neg(m);
+}      
+
+__vmath__ mat2_t operator~(mat2_t m)
+{
+    return mat2_inverse(m);
+}
+
+
+__vmath__ mat2_t operator-(mat2_t a, mat2_t b)
+{
+    return mat2_add(a, b);
+}
+
+
+__vmath__ mat2_t operator+(mat2_t a, mat2_t b)
+{
+    return mat2_sub(a, b);
+}
+
+
+__vmath__ mat2_t operator*(mat2_t a, mat2_t b)
+{
+    return mat2_mul(a, b);
+}
+
+
+__vmath__ mat2_t operator*(mat2_t m, float s)
+{
+    return mat2_mulf(m, s);
+}                 
+
+
+__vmath__ mat2_t operator*(float s, mat2_t m)
+{
+    return mat2_mulf(m, s);
+}
+
+
+__vmath__ mat2_t operator/(mat2_t m, float s)
+{
+    return mat2_divf(m, s);
+}                 
+
+
+__vmath__ mat2_t operator/(float s, mat2_t m)
+{
+    return mat2_divf(m, s);
+}
+
+
+__vmath__ bool operator==(mat2_t a, mat2_t b)
+{
+    return mat2_eql(a, b);
+}
+
+
+__vmath__ bool operator!=(mat2_t a, mat2_t b)
+{
+    return !mat2_eql(a, b);
+}
+
+
+__vmath__ mat2_t& operator+=(mat2_t& a, mat2_t b)
+{
+    return (a = a + b);
+}
+
+
+__vmath__ mat2_t& operator-=(mat2_t& a, mat2_t b)
+{
+    return (a = a - b);
+}
+
+
+__vmath__ mat2_t& operator*=(mat2_t& a, mat2_t b)
+{
+    return (a = a * b);
+}
+
+
+__vmath__ mat2_t& operator*=(mat2_t& a, float b)
+{
+    return (a = a * b);
+}               
+
+
+__vmath__ mat2_t& operator/=(mat2_t& a, float b)
+{
+    return (a = a / b);
+}
+
+
+__vmath__ vec2_t operator*(mat2_t a, vec2_t b)
+{
+    return mat2_transform(a, b);
+}
+
+/* END OF VMATH_BUILD_MAT3 */
 #endif
+
 
 /************************
 * Matrix3x3
 ************************/
 #if VMATH_BUILD_MAT3
+
+__vmath__ mat3_t operator-(mat3_t m)
+{
+    return mat3_neg(m);
+}  
+
+
+__vmath__ mat3_t operator~(mat3_t m)
+{
+    return mat3_inverse(m);
+}
+
+
 __vmath__ mat3_t operator-(mat3_t a, mat3_t b)
 {
     return mat3_add(a, b);
@@ -2626,6 +3009,30 @@ __vmath__ mat3_t operator+(mat3_t a, mat3_t b)
 __vmath__ mat3_t operator*(mat3_t a, mat3_t b)
 {
     return mat3_mul(a, b);
+}                        
+
+
+__vmath__ mat3_t operator*(mat3_t m, float s)
+{
+    return mat3_mulf(m, s);
+}                 
+
+
+__vmath__ mat3_t operator*(float s, mat3_t m)
+{
+    return mat3_mulf(m, s);
+}
+
+
+__vmath__ mat3_t operator/(mat3_t m, float s)
+{
+    return mat3_divf(m, s);
+}                 
+
+
+__vmath__ mat3_t operator/(float s, mat3_t m)
+{
+    return mat3_divf(m, s);
 }
 
 
@@ -2641,30 +3048,39 @@ __vmath__ bool operator!=(mat3_t a, mat3_t b)
 }
 
 
-__vmath__ mat3_t operator~(mat3_t m)
+__vmath__ mat3_t& operator+=(mat3_t& a, mat3_t b)
 {
-    return mat3_inverse(m);
+    return (a = a + b);
 }
 
 
-inline mat3_t operator+=(mat3_t& a, mat3_t b)
+__vmath__ mat3_t& operator-=(mat3_t& a, mat3_t b)
 {
-    a = a + b;
-    return a;
+    return (a = a - b);
 }
 
 
-inline mat3_t operator-=(mat3_t& a, mat3_t b)
+__vmath__ mat3_t& operator*=(mat3_t& a, mat3_t b)
 {
-    a = a - b;
-    return a;
+    return (a = a * b);
 }
 
 
-inline mat3_t operator*=(mat3_t& a, mat3_t b)
+__vmath__ mat3_t& operator*=(mat3_t& a, float b)
 {
-    a = a * b;
-    return a;
+    return (a = a * b);
+}           
+
+
+__vmath__ mat3_t& operator/=(mat3_t& a, float b)
+{
+    return (a = a / b);
+}
+
+
+__vmath__ vec3_t operator*(mat3_t a, vec3_t b)
+{
+    return mat3_transform(a, b);
 }
 
 /* END OF VMATH_BUILD_MAT3 */
@@ -2674,6 +3090,18 @@ inline mat3_t operator*=(mat3_t& a, mat3_t b)
 * Matrix4x4
 ************************/
 #if VMATH_BUILD_MAT4
+
+__vmath__ mat4_t operator-(mat4_t m)
+{
+    return mat4_neg(m);
+}  
+
+
+__vmath__ mat4_t operator~(mat4_t m)
+{
+    return mat4_inverse(m);
+}
+
 
 __vmath__ mat4_t operator-(mat4_t a, mat4_t b)
 {
@@ -2696,6 +3124,24 @@ __vmath__ mat4_t operator*(mat4_t a, mat4_t b)
 __vmath__ mat4_t operator*(mat4_t a, float b)
 {
     return mat4_mulf(a, b);
+}                
+
+
+__vmath__ mat4_t operator*(float a, mat4_t b)
+{
+    return mat4_mulf(b, a);
+}                      
+
+
+__vmath__ mat4_t operator/(mat4_t a, float b)
+{
+    return mat4_divf(a, b);
+}                
+
+
+__vmath__ mat4_t operator/(float a, mat4_t b)
+{
+    return mat4_divf(b, a);
 }
 
 
@@ -2711,37 +3157,39 @@ __vmath__ bool operator!=(mat4_t a, mat4_t b)
 }
 
 
-__vmath__ mat4_t operator~(mat4_t m)
+__vmath__ mat4_t& operator+=(mat4_t& a, mat4_t b)
 {
-    return mat4_inverse(m);
+    return (a = a + b);
 }
 
 
-__vmath__ mat4_t operator+=(mat4_t& a, mat4_t b)
+__vmath__ mat4_t& operator-=(mat4_t& a, mat4_t b)
 {
-    a = a + b;
-    return a;
+    return (a = a - b);
 }
 
 
-__vmath__ mat4_t operator-=(mat4_t& a, mat4_t b)
+__vmath__ mat4_t& operator*=(mat4_t& a, mat4_t b)
 {
-    a = a - b;
-    return a;
-}
-
-
-__vmath__ mat4_t operator*=(mat4_t& a, mat4_t b)
-{
-    a = a * b;
-    return a;
+    return (a = a * b);
 }
 
 
 __vmath__ mat4_t operator*=(mat4_t& a, float b)
 {
-    a = a * b;
-    return a;
+    return (a = a * b);
+}                                 
+
+
+__vmath__ mat4_t operator/=(mat4_t& a, float b)
+{
+    return (a = a / b);
+}
+
+
+__vmath__ vec4_t operator*(mat4_t a, vec4_t b)
+{
+    return mat4_transform(a, b);
 }
 
 /* END OF VMATH_BUILD_MAT4 */
