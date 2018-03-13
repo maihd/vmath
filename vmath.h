@@ -27,18 +27,30 @@
 #if !defined(__cplusplus) 
 # ifdef __GNUC__ /* GCC with strict-ansi */
 #  define __vmath_inline__ __inline__
-# else /* Windows MSVC */
+#  define 
+# elif defined(_MSC_VER) /* Windows MSVC */
 #  define __vmath_inline__ __inline
+# else
+#  define __vmath_inline__
 # endif
+#  define __vmath_nothrow__ 
 #else
 #  define __vmath_inline__ inline
+# ifdef __GNUC__
+#  define __vmath_nothrow__ __attribute((nothrow))
+#  define 
+# elif defined(_MSC_VER) /* Windows MSVC */
+#  define __vmath_nothrow__ __declspec(nothrow)
+# else
+#  define __vmath_nothrow__
+# endif
 #endif
 
 #ifdef __GNUC__ /* GCC */
-# define __vmath_attr__     __attribute__((pure, const))
+# define __vmath_attr__     __attribute__((pure, const)) __vmath_nothrow__
 # define __vmath_align__(x) __attribute__((aligned(x)))
 #else /* Windows MSVC */
-# define __vmath_attr__     __forceinline
+# define __vmath_attr__     __forceinline __vmath_nothrow__
 # define __vmath_align__(x) __declspec(align(x))
 #endif
 #define __vmath__ /*{space}*/ __vmath_attr__ static __vmath_inline__ 
