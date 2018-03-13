@@ -35,10 +35,10 @@
 #endif
 
 #ifdef __GNUC__ /* GCC */
-# define __vmath_attr__     __attribute__((nothrow, pure, const))
+# define __vmath_attr__     __attribute__((pure, const))
 # define __vmath_align__(x) __attribute__((aligned(x)))
 #else /* Windows MSVC */
-# define __vmath_attr__     __forceinline __declspec(nothrow)
+# define __vmath_attr__     __forceinline
 # define __vmath_align__(x) __declspec(align(x))
 #endif
 #define __vmath__ /*{space}*/ __vmath_attr__ static __vmath_inline__ 
@@ -196,7 +196,7 @@ typedef float32x4_t float4;
 typedef __m64       float2;
 typedef __m128      float3;
 typedef __m128      float4;
-static const __m128 __M128_ZERO = _mm_set_ps1(0);
+static const __m128 __M128_ZERO = { 0, 0, 0, 0 };
 #else
 typedef float       float2[2];
 typedef float       float3[3];
@@ -2103,15 +2103,15 @@ __vmath__ mat4_t mat4_frustum(float l, float r, float b, float t, float n, float
 /**
  * Create perspective projection matrix
  */
-__vmath__ mat4_t mat4_perspective(float fov, float aspect, float near, float far)
+__vmath__ mat4_t mat4_perspective(float fov, float aspect, float znear, float zfar)
 {
     const float a = 1.0f / tanf(fov * 0.5f);
-    const float b = far / (near - far);
+    const float b = zfar / (znear - zfar);
     mat4_t r = {
 	    a / aspect, 0, 0, 0,
 	    0, a, 0, 0,
 	    0, 0, b, -1,
-	    0, 0, near * b, 0,
+	    0, 0, znear * b, 0,
     };
     return r;
 }
