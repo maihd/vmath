@@ -10,7 +10,7 @@
 #define __VMATH_H__
 
 #define VMATH_LIBNAME "libvmath"
-#define VMATH_VERSION "v1.0.5" 
+#define VMATH_VERSION "v1.0.6" 
 
 
 /**
@@ -47,11 +47,9 @@
 #endif
 
 #ifdef __GNUC__ /* GCC */
-# define __vmath_attr__     __attribute__((pure, const)) __vmath_nothrow__
-# define __vmath_align__(x) __attribute__((aligned(x)))
+# define __vmath_attr__     __attribute__((pure)) __vmath_nothrow__
 #else /* Windows MSVC */
 # define __vmath_attr__     __forceinline __vmath_nothrow__
-# define __vmath_align__(x) __declspec(align(x))
 #endif
 #define __vmath__ /*{space}*/ __vmath_attr__ static __vmath_inline__ 
 
@@ -190,7 +188,8 @@
 #elif __clang__
 # pragma clang diagnostic ignored "-Wmissing-braces"
 #else
-# pragma warning(disable : 4141)
+# pragma warning(disable : 4141) /* Shutup announce missing braces warning */
+# pragma warning(disable : 4201) /* Shutup announce anonymous union warning */
 #endif
 
 #ifdef __cplusplus
@@ -219,8 +218,7 @@ typedef float       float4[4];
 /**
  * Vector2D data structure
  */
-__vmath_align__(8)
-typedef union vmath_vec2
+typedef struct vmath_vec2
 {
     struct
     {
@@ -235,18 +233,19 @@ typedef union vmath_vec2
  * It's also defined some handler for get Vector2D from its
  * @note: In SIMD enable, sizeof(vec3_t) == 4 * sizeof(float)
  *        instead sizeof(vec3_t) == 3 * sizeof(float)
- */
-__vmath_align__(16)
+ */                 
 typedef union vmath_vec3
 {
     struct
     {
         float x, y, z;
+        char _pad0_[(sizeof(float3) - 3 * sizeof(float))];
     };
     struct
     {
         float  _x;
         vec2_t yz;
+        char _pad1_[(sizeof(float3) - 3 * sizeof(float))];
     };
     vec2_t xy;
     float3 data;
@@ -257,7 +256,6 @@ typedef union vmath_vec3
  * @note: 'vec3_t yzw' member is rarely use, 
  *        and it is impossile to provide in SIMD enable
  */
-__vmath_align__(16)
 typedef union vmath_vec4
 {
     struct
@@ -285,7 +283,6 @@ typedef union vmath_vec4
  *
  * @hint: to convert to vec4_t, just get the 'vec4' member
  */
-__vmath_align__(16)
 typedef union vmath_quat
 {
     struct
@@ -300,7 +297,6 @@ typedef union vmath_quat
 /**
  * Matrix 2x2 data structure
  */
-__vmath_align__(16)
 typedef union vmath_mat2
 {
     struct
@@ -316,7 +312,6 @@ typedef union vmath_mat2
 /**
  * Matrix3x3 data structure
  */
-__vmath_align__(4)
 typedef union vmath_mat3
 {
     struct
@@ -332,7 +327,6 @@ typedef union vmath_mat3
 /**
  * Matrix4x4 data structure
  */
-__vmath_align__(64)
 typedef union vmath_mat4
 {
     struct
@@ -429,6 +423,22 @@ static const mat4_t MAT4_IDENTITY = {
  * @region: Functions define
  ********/
 
+#if 1 || VMATH_UTILS
+__vmath__ float vmath_rsqrt(float x)
+{
+    union
+    {
+        float x;
+        long  i;
+    } cvt; /* converter */
+
+    cvt.x = x;
+    cvt.i = 0x5F3759DF - (cvt.i >> 1);
+    cvt.x = cvt.x * (1.5f - 0.5f * x * cvt.x * cvt.x);
+    return cvt.x;
+}
+#endif
+
 /**************************
  * Vector2D
  **************************/
@@ -438,7 +448,9 @@ static const mat4_t MAT4_IDENTITY = {
  */
 __vmath__ vec2_t vec2(float x, float y)
 {
-    vec2_t v = { x, y };
+    vec2_t v;
+    v.x = x;
+    v.y = y;
     return v;
 }
 
@@ -630,7 +642,7 @@ __vmath__ vec2_t vec2_normalize(vec2_t v)
     const float lsqr = vec2_lensqr(v);
     if (lsqr != 1.0f && lsqr > 0)
     {
-        const float l = 1.0f / sqrtf(lsqr);
+        const float l = vmath_rsqrt(lsqr);
         return vec2(v.x * l, v.y * l);
     }
     return v;
@@ -648,7 +660,14 @@ __vmath__ vec2_t vec2_normalize(vec2_t v)
  */
 __vmath__ vec3_t vec3(float x, float y, float z)
 {
-    vec3_t v = { x, y, z };
+    vec3_t v;
+#if VMATH_SSE_ENABLE
+    v.data = _mm_set_ps(0, z, y, x);
+#else
+    v.x = x;
+    v.y = y;
+    v.z = z;
+#endif         
     return v;
 }
 
@@ -659,7 +678,9 @@ __vmath__ vec3_t vec3(float x, float y, float z)
 __vmath__ vec3_t vec3_add(vec3_t a, vec3_t b)
 {
 #if VMATH_NEON_ENABLE
-    return (vec3_t){ .data = vaddq_f32(a.data, b.data) };
+    vec3_t r;
+    r.data = vaddq_f32(a.data, b.data);
+    return r;
 #elif VMATH_SSE_ENABLE
     vec3_t r;
     r.data = _mm_add_ps(a.data, b.data);
@@ -676,7 +697,9 @@ __vmath__ vec3_t vec3_add(vec3_t a, vec3_t b)
 __vmath__ vec3_t vec3_sub(vec3_t a, vec3_t b)
 {
 #if VMATH_NEON_ENABLE
-    return (vec3_t){ .data = vsubq_f32(a.data, b.data) };
+    vec3_t r;
+    r.data = vsubq_f32(a.data, b.data);
+    return r;
 #elif VMATH_SSE_ENABLE
     vec3_t r;
     r.data = _mm_sub_ps(a.data, b.data);
@@ -692,7 +715,9 @@ __vmath__ vec3_t vec3_sub(vec3_t a, vec3_t b)
 __vmath__ vec3_t vec3_mul(vec3_t a, vec3_t b)
 {
 #if VMATH_NEON_ENABLE
-    return (vec3_t){ .data = vmulq_f32(a.data, b.data) };
+    vec3_t r;
+    r.data = vmulq_f32(a.data, b.data);
+    return r;
 #elif VMATH_SSE_ENABLE
     vec3_t r;
     r.data = _mm_mul_ps(a.data, b.data);
@@ -709,7 +734,9 @@ __vmath__ vec3_t vec3_mul(vec3_t a, vec3_t b)
 __vmath__ vec3_t vec3_div(vec3_t a, vec3_t b)
 {
 #if VMATH_NEON_ENABLE
-    return (vec3_t){ .data = vdivq_f32(a.data, b.data) };
+    vec3_t r;
+    r.data = vdivq_f32(a.data, b.data);
+    return r;
 #elif VMATH_SSE_ENABLE
     vec3_t r;
     r.data = _mm_div_ps(a.data, b.data);
@@ -725,7 +752,9 @@ __vmath__ vec3_t vec3_div(vec3_t a, vec3_t b)
 __vmath__ vec3_t vec3_addf(vec3_t v, float s)
 {
 #if VMATH_NEON_ENABLE
-    return (vec3_t){ .data = vaddq_n_f32(v.data, s) };
+    vec3_t r;
+    r.data = vaddq_n_f32(v.data, s);
+    return r;
 #elif VMATH_SSE_ENABLE
     vec3_t r;
     r.data = _mm_add_ps(v.data, _mm_set_ps1(s));
@@ -742,7 +771,9 @@ __vmath__ vec3_t vec3_addf(vec3_t v, float s)
 __vmath__ vec3_t vec3_subf(vec3_t v, float s)
 {
 #if VMATH_NEON_ENABLE
-    return (vec3_t){ .data = vsubq_n_f32(v.data, s) };
+    vec3_t r;
+    r.data = vsubq_n_f32(v.data, s);
+    return r;
 #elif VMATH_SSE_ENABLE
     vec3_t r;
     r.data = _mm_sub_ps(v.data, _mm_set_ps1(s));
@@ -759,7 +790,9 @@ __vmath__ vec3_t vec3_subf(vec3_t v, float s)
 __vmath__ vec3_t vec3_mulf(vec3_t v, float s)
 {
 #if VMATH_NEON_ENABLE
-    return (vec3_t){ .data = vmulq_n_f32(v.data, s) };
+    vec3_t r;
+    r.data = vmulq_n_f32(v.data, s);
+    return r;
 #elif VMATH_SSE_ENABLE
     vec3_t r;
     r.data = _mm_mul_ps(v.data, _mm_set_ps1(s));
@@ -798,7 +831,9 @@ __vmath__ bool   vec3_eql(vec3_t a, vec3_t b)
 __vmath__ vec3_t vec3_neg(vec3_t v)
 {
 #if VMATH_NEON_ENABLE
-    return (vec3_t){ .data = vnegq_f32(v.data) };
+    vec3_t r;
+    r.data = vnegq_f32(v.data);
+    return r;
 #elif VMATH_SSE_ENABLE
     vec3_t r;
     r.data = _mm_sub_ps(__M128_ZERO, v.data);
@@ -897,7 +932,7 @@ __vmath__ vec3_t vec3_normalize(vec3_t v)
     const float lsqr = vec3_lensqr(v);
     if (lsqr != 1.0f && lsqr > 0) 
     {
-        const float inv = 1.0f / sqrtf(lsqr);
+        const float inv = vmath_rsqrt(lsqr);
         return vec3(v.x * inv, v.y * inv, v.z * inv);
     }
     return v;
@@ -916,7 +951,15 @@ __vmath__ vec3_t vec3_normalize(vec3_t v)
  */
 __vmath__ vec4_t vec4(float x, float y, float z, float w)
 {
-    vec4_t v = { x, y, z, w };
+    vec4_t v;
+#if VMATH_SSE_ENABLE
+    v.data = _mm_set_ps(w, z, y, x);
+#else
+    v.x = x;
+    v.y = y;
+    v.z = z;
+    v.w = w;
+#endif
     return v;
 }
 
@@ -927,7 +970,9 @@ __vmath__ vec4_t vec4(float x, float y, float z, float w)
 __vmath__ vec4_t vec4_add(vec4_t a, vec4_t b)
 {
 #if VMATH_NEON_ENABLE
-    return (vec4_t){ .data = vaddq_f32(a.data, b.data) };
+    vec4_t r;
+    r.data = vaddq_f32(a.data, b.data);
+    return r;
 #elif VMATH_SSE_ENABLE
     vec4_t r;
     r.data = _mm_add_ps(a.data, b.data);
@@ -944,7 +989,9 @@ __vmath__ vec4_t vec4_add(vec4_t a, vec4_t b)
 __vmath__ vec4_t vec4_sub(vec4_t a, vec4_t b)
 {
 #if VMATH_NEON_ENABLE
-    return (vec4_t){ .data = vsubq_f32(a.data, b.data) };
+    vec4_t r;
+    r.data = vsubq_f32(a.data, b.data);
+    return r;
 #elif VMATH_SSE_ENABLE
     vec4_t r;
     r.data = _mm_sub_ps(a.data, b.data);
@@ -960,7 +1007,9 @@ __vmath__ vec4_t vec4_sub(vec4_t a, vec4_t b)
 __vmath__ vec4_t vec4_mul(vec4_t a, vec4_t b)
 {
 #if VMATH_NEON_ENABLE
-    return (vec4_t){ .data = vmulq_f32(a.data, b.data) };
+    vec4_t r;
+    r.data = vmulq_f32(a.data, b.data);
+    return r;
 #elif VMATH_SSE_ENABLE
     vec4_t r;
     r.data = _mm_mul_ps(a.data, b.data);
@@ -977,7 +1026,9 @@ __vmath__ vec4_t vec4_mul(vec4_t a, vec4_t b)
 __vmath__ vec4_t vec4_div(vec4_t a, vec4_t b)
 {
 #if VMATH_NEON_ENABLE
-    return (vec4_t){ .data = vdivq_f32(a.data, b.data) };
+    vec4_t r;
+    r.data = vdivq_f32(a.data, b.data);
+    return r;
 #elif VMATH_SSE_ENABLE
     vec4_t r;
     r.data = _mm_div_ps(a.data, b.data);
@@ -993,7 +1044,9 @@ __vmath__ vec4_t vec4_div(vec4_t a, vec4_t b)
 __vmath__ vec4_t vec4_addf(vec4_t v, float s)
 {
 #if VMATH_NEON_ENABLE
-    return (vec4_t){ .data = vmulq_n_f32(v.data, s) };
+    vec4_t r;
+    r.data = vmulq_n_f32(v.data, s);
+    return r;
 #elif VMATH_SSE_ENABLE
     vec4_t r;
     r.data = _mm_mul_ps(v.data, _mm_set_ps1(s));
@@ -1010,7 +1063,9 @@ __vmath__ vec4_t vec4_addf(vec4_t v, float s)
 __vmath__ vec4_t vec4_subf(vec4_t v, float s)
 {
 #if VMATH_NEON_ENABLE
-    return (vec4_t){ .data = vsubq_n_f32(v.data, s) };
+    vec4_t r;
+    r.data = vsubq_n_f32(v.data, s);
+    return r;
 #elif VMATH_SSE_ENABLE
     vec4_t r;
     r.data = _mm_sub_ps(v.data, _mm_set_ps1(s));
@@ -1027,7 +1082,9 @@ __vmath__ vec4_t vec4_subf(vec4_t v, float s)
 __vmath__ vec4_t vec4_mulf(vec4_t v, float s)
 {
 #if VMATH_NEON_ENABLE
-    return (vec4_t){ .data = vmulq_n_f32(v.data, s) };
+    vec4_t r;
+    r.data = vmulq_n_f32(v.data, s);
+    return r;
 #elif VMATH_SSE_ENABLE
     vec4_t r;
     r.data = _mm_mul_ps(v.data, _mm_set_ps1(s));
@@ -1068,7 +1125,9 @@ __vmath__ bool   vec4_eql(vec4_t a, vec4_t b)
 __vmath__ vec4_t vec4_neg(vec4_t v)
 {
 #if VMATH_NEON_ENABLE
-    return (vec4_t){ .data = vnegq_f32(v.data) };
+    vec4_t r;
+    r.data = vnegq_f32(v.data);
+    return r;
 #elif VMATH_SSE_ENABLE
     vec4_t r;
     r.data = _mm_sub_ps(__M128_ZERO, v.data);
@@ -1085,7 +1144,8 @@ __vmath__ vec4_t vec4_neg(vec4_t v)
 __vmath__ float  vec4_dot(vec4_t a, vec4_t b)
 {
 #if VMATH_NEON_ENABLE
-    vec4_t v = (vec4_t){ .data = vmulq_f32(a.data, b.data) };
+    vec4_t v;
+    v.data = vmulq_f32(a.data, b.data);
     return v.x + v.y + v.z + v.w;
 #elif VMATH_SSE_ENABLE
     return _mm_cvtss_f32(_mm_dp_ps(a.data, b.data, 0xf1));
@@ -1144,7 +1204,7 @@ __vmath__ vec4_t vec4_normalize(vec4_t v)
     const float lsqr = vec4_lensqr(v);
     if (lsqr != 1.0f && lsqr > 0)
     {
-        const float inv = 1.0f / sqrtf(lsqr);
+        const float inv = vmath_rsqrt(lsqr);
         return vec4(v.x * inv, v.y * inv, v.z * inv, v.w * inv);
     }
     return v;
@@ -1390,7 +1450,7 @@ __vmath__ mat2_t mat2_neg(mat2_t m)
 __vmath__ mat2_t mat2_add(mat2_t a, mat2_t b)
 {
     mat2_t r;
-    r.vec4 = vec4_add(a.vec4, a.vec4);
+    r.vec4 = vec4_add(a.vec4, b.vec4);
     return r;
 }
 
@@ -1400,7 +1460,7 @@ __vmath__ mat2_t mat2_add(mat2_t a, mat2_t b)
 __vmath__ mat2_t mat2_sub(mat2_t a, mat2_t b)
 {
     mat2_t r;
-    r.vec4 = vec4_sub(a.vec4, a.vec4);
+    r.vec4 = vec4_sub(a.vec4, b.vec4);
     return r;
 }
 
@@ -1473,6 +1533,7 @@ __vmath__ mat2_t mat2_transpose(mat2_t m)
  */
 __vmath__ float  mat2_det(mat2_t m)
 {
+    (void)m;
     return 0.0f;
 }
 
@@ -1481,6 +1542,7 @@ __vmath__ float  mat2_det(mat2_t m)
  */
 __vmath__ mat2_t mat2_inverse(mat2_t m)
 {
+    (void)m;
     return MAT2_IDENTITY;
 }
 
@@ -1514,10 +1576,11 @@ __vmath__ mat3_t mat3()
 
 __vmath__ mat2_t mat3_tomat2(mat3_t m)
 {
-    mat2_t r = {
-        m.m01, m.m01,
-        m.m10, m.m11
-    };
+    mat2_t r;
+    r.m00 = m.m00;
+    r.m01 = m.m01;
+    r.m10 = m.m10;
+    r.m11 = m.m11;
     return r;
 }
 
@@ -1526,12 +1589,11 @@ __vmath__ mat2_t mat3_tomat2(mat3_t m)
 */
 __vmath__ mat4_t mat3_tomat4(mat3_t m)
 {
-    mat4_t r = {
-        m.m00, m.m01, m.m02, 0,
-        m.m20, m.m11, m.m12, 0,
-        m.m10, m.m21, m.m22, 0,
-            0,     0,     0, 0,
-    };
+    mat4_t r;
+    r.rows[0] = vec4(m.m00, m.m01, m.m02, 0);
+    r.rows[1] = vec4(m.m10, m.m11, m.m12, 0);
+    r.rows[2] = vec4(m.m20, m.m21, m.m22, 0);
+    r.rows[3] = vec4(    0,     0,     0, 0);
     return r;
 }
 
@@ -1541,11 +1603,10 @@ __vmath__ mat4_t mat3_tomat4(mat3_t m)
  */
 __vmath__ mat3_t mat3_transpose(mat3_t m)
 {
-    mat3_t r = {
-        m.m00, m.m10, m.m20,
-        m.m01, m.m11, m.m21,
-        m.m02, m.m12, m.m22,
-    };
+    mat3_t r;
+    r.m00 = m.m00; r.m01 = m.m10; r.m02 = m.m20;
+    r.m10 = m.m01; r.m11 = m.m11; r.m12 = m.m21;
+    r.m20 = m.m02; r.m12 = m.m12; r.m22 = m.m22;
     return r;
 }
 
@@ -1555,11 +1616,10 @@ __vmath__ mat3_t mat3_transpose(mat3_t m)
  */
 __vmath__ mat3_t mat3_add(mat3_t a, mat3_t b)
 {
-    mat3_t r = {
-	    a.m00 + b.m00, a.m10 + b.m10, a.m20 + b.m20,
-	    a.m01 + b.m01, a.m11 + b.m11, a.m21 + b.m21,
-	    a.m02 + b.m02, a.m12 + b.m12, a.m22 + b.m22,
-    };
+    mat3_t r;
+	r.m00 = a.m00 + b.m00; r.m01 = a.m01 + b.m01; r.m02 = a.m02 + b.m02;
+    r.m10 = a.m10 + b.m10; r.m11 = a.m11 + b.m11; r.m12 = a.m12 + b.m12;
+    r.m20 = a.m20 + b.m20; r.m21 = a.m21 + b.m21; r.m22 = a.m22 + b.m22;
     return r;
 }
 
@@ -1569,11 +1629,10 @@ __vmath__ mat3_t mat3_add(mat3_t a, mat3_t b)
  */
 __vmath__ mat3_t mat3_sub(mat3_t a, mat3_t b)
 {
-    mat3_t r = {
-	    a.m00 - b.m00, a.m10 - b.m10, a.m20 - b.m20,
-	    a.m01 - b.m01, a.m11 - b.m11, a.m21 - b.m21,
-	    a.m02 - b.m02, a.m12 - b.m12, a.m22 - b.m22,
-    };
+    mat3_t r;
+    r.m00 = a.m00 - b.m00; r.m01 = a.m01 - b.m01; r.m02 = a.m02 - b.m02;
+    r.m10 = a.m10 - b.m10; r.m11 = a.m11 - b.m11; r.m12 = a.m12 - b.m12;
+    r.m20 = a.m20 - b.m20; r.m21 = a.m21 - b.m21; r.m22 = a.m22 - b.m22;
     return r;
 }
 
@@ -1583,19 +1642,18 @@ __vmath__ mat3_t mat3_sub(mat3_t a, mat3_t b)
  */
 __vmath__ mat3_t mat3_mul(mat3_t a, mat3_t b)
 {
-    mat3_t r = {
-	    a.m00 * b.m00 + a.m10 * b.m01 + a.m20 * b.m02,
-	    a.m01 * b.m00 + a.m11 * b.m01 + a.m21 * b.m02,
-	    a.m02 * b.m00 + a.m12 * b.m01 + a.m22 * b.m02,
+    mat3_t r;
+	r.m00 = a.m00 * b.m00 + a.m10 * b.m01 + a.m20 * b.m02;
+	r.m01 = a.m01 * b.m00 + a.m11 * b.m01 + a.m21 * b.m02;
+	r.m02 = a.m02 * b.m00 + a.m12 * b.m01 + a.m22 * b.m02;
 
-	    a.m00 * b.m10 + a.m10 * b.m11 + a.m20 * b.m12,
-	    a.m01 * b.m10 + a.m11 * b.m11 + a.m21 * b.m12,
-	    a.m02 * b.m10 + a.m12 * b.m11 + a.m22 * b.m12,
+	r.m10 = a.m00 * b.m10 + a.m10 * b.m11 + a.m20 * b.m12;
+	r.m11 = a.m01 * b.m10 + a.m11 * b.m11 + a.m21 * b.m12;
+	r.m12 = a.m02 * b.m10 + a.m12 * b.m11 + a.m22 * b.m12;
       
-	    a.m00 * b.m20 + a.m10 * b.m21 + a.m20 * b.m22,
-	    a.m01 * b.m20 + a.m11 * b.m21 + a.m21 * b.m22,
-	    a.m02 * b.m20 + a.m12 * b.m21 + a.m22 * b.m22,
-    };
+	r.m20 = a.m00 * b.m20 + a.m10 * b.m21 + a.m20 * b.m22;
+	r.m21 = a.m01 * b.m20 + a.m11 * b.m21 + a.m21 * b.m22;
+	r.m22 = a.m02 * b.m20 + a.m12 * b.m21 + a.m22 * b.m22;
     return r;
 }
 
@@ -1604,11 +1662,10 @@ __vmath__ mat3_t mat3_mul(mat3_t a, mat3_t b)
  */
 __vmath__ mat3_t mat3_mulf(mat3_t m, float s)
 {
-    mat3_t r = {
-        m.m00 * s, m.m01 * s, m.m02 * s,
-        m.m10 * s, m.m11 * s, m.m12 * s,
-        m.m20 * s, m.m21 * s, m.m22 * s,
-    };
+    mat3_t r;
+    r.m00 = m.m00 * s; r.m01 = m.m01 * s; r.m02 = m.m02 * s;
+    r.m10 = m.m10 * s; r.m11 = m.m11 * s; r.m12 = m.m12 * s;
+    r.m20 = m.m20 * s; r.m21 = m.m21 * s; r.m22 = m.m22 * s;
     return r;
 }
 
@@ -1637,11 +1694,10 @@ __vmath__ bool mat3_eql(mat3_t a, mat3_t b)
  */
 __vmath__ mat3_t mat3_neg(mat3_t m)
 {
-    mat3_t r = {
-        -m.m00, -m.m01, -m.m02,
-        -m.m10, -m.m11, -m.m12,
-        -m.m20, -m.m21, -m.m22,
-    };
+    mat3_t r;
+    r.m00 = -m.m00; r.m01 = -m.m01; r.m02 = -m.m02;
+    r.m10 = -m.m10; r.m11 = -m.m11; r.m12 = -m.m12;
+    r.m20 = -m.m20; r.m21 = -m.m21; r.m22 = -m.m22;
     return r;
 }
 
@@ -1669,19 +1725,19 @@ __vmath__ mat3_t mat3_inverse(mat3_t m)
     }
 
     d = 1.0f / d;
-    mat3_t r = {
-        d * (m.m11 * m.m22 - m.m12 * m.m21),
-        d * (m.m02 * m.m21 - m.m01 * m.m22),
-	    d * (m.m01 * m.m12 - m.m02 * m.m11),
 
-	    d * (m.m12 * m.m20 - m.m10 * m.m22),
-	    d * (m.m00 * m.m22 - m.m02 * m.m20),
-	    d * (m.m02 * m.m10 - m.m00 * m.m12),
+    mat3_t r;
+    r.m00 = d * (m.m11 * m.m22 - m.m12 * m.m21);
+    r.m01 = d * (m.m02 * m.m21 - m.m01 * m.m22);
+	r.m02 = d * (m.m01 * m.m12 - m.m02 * m.m11);
 
-	    d * (m.m10 * m.m21 - m.m11 * m.m20),
-	    d * (m.m01 * m.m20 - m.m00 * m.m21),
-	    d * (m.m00 * m.m11 - m.m01 * m.m10), 
-    };
+	r.m10 = d * (m.m12 * m.m20 - m.m10 * m.m22);
+	r.m11 = d * (m.m00 * m.m22 - m.m02 * m.m20);
+	r.m12 = d * (m.m02 * m.m10 - m.m00 * m.m12);
+
+	r.m20 = d * (m.m10 * m.m21 - m.m11 * m.m20);
+	r.m21 = d * (m.m01 * m.m20 - m.m00 * m.m21);
+	r.m22 = d * (m.m00 * m.m11 - m.m01 * m.m10); 
     return r;
 }
 
@@ -1723,10 +1779,9 @@ __vmath__ mat4_t mat4()
 */
 __vmath__ mat2_t mat4_tomat2(mat4_t m)
 {
-    mat2_t r = {
-        m.m00, m.m01,
-        m.m20, m.m11,
-    };
+    mat2_t r;
+    r.rows[0] = vec2(m.m00, m.m01);
+    r.rows[1] = vec2(m.m10, m.m11);
     return r;
 }
 
@@ -1736,11 +1791,10 @@ __vmath__ mat2_t mat4_tomat2(mat4_t m)
  */
 __vmath__ mat3_t mat4_tomat3(mat4_t m)
 {
-    mat3_t r = {
-	    m.m00, m.m01, m.m02,
-	    m.m20, m.m11, m.m12,
-	    m.m10, m.m21, m.m22,
-    };
+    mat3_t r;
+    r.m00 = m.m00; r.m01 = m.m01, r.m02 = m.m02;
+    r.m10 = m.m10; r.m11 = m.m11, r.m12 = m.m12;
+    r.m20 = m.m20; r.m21 = m.m21, r.m22 = m.m22;
     return r;
 }
 
@@ -1750,12 +1804,11 @@ __vmath__ mat3_t mat4_tomat3(mat4_t m)
  */
 __vmath__ mat4_t mat4_translate3f(float x, float y, float z)
 {				
-    mat4_t r = {
-	    1, 0, 0, 0,
-	    0, 1, 0, 0,
-	    0, 0, 1, 0,
-	    x, y, z, 1,
-    };
+    mat4_t r;
+	r.rows[0] = vec4(1, 0, 0, 0);
+	r.rows[1] = vec4(0, 1, 0, 0);
+	r.rows[2] = vec4(0, 0, 1, 0);
+	r.rows[3] = vec4(x, y, z, 1);
     return r;
 }
 
@@ -1783,12 +1836,11 @@ __vmath__ mat4_t mat4_translatev3(vec3_t v)
  */
 __vmath__ mat4_t mat4_scale3f(float x, float y, float z)
 {
-    mat4_t r = {
-	    x, 0, 0, 0,
-	    0, y, 0, 0,
-	    0, 0, z, 0,
-	    0, 0, 0, 1,
-    };
+    mat4_t r;
+	r.rows[0] = vec4(x, 0, 0, 0);
+	r.rows[1] = vec4(0, y, 0, 0);
+	r.rows[2] = vec4(0, 0, z, 0);
+	r.rows[3] = vec4(0, 0, 0, 1);
     return r;
 }
 
@@ -1823,12 +1875,11 @@ __vmath__ mat4_t mat4_rotatex(float angle)
 {
     const float c = cosf(angle);
     const float s = sinf(angle);
-    mat4_t r = {
-	    1,  0, 0, 0,
-	    0,  c, s, 0,
-	    0, -s, c, 0,
-	    0,  0, 0, 1,
-    };
+    mat4_t r;
+    r.rows[0] = vec4(1,  0, 0, 0);
+    r.rows[1] = vec4(0,  c, s, 0);
+    r.rows[2] = vec4(0, -s, c, 0);
+    r.rows[3] = vec4(0,  0, 0, 1);
     return r;
 }
 
@@ -1840,12 +1891,11 @@ __vmath__ mat4_t mat4_rotatey(float angle)
 {
     const float c = cosf(angle);
     const float s = sinf(angle);
-    mat4_t r = {
-	     c, 0, s, 0,
-	     0, 1, 0, 0,
-	    -s, 0, c, 0,
-	     0, 0, 0, 1,
-    };
+    mat4_t r;
+    r.rows[0] = vec4( c, 0, s, 0);
+    r.rows[1] = vec4( 0, 1, 0, 0);
+    r.rows[2] = vec4(-s, 0, c, 0);
+    r.rows[3] = vec4( 0, 0, 0, 1);
     return r;
 }
 
@@ -1857,12 +1907,11 @@ __vmath__ mat4_t mat4_rotatez(float angle)
 {
     const float c = cosf(angle);
     const float s = sinf(angle);
-    mat4_t r = {
-	     c, s, 0, 0,
-	    -s, c, 0, 0,
-	     0, 0, 1, 0,
-	     0, 0, 0, 1,
-    };
+    mat4_t r;
+    r.rows[0] = vec4( c, s, 0, 0);
+    r.rows[1] = vec4(-s, c, 0, 0);
+    r.rows[2] = vec4( 0, 0, 1, 0);
+    r.rows[3] = vec4( 0, 0, 0, 1);
     return r;
 }
 
@@ -1876,32 +1925,27 @@ __vmath__ mat4_t mat4_rotate3f(float x, float y, float z, float angle)
     const float s = sinf(-angle);
     const float t = 1.0f - c;
   
-    mat4_t r = {
-	    /* Row 1
-	     */
-	    t * x * x + c,
-	    t * x * y - s * z,
-	    t * x * z + s * y,
-	    0.0f,
+    mat4_t r;
+	/* Row 1 */
+	r.rows[0] = vec4(t * x * x + c,
+                     t * x * y - s * z,
+                     t * x * z + s * y,
+	                 0.0f);
 
-	    /* Row 2
-	     */
-	    t * x * y + s * z,
-	    t * y * y + c,
-	    t * y * z - s * x,
-	    0.0f,
+	/* Row 2 */
+    r.rows[1] = vec4(t * x * y + s * z,
+	                 t * y * y + c,
+	                 t * y * z - s * x,
+	                 0.0f);
 
-	    /* Row 3
-	     */
-	    t * x * z - s * y,
-	    t * y * z + s * x,
-	    t * z * z + c,
-	    0.0f,
+	/* Row 3 */
+    r.rows[2] = vec4(t * x * z - s * y,
+	                 t * y * z + s * x,
+	                 t * z * z + c,
+	                 0.0f);
 
-	    /* Row 4
-	     */
-	    0, 0, 0, 1.0f,
-    };
+    /* Row 4 */
+	r.rows[3] = vec4(0, 0, 0, 1.0f);
     return r;
 }
 
@@ -1981,29 +2025,6 @@ __vmath__ mat4_t mat4_mul(mat4_t a, mat4_t b)
     r.rows[1] = mat4_transform(a, b.rows[1]);
     r.rows[2] = mat4_transform(a, b.rows[2]);
     r.rows[3] = mat4_transform(a, b.rows[3]);
-    /* 
-    mat4_t r = {
-	b.m00 * a.m00 + b.m01 * a.m10 + b.m02 * a.m20 + b.m03 * a.m30,
-	b.m00 * a.m01 + b.m01 * a.m11 + b.m02 * a.m21 + b.m03 * a.m31,
-	b.m00 * a.m02 + b.m01 * a.m12 + b.m02 * a.m22 + b.m03 * a.m32,
-	b.m00 * a.m03 + b.m01 * a.m13 + b.m02 * a.m23 + b.m03 * a.m33,
-    
-	b.m10 * a.m00 + b.m11 * a.m10 + b.m12 * a.m20 + b.m13 * a.m30,
-	b.m10 * a.m01 + b.m11 * a.m11 + b.m12 * a.m21 + b.m13 * a.m31,
-	b.m10 * a.m02 + b.m11 * a.m12 + b.m12 * a.m22 + b.m13 * a.m32,
-	b.m10 * a.m03 + b.m11 * a.m13 + b.m12 * a.m23 + b.m13 * a.m33,
-     
-	b.m20 * a.m00 + b.m21 * a.m10 + b.m22 * a.m20 + b.m23 * a.m30,
-	b.m20 * a.m01 + b.m21 * a.m11 + b.m22 * a.m21 + b.m23 * a.m31,
-	b.m20 * a.m02 + b.m21 * a.m12 + b.m22 * a.m22 + b.m23 * a.m32,
-	b.m20 * a.m03 + b.m21 * a.m13 + b.m22 * a.m23 + b.m23 * a.m33,
-	
-	b.m30 * a.m00 + b.m31 * a.m10 + b.m32 * a.m20 + b.m33 * a.m30,
-	b.m30 * a.m01 + b.m31 * a.m11 + b.m32 * a.m21 + b.m33 * a.m31,
-	b.m30 * a.m02 + b.m31 * a.m12 + b.m32 * a.m22 + b.m33 * a.m32,
-	b.m30 * a.m03 + b.m31 * a.m13 + b.m32 * a.m23 + b.m33 * a.m33,
-    };
-    */   
     return r;
 }
 
@@ -2061,12 +2082,11 @@ __vmath__ mat4_t mat4_neg(mat4_t m)
  */
 __vmath__ mat4_t mat4_transpose(mat4_t m)
 {
-    mat4_t r = {
-	    m.m00, m.m10, m.m20, m.m30,
-	    m.m01, m.m11, m.m21, m.m31,
-	    m.m02, m.m12, m.m22, m.m32,
-	    m.m03, m.m13, m.m23, m.m33,
-    };
+    mat4_t r;
+	r.rows[0] = vec4(m.m00, m.m10, m.m20, m.m30);
+	r.rows[1] = vec4(m.m01, m.m11, m.m21, m.m31);
+	r.rows[2] = vec4(m.m02, m.m12, m.m22, m.m32);
+	r.rows[3] = vec4(m.m03, m.m13, m.m23, m.m33);
     return r;
 }
 
@@ -2076,17 +2096,16 @@ __vmath__ mat4_t mat4_transpose(mat4_t m)
  */
 __vmath__ mat4_t mat4_ortho(float l, float r, float b, float t, float n, float f)
 {
-    mat4_t m = {
-	    2.0f / (r - l), 0, 0, 0,
-	    0, 2.0f / (t - b), 0, 0,
-	    0, 0, 2.0f / (f - n), 0,
+    mat4_t m;
+	m.rows[0] = vec4(2.0f / (r - l), 0, 0, 0);
+    m.rows[1] = vec4(0, 2.0f / (t - b), 0, 0);
+    m.rows[2] = vec4(0, 0, 2.0f / (f - n), 0);
 
-	    /* Row 4 */
-	    (l + r) / (l - r),
-	    (b + t) / (b - t),
-	    (n + f) / (n - f),
-	    1.0f,
-    };
+	/* Row 4 */
+    m.rows[3] = vec4((l + r) / (l - r),
+	                 (b + t) / (b - t),
+	                 (n + f) / (n - f),
+	                 1.0f);
     return m;
 }
 
@@ -2096,18 +2115,18 @@ __vmath__ mat4_t mat4_ortho(float l, float r, float b, float t, float n, float f
  */
 __vmath__ mat4_t mat4_frustum(float l, float r, float b, float t, float n, float f)
 {
-    mat4_t m = {
-	    /* Row 1 */
-	    2.0f / (r - l), 0, 0, 0,
-	    /* Row 2 */
-	    0, 2.0f / (t - b), 0, 0,
-	    /* Row 3 */
-	    (r + l) / (r - l),
-	    (t + b) / (t - b),
-	    (f + b) / (f - n), 1.0f,
-	    /* Row 4 */
-	    0, 0, 2.0f / (f - n), 0,
-    };
+    mat4_t m;
+    /* Row 1 */
+    m.rows[0] = vec4(2.0f / (r - l), 0, 0, 0);
+    /* Row 2 */
+    m.rows[1] = vec4(0, 2.0f / (t - b), 0, 0);
+    /* Row 3 */
+    m.rows[0] = vec4((r + l) / (r - l),
+	                 (t + b) / (t - b),
+	                 (f + b) / (f - n), 
+                     1.0f);
+    /* Row 4 */
+    m.rows[0] = vec4(0, 0, 2.0f / (f - n), 0);
     return m;
 }
 
@@ -2119,12 +2138,11 @@ __vmath__ mat4_t mat4_perspective(float fov, float aspect, float znear, float zf
 {
     const float a = 1.0f / tanf(fov * 0.5f);
     const float b = zfar / (znear - zfar);
-    mat4_t r = {
-	    a / aspect, 0, 0, 0,
-	    0, a, 0, 0,
-	    0, 0, b, -1,
-	    0, 0, znear * b, 0,
-    };
+    mat4_t r;
+	r.rows[0] = vec4(a / aspect,   0,         0,   0);
+	r.rows[1] = vec4(         0,   a,         0,   0);
+	r.rows[2] = vec4(         0,   0,         b,  -1);
+	r.rows[3] = vec4(         0,   0, znear * b,   0);
     return r;
 }
 
@@ -2137,17 +2155,16 @@ __vmath__ mat4_t mat4_lookat(vec3_t eye, vec3_t target, vec3_t up)
     const vec3_t z = vec3_normalize(vec3_sub(eye, target));
     const vec3_t x = vec3_normalize(vec3_cross(up, z));
     const vec3_t y = vec3_normalize(vec3_cross( z, x));
-    mat4_t r = {
-	    x.x, y.x, z.x, 0,
-	    x.y, y.y, z.y, 0,
-	    x.z, y.z, z.z, 0,
+    mat4_t r;
+    r.rows[0] = vec4(x.x, y.x, z.x, 0);
+    r.rows[1] = vec4(x.y, y.y, z.y, 0);
+    r.rows[2] = vec4(x.z, y.z, z.z, 0);
 
         /* Row 4 */
-	    -vec3_dot(x, eye), 
-        -vec3_dot(y, eye), 
-        -vec3_dot(z, eye), 
-        1.0f,
-    };
+    r.rows[3] = vec4(-vec3_dot(x, eye), 
+                     -vec3_dot(y, eye), 
+                     -vec3_dot(z, eye), 
+                     1.0f);
     return r;
 }
 
@@ -2201,27 +2218,26 @@ __vmath__ mat4_t mat4_inverse(mat4_t m)
     }
     d = 1.0f / d;
   
-    mat4_t r = {
-	    d *  (m.m11 * c6 - m.m12 * c5 + m.m13 * c4),
-	    d * -(m.m01 * c6 - m.m02 * c5 + m.m03 * c4),
-	    d *  (m.m31 * s6 - m.m32 * s5 + m.m33 * s4),
-	    d * -(m.m21 * s6 - m.m22 * s5 + m.m23 * s4),
+    mat4_t r;
+	r.m00 = d *  (m.m11 * c6 - m.m12 * c5 + m.m13 * c4);
+	r.m01 = d * -(m.m01 * c6 - m.m02 * c5 + m.m03 * c4);
+	r.m02 = d *  (m.m31 * s6 - m.m32 * s5 + m.m33 * s4);
+	r.m03 = d * -(m.m21 * s6 - m.m22 * s5 + m.m23 * s4);
       
-	    d * -(m.m10 * c6 - m.m12 * c3 + m.m13 * c2),
-	    d *  (m.m00 * c6 - m.m02 * c3 + m.m03 * c2),
-	    d * -(m.m30 * s6 - m.m32 * s3 + m.m33 * s2),
-	    d *  (m.m20 * s6 - m.m22 * s3 + m.m23 * s2),
+	r.m10 = d * -(m.m10 * c6 - m.m12 * c3 + m.m13 * c2);
+	r.m11 = d *  (m.m00 * c6 - m.m02 * c3 + m.m03 * c2);
+	r.m12 = d * -(m.m30 * s6 - m.m32 * s3 + m.m33 * s2);
+	r.m13 = d *  (m.m20 * s6 - m.m22 * s3 + m.m23 * s2);
       
-	    d *  (m.m10 * c5 - m.m11 * c3 + m.m13 * c1),
-	    d * -(m.m00 * c5 - m.m01 * c3 + m.m03 * c1),
-	    d *  (m.m30 * s5 - m.m31 * s3 + m.m33 * s1),
-	    d * -(m.m20 * s5 - m.m21 * s3 + m.m23 * s1),
+	r.m20 = d *  (m.m10 * c5 - m.m11 * c3 + m.m13 * c1);
+	r.m21 = d * -(m.m00 * c5 - m.m01 * c3 + m.m03 * c1);
+	r.m22 = d *  (m.m30 * s5 - m.m31 * s3 + m.m33 * s1);
+	r.m23 = d * -(m.m20 * s5 - m.m21 * s3 + m.m23 * s1);
 
-	    d * -(m.m10 * c4 - m.m11 * c2 + m.m12 * c1),
-	    d *  (m.m00 * c4 - m.m01 * c2 + m.m02 * c1),
-	    d * -(m.m30 * s4 - m.m31 * s2 + m.m32 * s1),
-	    d *  (m.m20 * s4 - m.m21 * s2 + m.m22 * s1),
-    };
+	r.m30 = d * -(m.m10 * c4 - m.m11 * c2 + m.m12 * c1);
+	r.m31 = d *  (m.m00 * c4 - m.m01 * c2 + m.m02 * c1);
+	r.m32 = d * -(m.m30 * s4 - m.m31 * s2 + m.m32 * s1);
+	r.m33 = d *  (m.m20 * s4 - m.m21 * s2 + m.m22 * s1);
     return r;
 }
 
@@ -2346,7 +2362,7 @@ __vmath__ vec4_t vec4(vec3_t v)
 {
 #if VMATH_SSE_ENABLE || VMATH_NEON_ENABLE
     vec4_t r;
-    r.data = r.data;
+    r.data = v.data;
     return r;
 #else
     return vec4(v.x, v.y, v.z, w);
@@ -3208,6 +3224,18 @@ __vmath__ vec4_t operator*(mat4_t a, vec4_t b)
 #endif
 
 /* END OF VMATH_OPERATOR_OVERLOADING */
+#endif
+
+/**
+ * Turn on annoy warning
+ */
+#if __GNUC__
+# pragma GCC   diagnostic warning "-Wmissing-braces"
+#elif __clang__
+# pragma clang diagnostic warning "-Wmissing-braces"
+#else
+# pragma warning(default : 4141) /* Shutup announce missing braces warning */
+# pragma warning(default : 4201) /* Shutup announce anonymous union warning */
 #endif
 
 #endif /* __VMATH_H__ */
