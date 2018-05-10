@@ -24,19 +24,23 @@
 /**
  * Custom modifier
  */
-#if !defined(__cplusplus) 
-# ifdef __GNUC__ /* GCC with strict-ansi */
+#if !defined(__cplusplus)
+
+# if   defined(__GNUC__) /* GCC with strict-ansi */
 #  define __vmath_inline__ __inline__
-#  define 
 # elif defined(_MSC_VER) /* Windows MSVC */
 #  define __vmath_inline__ __inline
 # else
 #  define __vmath_inline__
 # endif
-#  define __vmath_nothrow__ 
+
+# define __vmath_nothrow__ 
+
 #else
-#  define __vmath_inline__ inline
-# ifdef __GNUC__
+
+# define __vmath_inline__ inline
+
+# if   defined(__GNUC__)
 #  define __vmath_nothrow__ __attribute((nothrow))
 #  define 
 # elif defined(_MSC_VER) /* Windows MSVC */
@@ -44,6 +48,7 @@
 # else
 #  define __vmath_nothrow__
 # endif
+
 #endif
 
 #ifdef __GNUC__ /* GCC */
@@ -648,6 +653,15 @@ __vmath__ vec2_t vec2_normalize(vec2_t v)
     return v;
 }
 
+/**
+ * Calculate reflection vector
+ */ 
+__vmath__ vec2_t vec2_reflect(vec2_t v, vec2_t n)
+{
+    /* equation: ref = v - 2 * n * dot(v, n) */
+    return vec2_sub(v, vec2_mulf(n, 2 * vec2_dot(n, v)));
+}
+
 /* END OF VMATH_BUILD_VEC2 */
 #endif
 
@@ -939,6 +953,15 @@ __vmath__ vec3_t vec3_normalize(vec3_t v)
 #endif
 }
 
+/**
+ * Calculate reflection vector
+ */ 
+__vmath__ vec3_t vec3_reflect(vec3_t v, vec3_t n)
+{
+    /* equation: ref = v - 2 * n * dot(v, n) */
+    return vec3_sub(v, vec3_mulf(n, 2 * vec3_dot(n, v)));
+}
+
 /* END OF VMATH_BUILD_VEC3 */
 #endif
 
@@ -1209,6 +1232,15 @@ __vmath__ vec4_t vec4_normalize(vec4_t v)
     }
     return v;
 #endif
+}
+
+/**
+ * Calculate reflection vector
+ */ 
+__vmath__ vec4_t vec4_reflect(vec4_t v, vec4_t n)
+{
+    /* equation: ref = v - 2 * n * dot(v, n) */
+    return vec4_sub(v, vec4_mulf(n, 2 * vec4_dot(n, v)));
 }
 
 /* END OF VMATH_BUILD_VEC4 */
