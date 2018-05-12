@@ -229,6 +229,7 @@ typedef union vmath_vec2
     {
         float x, y;
     };
+    
     float2_t data;
 } vec2_t;
 
@@ -248,7 +249,7 @@ typedef union vmath_vec3
 
     struct
     {
-        float  _x;
+        float  __;
         vec2_t yz;
     };
 
@@ -259,7 +260,7 @@ typedef union vmath_vec3
 /**
  * Vector4D data structure
  * @note: 'vec3_t yzw' member is rarely use, 
- *        and it is impossile to provide in SIMD enable
+ *        and it is impossile to provide in vec3_t SIMD enable
  */
 typedef union vmath_vec4
 {
@@ -276,16 +277,11 @@ typedef union vmath_vec4
 
     struct
     {
-        float  _x;
+        float  __;
         vec2_t yz;
-        float  _w;
     };
 
-    struct
-    {
-	vec3_t xyz;
-    };
-    
+    vec3_t   xyz;
     float4_t data;
 } vec4_t;
 
