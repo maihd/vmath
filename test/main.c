@@ -28,6 +28,7 @@ struct
 } app;
 
 static void _sighandler(int sig);
+static int  exec_sync(const char* cmd);
 
 int main(int argc, char* argv[])
 {
@@ -39,15 +40,14 @@ int main(int argc, char* argv[])
 
     csfx_filetime_t files[] =
     {
-	{ 0, "./src" } /* listen folder */
+	{ 0, "./src/csfx_main.c" }
     };
-    csfx_watch_files(files, countof(files));
     
     while (!app.quit)
     {
 	if (csfx_watch_files(files, countof(files)))
 	{
-	    system("make libtest");
+	    exec_sync("make libtest");
 	    /* Call csfx_watch_files again to ignore change after build */
 	    csfx_watch_files(files, countof(files));
 	}
@@ -72,4 +72,9 @@ void _sighandler(int sig)
     {
 	app.quit = 1;
     }
+}
+
+int exec_sync(const char* cmd)
+{
+    return system(cmd);
 }
