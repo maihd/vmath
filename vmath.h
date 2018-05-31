@@ -42,7 +42,6 @@
 
 # if   defined(__GNUC__)
 #  define __vmath_nothrow__ __attribute((nothrow))
-#  define 
 # elif defined(_MSC_VER) /* Windows MSVC */
 #  define __vmath_nothrow__ __declspec(nothrow)
 # else
@@ -2294,7 +2293,7 @@ __vmath__ mat4_t mat4_inverse(mat4_t m)
 **************************/
 #if VMATH_BUILD_VEC2
 
-__vmath__ vec2_t vec2()
+__vmath__ vec2_t vec2(void)
 {
     return vec2(0, 0);
 }
@@ -2304,11 +2303,110 @@ __vmath__ vec2_t vec2(float s)
     return vec2(s, s);
 }
 
-__vmath__ vec2_t vec2(float* data)
+__vmath__ vec2_t vec2(const float* data)
 {
     return vec2(data[0], data[1]);
 }
 
+__vmath__ vec2_t vec2(vec3_t v)
+{
+    return vec2(v.x, v.y);
+}
+
+__vmath__ vec2_t vec2(vec4_t v)
+{
+    return vec2(v.x, v.y);
+}
+
+__vmath__ vec2_t add(vec2_t a, vec2_t b)
+{
+    return vec2_add(a, b);
+}
+
+__vmath__ vec2_t sub(vec2_t a, vec2_t b)
+{
+    return vec2_sub(a, b);
+}
+
+__vmath__ vec2_t mul(vec2_t a, vec2_t b)
+{
+    return vec2_mul(a, b);
+}
+
+__vmath__ vec2_t div(vec2_t a, vec2_t b)
+{
+    return vec2_div(a, b);
+}
+
+__vmath__ vec2_t add(vec2_t v, float s)
+{
+    return vec2_addf(v, s);
+}
+
+__vmath__ vec2_t sub(vec2_t v, float s)
+{
+    return vec2_subf(v, s);
+}
+
+__vmath__ vec2_t mul(vec2_t v, float s)
+{
+    return vec2_mulf(v, s);
+}
+
+__vmath__ vec2_t div(vec2_t v, float s)
+{
+    return vec2_divf(v, s);
+}
+
+__vmath__ vec2_t add(float s, vec2_t v)
+{
+    return vec2_addf(v, s);
+}
+
+__vmath__ vec2_t sub(float s, vec2_t v)
+{
+    return vec2_sub(vec2(s), v);
+}
+
+__vmath__ vec2_t mul(float s, vec2_t v)
+{
+    return vec2_mulf(v, s);
+}
+
+__vmath__ vec2_t div(float s, vec2_t v)
+{
+    return vec2_div(vec2(s), v);
+}
+
+__vmath__ vec2_t neg(vec2_t v)
+{
+    return vec2_neg(v);
+}
+
+__vmath__ float dot(vec2_t a, vec2_t b)
+{
+    return vec2_dot(a, b);
+}
+
+__vmath__ float len(vec2_t v)
+{
+    return vec2_len(v);
+}
+
+__vmath__ float lensqr(vec2_t v)
+{
+    return vec2_lensqr(v);
+}
+
+__vmath__ vec2_t reflect(vec2_t v, vec2_t n)
+{
+    return vec2_reflect(v, n);
+}
+
+__vmath__ vec2_t normalize(vec2_t v)
+{
+    return vec2_normalize(v);
+}
 /* END OF VMATH_BUILD_VEC2 */
 #endif
 
@@ -2332,9 +2430,9 @@ __vmath__ vec3_t vec3(float s)
 #else
     return vec3(s, s, s);
 #endif
-}
+} 
 
-__vmath__ vec3_t vec3(float* data)
+__vmath__ vec3_t vec3(const float* data)
 {
     return vec3(data[0], data[1], data[2]);
 }
@@ -2342,6 +2440,106 @@ __vmath__ vec3_t vec3(float* data)
 __vmath__ vec3_t vec3(vec2_t v, float z = 0.0f)
 {
     return vec3(v.x, v.y, z);
+}
+
+__vmath__ vec3_t vec3(vec4_t v)
+{
+    return vec3(v.x, v.y, v.z);
+}
+
+__vmath__ vec3_t add(vec3_t a, vec3_t b)
+{
+    return vec3_add(a, b);
+}
+
+__vmath__ vec3_t sub(vec3_t a, vec3_t b)
+{
+    return vec3_sub(a, b);
+}
+
+__vmath__ vec3_t mul(vec3_t a, vec3_t b)
+{
+    return vec3_mul(a, b);
+}
+
+__vmath__ vec3_t div(vec3_t a, vec3_t b)
+{
+    return vec3_div(a, b);
+}
+
+__vmath__ vec3_t add(vec3_t v, float s)
+{
+    return vec3_addf(v, s);
+}
+
+__vmath__ vec3_t sub(vec3_t v, float s)
+{
+    return vec3_subf(v, s);
+}
+
+__vmath__ vec3_t mul(vec3_t v, float s)
+{
+    return vec3_mulf(v, s);
+}
+
+__vmath__ vec3_t div(vec3_t v, float s)
+{
+    return vec3_divf(v, s);
+}
+
+__vmath__ vec3_t add(float s, vec3_t v)
+{
+    return vec3_addf(v, s);
+}
+
+__vmath__ vec3_t sub(float s, vec3_t v)
+{
+    return vec3_sub(vec3(s), v);
+}
+
+__vmath__ vec3_t mul(float s, vec3_t v)
+{
+    return vec3_mulf(v, s);
+}
+
+__vmath__ vec3_t div(float s, vec3_t v)
+{
+    return vec3_div(vec3(s), v);
+}
+
+__vmath__ vec3_t neg(vec3_t v)
+{
+    return vec3_neg(v);
+}
+
+__vmath__ float dot(vec3_t a, vec3_t b)
+{
+    return vec3_dot(a, b);
+}
+
+__vmath__ float len(vec3_t v)
+{
+    return vec3_len(v);
+}
+
+__vmath__ float lensqr(vec3_t v)
+{
+    return vec3_lensqr(v);
+}
+
+__vmath__ vec3_t cross(vec3_t a, vec3_t b)
+{
+    return vec3_cross(a, b);
+}
+
+__vmath__ vec3_t reflect(vec3_t v, vec3_t n)
+{
+    return vec3_reflect(v, n);
+}
+
+__vmath__ vec3_t normalize(vec3_t v)
+{
+    return vec3_normalize(v);
 }
 
 /* END OF VMATH_BUILD_VEC3 */
@@ -2368,7 +2566,7 @@ __vmath__ vec4_t vec4(float s)
 #endif
 }
 
-__vmath__ vec4_t vec4(float* data)
+__vmath__ vec4_t vec4(const float* data)
 {
 #if VMATH_SSE_ENABLE
     vec4_t r;
@@ -2403,14 +2601,144 @@ __vmath__ vec4_t vec4(vec3_t v)
 __vmath__ vec4_t vec4(vec3_t v, float w)
 {
     return vec4(v.x, v.y, v.z, w);
-}        
+}
+
+__vmath__ vec4_t add(vec4_t a, vec4_t b)
+{
+    return vec4_add(a, b);
+}
+
+__vmath__ vec4_t sub(vec4_t a, vec4_t b)
+{
+    return vec4_sub(a, b);
+}
+
+__vmath__ vec4_t mul(vec4_t a, vec4_t b)
+{
+    return vec4_mul(a, b);
+}
+
+__vmath__ vec4_t div(vec4_t a, vec4_t b)
+{
+    return vec4_div(a, b);
+}
+
+__vmath__ vec4_t add(vec4_t v, float s)
+{
+    return vec4_addf(v, s);
+}
+
+__vmath__ vec4_t sub(vec4_t v, float s)
+{
+    return vec4_subf(v, s);
+}
+
+__vmath__ vec4_t mul(vec4_t v, float s)
+{
+    return vec4_mulf(v, s);
+}
+
+__vmath__ vec4_t div(vec4_t v, float s)
+{
+    return vec4_divf(v, s);
+}
+
+__vmath__ vec4_t add(float s, vec4_t v)
+{
+    return vec4_addf(v, s);
+}
+
+__vmath__ vec4_t sub(float s, vec4_t v)
+{
+    return vec4_sub(vec4(s), v);
+}
+
+__vmath__ vec4_t mul(float s, vec4_t v)
+{
+    return vec4_mulf(v, s);
+}
+
+__vmath__ vec4_t div(float s, vec4_t v)
+{
+    return vec4_div(vec4(s), v);
+}
+
+__vmath__ vec4_t neg(vec4_t v)
+{
+    return vec4_neg(v);
+}
+
+__vmath__ float dot(vec4_t a, vec4_t b)
+{
+    return vec4_dot(a, b);
+}
+
+__vmath__ float len(vec4_t v)
+{
+    return vec4_len(v);
+}
+
+__vmath__ float lensqr(vec4_t v)
+{
+    return vec4_lensqr(v);
+}
+
+__vmath__ vec4_t reflect(vec4_t v, vec4_t n)
+{
+    return vec4_reflect(v, n);
+}
+
+__vmath__ vec4_t normalize(vec4_t v)
+{
+    return vec4_normalize(v);
+}
 
 /* END OF VMATH_BUILD_VEC4 */
 #endif
 
 /**************************
-* Matrix 2x2 constructor
-**************************/
+ * Quaternion functions
+ **************************/
+#if VMATH_BUILD_QUAT
+__vmath__ quat_t quat(float s)
+{
+    return quat(s, s, s, s);
+}
+
+__vmath__ quat_t add(quat_t a, quat_t b)
+{
+    return quat_add(a, b);
+}
+
+__vmath__ quat_t sub(quat_t a, quat_t b)
+{
+    return quat_sub(a, b);
+}
+
+__vmath__ quat_t mul(quat_t a, quat_t b)
+{
+    return quat_mul(a, b);
+}
+
+__vmath__ quat_t mul(float s, quat_t q)
+{
+    return quat_mulf(q, s);
+}
+
+__vmath__ quat_t mul(quat_t q, float s)
+{
+    return quat_mulf(q, s);
+}
+
+__vmath__ quat_t neg(quat_t q)
+{
+    return quat_neg(q);
+}
+#endif
+
+/**************************
+ * Matrix 2x2 constructor
+ **************************/
 #if VMATH_BUILD_MAT2
 
 __vmath__ mat2_t mat2(float s)
@@ -2421,6 +2749,41 @@ __vmath__ mat2_t mat2(float s)
 __vmath__ mat2_t mat2(vec2_t row0, vec2_t row1)
 {
     return mat2(row0.x, row0.y, row1.x, row1.y);
+}
+
+__vmath__ mat2_t neg(mat2_t m)
+{
+    return mat2_neg(m);
+}
+
+__vmath__ mat2_t add(mat2_t a, mat2_t b)
+{
+    return mat2_add(a, b);
+}
+
+__vmath__ mat2_t sub(mat2_t a, mat2_t b)
+{
+    return mat2_sub(a, b);
+}
+
+__vmath__ mat2_t mul(mat2_t a, mat2_t b)
+{
+    return mat2_mul(a, b);
+}
+
+__vmath__ mat2_t mul(mat2_t m, float s)
+{
+    return mat2_mulf(m, s);
+}
+
+__vmath__ mat2_t mul(float s, mat2_t m)
+{
+    return mat2_mulf(m, s);
+}
+
+__vmath__ vec2_t mul(mat2_t m, vec2_t v)
+{
+    return mat2_transform(m, v);
 }
 
 /* END OF VMATH_BUILD_MAT2 */
@@ -2463,6 +2826,41 @@ __vmath__ mat3_t mat3(float m00, float m01, float m02,
     return r;
 }
 
+__vmath__ mat3_t neg(mat3_t m)
+{
+    return mat3_neg(m);
+}
+
+__vmath__ mat3_t add(mat3_t a, mat3_t b)
+{
+    return mat3_add(a, b);
+}
+
+__vmath__ mat3_t sub(mat3_t a, mat3_t b)
+{
+    return mat3_sub(a, b);
+}
+
+__vmath__ mat3_t mul(mat3_t a, mat3_t b)
+{
+    return mat3_mul(a, b);
+}
+
+__vmath__ mat3_t mul(mat3_t m, float s)
+{
+    return mat3_mulf(m, s);
+}
+
+__vmath__ mat3_t mul(float s, mat3_t m)
+{
+    return mat3_mulf(m, s);
+}
+
+__vmath__ vec3_t mul(mat3_t m, vec3_t v)
+{
+    return mat3_transform(m, v);
+}
+
 /* END OF VMATH_BUILD_MAT3 */
 #endif  
 
@@ -2503,6 +2901,41 @@ __vmath__ mat4_t mat4(float m00, float m01, float m02, float m03,
     r.rows[2] = vec4(m20, m21, m22, m23);
     r.rows[3] = vec4(m30, m31, m32, m33);
     return r;
+}
+
+__vmath__ mat4_t neg(mat4_t m)
+{
+    return mat4_neg(m);
+}
+
+__vmath__ mat4_t add(mat4_t a, mat4_t b)
+{
+    return mat4_add(a, b);
+}
+
+__vmath__ mat4_t sub(mat4_t a, mat4_t b)
+{
+    return mat4_sub(a, b);
+}
+
+__vmath__ mat4_t mul(mat4_t a, mat4_t b)
+{
+    return mat4_mul(a, b);
+}
+
+__vmath__ mat4_t mul(mat4_t m, float s)
+{
+    return mat4_mulf(m, s);
+}
+
+__vmath__ mat4_t mul(float s, mat4_t m)
+{
+    return mat4_mulf(m, s);
+}
+
+__vmath__ vec4_t mul(mat4_t m, vec4_t v)
+{
+    return mat4_transform(m, v);
 }
 
 __vmath__ mat4_t mat4_scale(float s)
@@ -2565,21 +2998,26 @@ __vmath__ mat4_t mat4_translate(float x, float y, float z)
     return mat4_translate3f(x, y, z);
 }
 
-
 /**
-* Apply transform (Matrix4x4) for Vector3D
-*/
+ * Apply transform (Matrix4x4) for Vector3D
+ */
 __vmath__ vec3_t mat4_transform(mat4_t m, vec3_t v)
 {
     const vec4_t c0 = vec4(m.m00, m.m10, m.m20, m.m30);
     const vec4_t c1 = vec4(m.m01, m.m11, m.m21, m.m31);
     const vec4_t c2 = vec4(m.m02, m.m12, m.m22, m.m32);
-    const vec4_t c3 = vec4(m.m03, m.m13, m.m23, m.m33);
+    /* const vec4_t c3 = vec4(m.m03, m.m13, m.m23, m.m33);
+     */
 
     const float x = vec4_dot(c0, vec4(v));
     const float y = vec4_dot(c1, vec4(v));
     const float z = vec4_dot(c2, vec4(v));
     return vec3(x, y, z);
+}
+
+__vmath__ vec3_t mul(mat4_t m, vec3_t v)
+{
+    return mat4_transform(m, v);
 }
 
 /* END OF VMATH_BUILD_MAT4 */
