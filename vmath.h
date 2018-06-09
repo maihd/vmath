@@ -10,8 +10,7 @@
 #define __VMATH_H__
 
 #define VMATH_LIBNAME "libvmath"
-#define VMATH_VERSION "v1.0.6" 
-
+#define VMATH_VERSION "v1.0.7" 
 
 /**
  * Include dependencies
@@ -311,9 +310,10 @@ typedef union vmath_mat2
         float m00, m01;
         float m10, m11;
     };
-    vec2_t   rows[2];
-    vec4_t   vec4;
-    float4_t data;
+    vec4_t vec4;
+    vec2_t rows[2];
+    float  m[2][2];
+    float  data[4];
 } mat2_t;
 
 /**
@@ -327,8 +327,8 @@ typedef union vmath_mat3
         float m10, m11, m12;
         float m20, m21, m22;
     };
-    float  m[3][3];
-    float  data[9];
+    float m[3][3];
+    float data[9];
 } mat3_t;
 
 /**
@@ -338,10 +338,10 @@ typedef union vmath_mat4
 {
     struct
     {
-	float m00, m01, m02, m03;
-	float m10, m11, m12, m13;
-	float m20, m21, m22, m23;
-	float m30, m31, m32, m33;
+	    float m00, m01, m02, m03;
+	    float m10, m11, m12, m13;
+	    float m20, m21, m22, m23;
+	    float m30, m31, m32, m33;
     };
     vec4_t rows[4];
     float  m[4][4];
@@ -432,7 +432,11 @@ static const mat4_t MAT4_IDENTITY = {
 #ifndef VMATH_UTILS
 #define VMATH_UTILS 1
 #endif
+
 #if (VMATH_UTILS != 0)
+/** 
+ * Fast inverse square root
+ */
 __vmath__ float vmath_rsqrt(float x)
 {
     union
@@ -446,6 +450,21 @@ __vmath__ float vmath_rsqrt(float x)
     cvt.x = cvt.x * (1.5f - 0.5f * x * cvt.x * cvt.x);
     return cvt.x;
 }
+
+/**
+ * Fast square root
+ */
+__vmath__ float vmath_fsqrt(float x)
+{
+    return x == 0.0f ? 0.0f : 1.0f / vmath_rsqrt(x);
+}
+#else
+# ifndef vmath_rsqrt
+# define vmath_rsqrt(x) (1.0f / sqrtf(x))
+# endif
+# ifndef vmath_fsqrt
+# define vmath_fsqrt(x) sqrtf(x)
+# endif
 #endif
 
 /**************************
@@ -565,7 +584,7 @@ __vmath__ vec2_t vec2_divf(vec2_t v, float s)
 /**
  * Compare two vector2d is equal or not
  */
-__vmath__ bool   vec2_eql(vec2_t a, vec2_t b)
+__vmath__ bool   vec2_equal(vec2_t a, vec2_t b)
 {
     return a.x == b.x && a.y == b.y;
 }
@@ -599,7 +618,7 @@ __vmath__ float  vec2_dot(vec2_t a, vec2_t b)
 /**
  * Squared length of vector 2d
  */
-__vmath__ float  vec2_lensqr(vec2_t v)
+__vmath__ float  vec2_lengthsquared(vec2_t v)
 {
     return vec2_dot(v, v);
 }
@@ -607,25 +626,25 @@ __vmath__ float  vec2_lensqr(vec2_t v)
 /**
  * Length of vector 2d
  */
-__vmath__ float  vec2_len(vec2_t v)
+__vmath__ float  vec2_length(vec2_t v)
 {
-    return sqrtf(vec2_lensqr(v));
+    return vmath_fsqrt(vec2_lengthsquared(v));
 }
 
 /**
  * Distance of two vector 2d
  */
-__vmath__ float  vec2_dist(vec2_t a, vec2_t b)
+__vmath__ float  vec2_distance(vec2_t a, vec2_t b)
 {
-    return vec2_len(vec2_sub(b, a));
+    return vec2_length(vec2_sub(b, a));
 }
 
 /**
  * Squared distance of two vector 2d
  */
-__vmath__ float  vec2_distsqr(vec2_t a, vec2_t b)
+__vmath__ float  vec2_distancesquared(vec2_t a, vec2_t b)
 {
-    return vec2_lensqr(vec2_sub(b, a));
+    return vec2_lengthsquared(vec2_sub(b, a));
 }
 
 /**
@@ -641,7 +660,7 @@ __vmath__ float  vec2_angle(vec2_t v)
  */
 __vmath__ vec2_t vec2_normalize(vec2_t v)
 {
-    const float lsqr = vec2_lensqr(v);
+    const float lsqr = vec2_lengthsquared(v);
     if (lsqr != 1.0f && lsqr > 0)
     {
         const float l = vmath_rsqrt(lsqr);
@@ -819,7 +838,7 @@ __vmath__ vec3_t vec3_divf(vec3_t v, float s)
 /**
  * Compare two vector3d is equal or not
  */
-__vmath__ bool   vec3_eql(vec3_t a, vec3_t b)
+__vmath__ bool   vec3_equal(vec3_t a, vec3_t b)
 {
 #if VMATH_SSE_ENABLE
     return (_mm_movemask_ps(_mm_cmpeq_ps(a.data, b.data)) & 0x7) == 0x7;
@@ -851,7 +870,7 @@ __vmath__ vec3_t vec3_neg(vec3_t v)
  */
 __vmath__ float vec3_dot(vec3_t a, vec3_t b)
 {
-#if VMATH_SSE_ENABLE
+#if VMATH_SSE_ENABLE && defined(__SSE4_1__)
     return _mm_cvtss_f32(_mm_dp_ps(a.data, b.data, 0x71));
 #else
     return a.x * b.x + a.y * b.y + a.z * b.z;
@@ -882,7 +901,7 @@ __vmath__ vec3_t vec3_cross(vec3_t a, vec3_t b)
 /**
  * Squared length of vector 3d
  */
-__vmath__ float vec3_lensqr(vec3_t v)
+__vmath__ float vec3_lengthsquared(vec3_t v)
 {
     return vec3_dot(v, v);
 }
@@ -890,29 +909,29 @@ __vmath__ float vec3_lensqr(vec3_t v)
 /**
  * Length of vector 3d
  */
-__vmath__ float vec3_len(vec3_t v)
+__vmath__ float vec3_length(vec3_t v)
 {
-#if VMATH_SSE_ENABLE
+#if VMATH_SSE_ENABLE && defined(__SSE4_1__)
     return _mm_cvtss_f32(_mm_sqrt_ss(_mm_dp_ps(v.data, v.data, 0x71)));
 #else
-    return sqrtf(vec3_lensqr(v));
+    return vmath_fsqrt(vec3_lengthsquared(v));
 #endif
 }
 
 /**
  * Distance of two vector 3d
  */
-__vmath__ float vec3_dist(vec3_t a, vec3_t b)
+__vmath__ float vec3_distance(vec3_t a, vec3_t b)
 {
-    return vec3_len(vec3_sub(b, a));
+    return vec3_length(vec3_sub(b, a));
 }
 
 /**
  * Squared distance of two vector 3d
  */
-__vmath__ float vec3_distsqr(vec3_t a, vec3_t b)
+__vmath__ float vec3_distancesquared(vec3_t a, vec3_t b)
 {
-    return vec3_lensqr(vec3_sub(b, a));
+    return vec3_lengthsquared(vec3_sub(b, a));
 }
 
 /**
@@ -925,7 +944,7 @@ __vmath__ vec3_t vec3_normalize(vec3_t v)
     r.data = _mm_mul_ps(v.data, _mm_rsqrt_ps(_mm_dp_ps(v.data, v.data, 0x77)));
     return r;
 #else
-    const float lsqr = vec3_lensqr(v);
+    const float lsqr = vec3_lengthsquared(v);
     if (lsqr != 1.0f && lsqr > 0) 
     {
         const float inv = vmath_rsqrt(lsqr);
@@ -1108,10 +1127,10 @@ __vmath__ vec4_t vec4_divf(vec4_t v, float s)
 /**
  * Compare two vector4d is equal or not
  */
-__vmath__ bool   vec4_eql(vec4_t a, vec4_t b)
+__vmath__ bool   vec4_equal(vec4_t a, vec4_t b)
 {
 #if VMATH_NEON_ENABLE
-    return eql2(a.xy, b.xy) && eql2(a.zw, b.zw);
+    return vec2_equal(a.xy, b.xy) && vec2_equal(a.zw, b.zw);
 #elif VMATH_SSE_ENABLE
     return _mm_movemask_ps(_mm_cmpeq_ps(a.data, b.data)) == 0xf;
 #else
@@ -1156,7 +1175,7 @@ __vmath__ float  vec4_dot(vec4_t a, vec4_t b)
 /**
  * Squared length of vector4d
  */
-__vmath__ float  vec4_lensqr(vec4_t v)
+__vmath__ float  vec4_lengthsquared(vec4_t v)
 {
     return vec4_dot(v, v);
 }
@@ -1164,25 +1183,25 @@ __vmath__ float  vec4_lensqr(vec4_t v)
 /**
  * Length of vector4d
  */
-__vmath__ float  vec4_len(vec4_t v)
+__vmath__ float  vec4_length(vec4_t v)
 {
-    return sqrtf(vec4_lensqr(v));
+    return vmath_fsqrt(vec4_lengthsquared(v));
 }
 
 /**
  * Distance of two vector4d
  */
-__vmath__ float  vec4_dist(vec4_t a, vec4_t b)
+__vmath__ float  vec4_distance(vec4_t a, vec4_t b)
 {
-    return vec4_len(vec4_sub(b, a));
+    return vec4_length(vec4_sub(b, a));
 }
 
 /**
  * Squared distance of two vector4d
  */
-__vmath__ float  vec4_distsqr(vec4_t a, vec4_t b)
+__vmath__ float  vec4_distancesquared(vec4_t a, vec4_t b)
 {
-    return vec4_lensqr(vec4_sub(b, a));
+    return vec4_lengthsquared(vec4_sub(b, a));
 }
 
 /**
@@ -1195,7 +1214,7 @@ __vmath__ vec4_t vec4_normalize(vec4_t v)
     r.data = _mm_mul_ps(v.data, _mm_rsqrt_ps(_mm_dp_ps(v.data, v.data, 0xff)));
     return r;
 #else
-    const float lsqr = vec4_lensqr(v);
+    const float lsqr = vec4_lengthsquared(v);
     if (lsqr != 1.0f && lsqr > 0)
     {
         const float inv = vmath_rsqrt(lsqr);
@@ -1306,9 +1325,9 @@ __vmath__ quat_t quat_neg(quat_t q)
 /**
  *
  */
-__vmath__ bool   quat_eql(quat_t a, quat_t b)
+__vmath__ bool   quat_equal(quat_t a, quat_t b)
 {
-    return vec4_eql(a.vec4, b.vec4);
+    return vec4_equal(a.vec4, b.vec4);
 }
 
 /**
@@ -1340,9 +1359,9 @@ __vmath__ quat_t quat_euler(float y, float p, float r)
 
     return quat(
         s1 * s2 * c3 + c1 * c2 * s3,
-	s1 * c2 * c3 + c1 * s2 * s3,
-	c1 * s2 * c3 - s1 * c2 * s3,
-	c1 * c2 * c3 - s1 * s2 * s3
+	    s1 * c2 * c3 + c1 * s2 * s3,
+	    c1 * s2 * c3 - s1 * c2 * s3,
+	    c1 * c2 * c3 - s1 * s2 * s3
     );
 }
 
@@ -1361,7 +1380,7 @@ __vmath__ quat_t quat_eulerv3(vec3_t e)
  */
 __vmath__ vec4_t quat_toaxis(quat_t q)
 {
-    if (fabsf(q.w) > 0)
+    if (q.w != 0.0f)
     {
         q = quat_normalize(q);
     }
@@ -1385,7 +1404,7 @@ __vmath__ vec4_t quat_toaxis(quat_t q)
  */
 __vmath__ quat_t quat_fromaxis(vec3_t axis, float angle)
 {
-    if (vec3_lensqr(axis) == 0.0f)
+    if (vec3_lengthsquared(axis) == 0.0f)
     {
         return QUAT_IDENTITY;
     }
@@ -1407,7 +1426,7 @@ __vmath__ quat_t quat_inverse(quat_t q)
 /**
  * Get conjugate quaternion
  */
-__vmath__ quat_t quat_conj(quat_t q)
+__vmath__ quat_t quat_conjugate(quat_t q)
 {
     return quat(-q.x, -q.y, -q.z, q.w);
 }
@@ -1417,6 +1436,14 @@ __vmath__ quat_t quat_conj(quat_t q)
  */
 __vmath__ quat_t quat_mul(quat_t a, quat_t b)
 {
+#if VMATH_QUAT_MUL_SIMPLE   
+    return quat(
+        a.x * b.x - a.y * b.y - a.z * b.z - a.w * b.w,
+        a.y * b.x + a.x * b.y - a.w * b.z + a.z * b.w,
+        a.z * b.x + a.w * b.y + a.x * b.z - a.y * b.w,
+        a.w * b.x - a.z * b.y + a.y * b.z + a.x * b.w,
+    );
+#else
     quat_t r;
     r.vec4.xyz = vec3_add(
         vec3_add(vec3_mulf(a.vec4.xyz, b.w), vec3_mulf(b.vec4.xyz, a.w)),
@@ -1424,6 +1451,7 @@ __vmath__ quat_t quat_mul(quat_t a, quat_t b)
     );
     r.vec4.w   = a.w * b.w - vec3_dot(a.vec4.xyz, b.vec4.xyz);
     return r;
+#endif
 }
 
 /* END OF VMATH_BUILD_QUAT */
@@ -1445,15 +1473,8 @@ __vmath__ quat_t quat_mul(quat_t a, quat_t b)
  */
 __vmath__ mat2_t mat2(float m00, float m01, float m10, float m11)
 {
-#if VMATH_SSE_ENABLE
     mat2_t r;
-    r.data = _mm_set_ps(m11, m10, m01, m00);
-#else
-    mat2_t r = {
-        m00, m01,
-        m10, m11,
-    };
-#endif
+    r.vec4 = vec4(m00, m01, m10, m11);
     return r;
 }
 
@@ -1495,17 +1516,18 @@ __vmath__ mat2_t mat2_mul(mat2_t a, mat2_t b)
 #if VMATH_SSE_ENABLE
     mat2_t r;
 
-    const __m128 tmp  = _mm_shuffle_ps(a.data,
-				       a.data,
-				       _MM_SHUFFLE(3, 1, 2, 0));
+    const __m128 tmp  = _mm_shuffle_ps(
+        a.vec4.data, a.vec4.data, _MM_SHUFFLE(3, 1, 2, 0));
     
-    r.data = _mm_hadd_ps(
-        _mm_mul_ps(tmp, _mm_shuffle_ps(b.data,
-				       b.data,
-				       _MM_SHUFFLE(1, 0, 1, 0))),
-        _mm_mul_ps(tmp, _mm_shuffle_ps(b.data,
-				       b.data,
-				       _MM_SHUFFLE(3, 2, 3, 2))));
+    r.vec4.data = _mm_hadd_ps(
+        _mm_mul_ps(
+            tmp, 
+            _mm_shuffle_ps(
+                b.vec4.data, b.vec4.data, _MM_SHUFFLE(1, 0, 1, 0))),
+        _mm_mul_ps(
+            tmp, 
+            _mm_shuffle_ps(
+                b.vec4.data, b.vec4.data, _MM_SHUFFLE(3, 2, 3, 2))));
     return r;
 #else
     return mat2(
@@ -1540,9 +1562,9 @@ __vmath__ mat2_t mat2_divf(mat2_t m, float s)
 /**
  * Test if 2 matrix 2x2 is equal
  */                             
-__vmath__ bool   mat2_eql(mat2_t a, mat2_t b)
+__vmath__ bool   mat2_equal(mat2_t a, mat2_t b)
 {
-    return vec4_eql(a.vec4, b.vec4);
+    return vec4_equal(a.vec4, b.vec4);
 }
 
 /**
@@ -1552,7 +1574,7 @@ __vmath__ mat2_t mat2_transpose(mat2_t m)
 {
 #if VMATH_SSE_ENABLE
     mat2_t r;
-    r.data = _mm_shuffle_ps(m.data, m.data, _MM_SHUFFLE(3, 1, 2, 0));
+    r.vec4.data = _mm_shuffle_ps(m.vec4.data, m.vec4.data, _MM_SHUFFLE(3, 1, 2, 0));
     return r;
 #else
     return mat2(m.m00, m.m10, m.m01, m.m11);
@@ -1710,7 +1732,7 @@ __vmath__ mat3_t mat3_divf(mat3_t m, float s)
  * Compare if two matrices is equal or not
  * @return: true is equal, false otherwise
  */
-__vmath__ bool mat3_eql(mat3_t a, mat3_t b)
+__vmath__ bool mat3_equal(mat3_t a, mat3_t b)
 {
     return
         a.m00 == b.m00 && a.m01 == b.m01 && a.m02 == b.m02 &&
@@ -2085,13 +2107,13 @@ __vmath__ mat4_t mat4_divf(mat4_t m, float s)
  * Compare if two matrix is equal or not
  * @return: true if equal, false otherwise
  */
-__vmath__ bool mat4_eql(mat4_t a, mat4_t b)
+__vmath__ bool mat4_equal(mat4_t a, mat4_t b)
 {
     return
-        vec4_eql(a.rows[0], b.rows[0]) &&
-        vec4_eql(a.rows[1], b.rows[1]) &&
-        vec4_eql(a.rows[2], b.rows[2]) &&
-        vec4_eql(a.rows[3], b.rows[3]);
+        vec4_equal(a.rows[0], b.rows[0]) &&
+        vec4_equal(a.rows[1], b.rows[1]) &&
+        vec4_equal(a.rows[2], b.rows[2]) &&
+        vec4_equal(a.rows[3], b.rows[3]);
 }
 
 /**
@@ -2153,8 +2175,8 @@ __vmath__ mat4_t mat4_frustum(float l, float r,
     m.rows[1] = vec4(0, 2.0f / (t - b), 0, 0);
     /* Row 3 */
     m.rows[2] = vec4((r + l) / (r - l),
-		     (t + b) / (t - b),
-		     (f + b) / (f - n), 
+		             (t + b) / (t - b),
+		             (f + b) / (f - n), 
                      1.0f);
     /* Row 4 */
     m.rows[3] = vec4(0, 0, 2.0f / (f - n), 0);
@@ -2388,14 +2410,24 @@ __vmath__ float dot(vec2_t a, vec2_t b)
     return vec2_dot(a, b);
 }
 
-__vmath__ float len(vec2_t v)
+__vmath__ float length(vec2_t v)
 {
-    return vec2_len(v);
+    return vec2_length(v);
 }
 
-__vmath__ float lensqr(vec2_t v)
+__vmath__ float lengthsquared(vec2_t v)
 {
-    return vec2_lensqr(v);
+    return vec2_lengthsquared(v);
+}
+
+__vmath__ float distance(vec2_t a, vec2_t b)
+{
+    return vec2_distance(a, b);
+}
+
+__vmath__ float distancesquared(vec2_t a, vec2_t b)
+{
+    return vec2_distancesquared(a, b);
 }
 
 __vmath__ vec2_t reflect(vec2_t v, vec2_t n)
@@ -2517,14 +2549,24 @@ __vmath__ float dot(vec3_t a, vec3_t b)
     return vec3_dot(a, b);
 }
 
-__vmath__ float len(vec3_t v)
+__vmath__ float length(vec3_t v)
 {
-    return vec3_len(v);
+    return vec3_length(v);
 }
 
-__vmath__ float lensqr(vec3_t v)
+__vmath__ float lengthsquared(vec3_t v)
 {
-    return vec3_lensqr(v);
+    return vec3_lengthsquared(v);
+}
+
+__vmath__ float distance(vec3_t a, vec3_t b)
+{
+    return vec3_distance(a, b);
+}
+
+__vmath__ float distancesquared(vec3_t a, vec3_t b)
+{
+    return vec3_distancesquared(a, b);
 }
 
 __vmath__ vec3_t cross(vec3_t a, vec3_t b)
@@ -2673,14 +2715,24 @@ __vmath__ float dot(vec4_t a, vec4_t b)
     return vec4_dot(a, b);
 }
 
-__vmath__ float len(vec4_t v)
+__vmath__ float length(vec4_t v)
 {
-    return vec4_len(v);
+    return vec4_length(v);
 }
 
-__vmath__ float lensqr(vec4_t v)
+__vmath__ float lengthsquared(vec4_t v)
 {
-    return vec4_lensqr(v);
+    return vec4_lengthsquared(v);
+}
+
+__vmath__ float distance(vec4_t a, vec4_t b)
+{
+    return vec4_distance(a, b);
+}
+
+__vmath__ float distancesquared(vec4_t a, vec4_t b)
+{
+    return vec4_distancesquared(a, b);
 }
 
 __vmath__ vec4_t reflect(vec4_t v, vec4_t n)
@@ -3074,13 +3126,13 @@ __vmath__ vec2_t operator/(vec2_t v, float s)
 
 __vmath__ bool operator==(vec2_t a, vec2_t b)
 {
-    return vec2_eql(a, b);
+    return vec2_equal(a, b);
 }
 
 
 __vmath__ bool operator!=(vec2_t a, vec2_t b)
 {
-    return !vec2_eql(a, b);
+    return !vec2_equal(a, b);
 }
 
 
@@ -3153,13 +3205,13 @@ __vmath__ vec3_t operator/(vec3_t v, float s)
 
 __vmath__ bool operator==(vec3_t a, vec3_t b)
 {
-    return vec3_eql(a, b);
+    return vec3_equal(a, b);
 }
 
 
 __vmath__ bool operator!=(vec3_t a, vec3_t b)
 {
-    return !vec3_eql(a, b);
+    return !vec3_equal(a, b);
 }
 
 
@@ -3232,13 +3284,13 @@ __vmath__ vec4_t operator/(vec4_t v, float s)
 
 __vmath__ bool operator==(vec4_t a, vec4_t b)
 {
-    return vec4_eql(a, b);
+    return vec4_equal(a, b);
 }
 
 
 __vmath__ bool operator!=(vec4_t a, vec4_t b)
 {
-    return !vec4_eql(a, b);
+    return !vec4_equal(a, b);
 }
 
 
@@ -3323,13 +3375,13 @@ __vmath__ quat_t operator/(float b, quat_t a)
 
 __vmath__ bool operator==(quat_t a, quat_t b)
 {
-    return quat_eql(a, b);
+    return quat_equal(a, b);
 }
 
 
 __vmath__ bool operator!=(quat_t a, quat_t b)
 {
-    return !quat_eql(a, b);
+    return !quat_equal(a, b);
 }
 
 
@@ -3425,13 +3477,13 @@ __vmath__ mat2_t operator/(float s, mat2_t m)
 
 __vmath__ bool operator==(mat2_t a, mat2_t b)
 {
-    return mat2_eql(a, b);
+    return mat2_equal(a, b);
 }
 
 
 __vmath__ bool operator!=(mat2_t a, mat2_t b)
 {
-    return !mat2_eql(a, b);
+    return !mat2_equal(a, b);
 }
 
 
@@ -3535,13 +3587,13 @@ __vmath__ mat3_t operator/(float s, mat3_t m)
 
 __vmath__ bool operator==(mat3_t a, mat3_t b)
 {
-    return mat3_eql(a, b);
+    return mat3_equal(a, b);
 }
 
 
 __vmath__ bool operator!=(mat3_t a, mat3_t b)
 {
-    return !mat3_eql(a, b);
+    return !mat3_equal(a, b);
 }
 
 
@@ -3644,13 +3696,13 @@ __vmath__ mat4_t operator/(float a, mat4_t b)
 
 __vmath__ bool operator==(mat4_t a, mat4_t b)
 {
-    return mat4_eql(a, b);
+    return mat4_equal(a, b);
 }
 
 
 __vmath__ bool operator!=(mat4_t a, mat4_t b)
 {
-    return !mat4_eql(a, b);
+    return !mat4_equal(a, b);
 }
 
 

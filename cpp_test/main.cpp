@@ -43,6 +43,14 @@ void vec2_test(void)
 
 void vec3_test(void)
 {
+    vec3_t a = vec3(1, 2, 3);
+    vec3_t b = vec3(4, 5, 6);
+    vec3_t c = add(a, b);
+    assert(c == vec3(5, 7, 9));
+    assert(lengthsquared(c) == 5 * 5 + 7 * 7 + 9 * 9);
+    assert(length(c) == vmath_fsqrt(5 * 5 + 7 * 7 + 9 * 9));
+
+    printf("vec3(%f, %f, %f)\n", c.x, c.y, c.z);
 }
 
 void vec4_test(void)
