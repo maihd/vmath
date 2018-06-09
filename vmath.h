@@ -92,6 +92,15 @@
 #define VMATH_BUILD_MAT4 1
 #endif
 
+#ifndef VMATH_GLSL_LIKE
+#define VMATH_GLSL_LIKE 0
+#endif
+
+#if !defined(_MSC_VER)
+#undef  VMATH_GLSL_LIKE
+#define VMATH_GLSL_LIKE 0
+#endif
+
 #ifndef VMATH_OPERATOR_OVERLOADING
 #define VMATH_OPERATOR_OVERLOADING 1
 #endif
@@ -195,10 +204,6 @@
 # pragma warning(disable : 4201) /* Shutup announce anonymous union warning */
 #endif
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /********
  * @region: Data types definitions
  ********/
@@ -217,7 +222,6 @@ typedef float       float3_t[3];
 typedef float       float4_t[4];
 #endif
 
-
 /**
  * Vector2D data structure
  */
@@ -230,7 +234,6 @@ typedef union vmath_vec2
     
     float2_t data;
 } vec2_t;
-
 
 /**
  * Vector3D data structures definition
@@ -283,7 +286,6 @@ typedef union vmath_vec4
     float4_t data;
 } vec4_t;
 
-
 /**
  * Quaternion data structure
  *
@@ -298,7 +300,6 @@ typedef union vmath_quat
     vec4_t   vec4;
     float4_t data;
 } quat_t;
-
 
 /**
  * Matrix 2x2 data structure
@@ -347,6 +348,213 @@ typedef union vmath_mat4
     float  m[4][4];
     float  data[16];
 } mat4_t;
+
+#if defined(__cplusplus) && VMATH_GLSL_LIKE
+
+#if defined(_MSC_VER)
+#define __vmath_novtable__ __declspec(novtable)
+#else
+#define __vmath_novtable__
+#endif
+
+#define __vmath_ctor__ /*{space}*/ __vmath_attr__ __vmath_inline__ 
+
+union vec2;
+union vec3;
+union vec4;
+union quat;
+union mat2;
+union mat3;
+union mat4;
+
+union __vmath_novtable__ vec2 
+{
+public: /* Fields */
+    struct
+    {
+        float x, y;
+    };
+
+    float2_t data;
+
+public: /* Constructor */
+    __vmath_ctor__ vec2(void)             : vec2(0, 0) {}
+    __vmath_ctor__ explicit vec2(float s) : vec2(s, s) {}
+    __vmath_ctor__ vec2(float x, float y) : x(x), y(y) {}
+
+    __vmath_ctor__ vec2(const vec2_t& v) : pure(v) {}
+    __vmath_ctor__ operator vec2_t() const { return pure; }
+
+private:
+    vec2_t pure;
+};
+
+union __vmath_novtable__ vec3 
+{
+public: /* Fields */
+    struct
+    {
+        float x, y, z;
+    };
+    struct
+    {
+        vec2_t xy;
+    };
+    struct
+    {
+        float  __;
+        vec2_t yz;
+    };
+
+    float3_t data;
+
+public: /* Constructors */
+    __vmath_ctor__ vec3(void)    : vec3(0, 0, 0) {}
+    __vmath_ctor__ explicit vec3(float s) : vec3(s, s, s) {}
+    __vmath_ctor__ vec3(float x, float y, float z) : x(x), y(y), z(z) {}
+
+    __vmath_ctor__ vec3(const vec3_t& v) : pure(v) {}
+    __vmath_ctor__ operator vec3_t() const { return pure; }
+
+private:
+    vec3_t pure;
+};
+
+union __vmath_novtable__ vec4 
+{
+public: /* Fields */
+    struct
+    {
+        float x, y, z, w;
+    };
+    struct
+    {
+        vec2_t xy;
+        vec2_t zw;
+    };
+    struct  
+    {
+        float  __;
+        vec2_t yz;
+    };
+    vec3_t   xyz;
+    float4_t data;  
+
+public: /* Constructors */
+    __vmath_ctor__ vec4(void)          : vec4(0, 0, 0, 0)       {}
+    __vmath_ctor__ explicit vec4(float s)       : vec4(s, s, s, s)       {}
+    __vmath_ctor__ vec4(const vec3& v) : vec4(v.x, v.y, v.z, 0) {}
+    __vmath_ctor__ vec4(float x, float y, float z, float w) : x(x), y(y), z(z), w(w) {}
+    
+    __vmath_ctor__ vec4(const vec4_t& v) : pure(v) {}
+    __vmath_ctor__ operator vec4_t() const { return pure; }
+
+private:
+    vec4_t   pure;
+};
+
+/**
+ * Quaternion data structure
+ *
+ * @hint: to convert to vec4_t, just get the 'vec4' member
+ */
+union __vmath_novtable__ quat
+{
+public: /* Fields */
+    union
+    {
+        struct
+        {
+            float x, y, z, w;
+        }; 
+        vec4_t   vec4;
+        float4_t data;
+    };
+
+public: /* Constructors */
+    __vmath_ctor__ quat(float x, float y, float z, float w) : vec4(::vec4(x, y, z, w)) {}
+    
+    __vmath_ctor__ quat(const quat_t& v) : pure(v) {}
+    __vmath_ctor__ operator quat_t() const { return pure; }
+
+private:
+    quat_t pure;
+};
+
+/**
+ * Matrix 2x2 data structure
+ */
+union __vmath_novtable__ mat2
+{
+public: /* Fields */
+    struct
+    {
+        float m00, m01;
+        float m10, m11;
+    };
+    vec4_t vec4;
+    vec2_t rows[2];
+    float  m[2][2];
+    float  data[4];
+
+public: /* Constructors */
+    __vmath_ctor__ mat2(const mat2_t& v) : pure(v) {}
+    __vmath_ctor__ operator mat2_t() const { return pure; }
+
+private:
+    mat2_t pure;
+};
+
+/**
+ * Matrix3x3 data structure
+ */
+union __vmath_novtable__ mat3
+{
+public: /* Fields */
+    struct
+    {
+        float m00, m01, m02;
+        float m10, m11, m12;
+        float m20, m21, m22;
+    };
+    float m[3][3];
+    float data[9];
+    
+public: /* Constructors */
+    __vmath_ctor__ mat3(const mat3_t& v) : pure(v) {}
+    __vmath_ctor__ operator mat3_t() const { return pure; }
+
+private:
+    mat3_t pure;
+};
+
+/**
+ * Matrix4x4 data structure
+ */
+union __vmath_novtable__ mat4
+{
+public: /* Fields */
+    struct
+    {
+        float m00, m01, m02, m03;
+        float m10, m11, m12, m13;
+        float m20, m21, m22, m23;
+        float m30, m31, m32, m33;
+    };
+    vec4_t rows[4];
+    float  m[4][4];
+    float  data[16];
+
+public: /* Constructors */
+    __vmath_ctor__ mat4(const mat4_t& v) : pure(v) {}
+    __vmath_ctor__ operator mat4_t() const { return pure; }
+
+private:
+    mat4_t pure;
+};
+
+#else
+#endif /* VMATH_GLSL_LIKE */
 
 /********
  * @endregion: Data types definitions
@@ -425,6 +633,326 @@ static const mat4_t MAT4_IDENTITY = {
 /* END OF VMATH_CONSTANTS */
 #endif
 
+/*****************************
+ * Non GLSL-like constructors
+ *****************************/
+#if !(defined(__cplusplus) && (VMATH_GLSL_LIKE != 0))
+/**
+ * Create Vector2D
+ */
+__vmath__ vec2_t vec2(float x, float y)
+{
+    vec2_t v;
+    v.x = x;
+    v.y = y;
+    return v;
+}
+
+/**
+ * Create a Vector3D
+ */
+__vmath__ vec3_t vec3(float x, float y, float z)
+{
+    vec3_t v;
+#if VMATH_SSE_ENABLE
+    v.data = _mm_set_ps(0, z, y, x);
+#else
+    v.x = x;
+    v.y = y;
+    v.z = z;
+#endif         
+    return v;
+}
+
+/**
+ * Create a Vector4D
+ */
+__vmath__ vec4_t vec4(float x, float y, float z, float w)
+{
+    vec4_t v;
+    
+#if (VMATH_SSE_ENABLE != 0)
+    v.data = _mm_set_ps(w, z, y, x);
+#else
+    v.x = x;
+    v.y = y;
+    v.z = z;
+    v.w = w;
+#endif
+    
+    return v;
+}
+
+/**
+ * Create Quaternion
+ * @return: Created quaternion
+ */
+__vmath__ quat_t quat(float x, float y, float z, float w)
+{           
+    quat_t r;
+    r.vec4 = vec4(x, y, z, w);
+    return r;
+}
+
+/**
+ * Create a matrix 2x2 with 4 components of its
+ *
+ * @param m00 component at [0, 0]
+ * @param m01 component at [0, 1]
+ * @param m10 component at [1, 0]
+ * @param m11 component at [1, 1]
+ * @return result matrix
+ */
+__vmath__ mat2_t mat2(float m00, float m01, float m10, float m11)
+{
+    mat2_t r;
+    r.vec4 = vec4(m00, m01, m10, m11);
+    return r;
+}
+
+/**
+ * Create a identify matrix 3x3
+ */
+__vmath__ mat3_t mat3(float s)
+{
+    mat3_t r = {
+        s, 0, 0,
+        0, s, 0,
+        0, 0, s,
+    };
+    return r;
+}
+
+/**
+ * Create a identity matrix 4x4
+ */
+__vmath__ mat4_t mat4(float s)
+{
+    mat4_t r;
+    r.rows[0] = vec4(s, 0, 0, 0);
+    r.rows[1] = vec4(0, s, 0, 0);
+    r.rows[2] = vec4(0, 0, s, 0);
+    r.rows[3] = vec4(0, 0, 0, s);
+    return r;
+}
+
+#if defined(__cplusplus) && VMATH_FUNCTION_OVERLOADING != 0
+/* BEGIN OF VMATH_FUNCTION_OVERLOADING */
+
+#if VMATH_BUILD_VEC2
+__vmath__ vec2_t vec2(void)
+{
+    return vec2(0, 0);
+}
+
+__vmath__ vec2_t vec2(float s)
+{
+    return vec2(s, s);
+}
+
+__vmath__ vec2_t vec2(const float* data)
+{
+    return vec2(data[0], data[1]);
+}
+
+__vmath__ vec2_t vec2(vec3_t v)
+{
+    return vec2(v.x, v.y);
+}
+
+__vmath__ vec2_t vec2(vec4_t v)
+{
+    return vec2(v.x, v.y);
+}
+#endif /* VMATH_BUILD_VEC2 */
+
+#if VMATH_BUILD_VEC3
+__vmath__ vec3_t vec3(void)
+{
+    return vec3(0, 0, 0);
+}
+
+__vmath__ vec3_t vec3(float s)
+{
+#if VMATH_SSE_ENABLE
+    vec3_t r;
+    r.data = _mm_set_ps1(s);
+    return r;
+#else
+    return vec3(s, s, s);
+#endif
+} 
+
+__vmath__ vec3_t vec3(const float* data)
+{
+    return vec3(data[0], data[1], data[2]);
+}
+
+__vmath__ vec3_t vec3(vec2_t v, float z = 0.0f)
+{
+    return vec3(v.x, v.y, z);
+}
+
+__vmath__ vec3_t vec3(vec4_t v)
+{
+    return vec3(v.x, v.y, v.z);
+}
+#endif /* VMATH_BUILD_VEC3 */
+
+#if VMATH_BUILD_VEC4
+__vmath__ vec4_t vec4(void)
+{
+    return vec4(0, 0, 0, 0);
+}
+
+__vmath__ vec4_t vec4(float s)
+{
+#if VMATH_SSE_ENABLE
+    vec4_t r;
+    r.data = _mm_set_ps1(s);
+    return r;
+#else
+    return vec4(s, s, s, s);
+#endif
+}
+
+__vmath__ vec4_t vec4(const float* data)
+{
+#if VMATH_SSE_ENABLE
+    vec4_t r;
+    r.data = _mm_load_ps(data);
+    return r;
+#else
+    return vec4(data[0], data[1], data[2], data[3]);
+#endif
+}
+
+__vmath__ vec4_t vec4(vec2_t v)
+{
+    return vec4(v.x, v.y, 0, 0);
+}
+
+__vmath__ vec4_t vec4(vec2_t xy, vec2_t zw)
+{
+    return vec4(xy.x, xy.y, zw.x, zw.y);
+}
+
+__vmath__ vec4_t vec4(vec3_t v)
+{
+#if VMATH_SSE_ENABLE || VMATH_NEON_ENABLE
+    vec4_t r;
+    r.data = v.data;
+    return r;
+#else
+    return vec4(v.x, v.y, v.z, w);
+#endif
+}        
+
+__vmath__ vec4_t vec4(vec3_t v, float w)
+{
+    return vec4(v.x, v.y, v.z, w);
+}
+#endif /* VMATH_BUILD_VEC4 */
+
+
+#if VMATH_BUILD_QUAT
+__vmath__ quat_t quat(float s)
+{
+    return quat(s, s, s, s);
+}
+#endif /* VMATH_BUILD_QUAT */
+
+#if VMATH_BUILD_MAT2
+__vmath__ mat2_t mat2(float s)
+{
+    return mat2(s, 0, 0, s);
+}
+
+__vmath__ mat2_t mat2(vec2_t row0, vec2_t row1)
+{
+    return mat2(row0.x, row0.y, row1.x, row1.y);
+}
+
+__vmath__ mat2_t mat2(const float* data)
+{
+    return mat2(data[0], data[1], data[2], data[3]);   
+}
+#endif /* VMATH_BUILD_MAT2 */
+
+
+#if VMATH_BUILD_MAT3
+__vmath__ mat3_t mat3(vec3_t row0, vec3_t row1, vec3_t row2)
+{
+    mat3_t r = {
+        row0.x, row0.y, row0.z,
+        row1.x, row1.y, row1.z,
+        row2.z, row2.y, row2.z,
+    };
+    return r;
+}
+
+__vmath__ mat3_t mat3(float m00, float m01, float m02,
+                      float m10, float m11, float m12,
+                      float m20, float m21, float m22)
+{
+    mat3_t r = {
+        m00, m01, m02,
+        m10, m11, m12,
+        m20, m21, m22,
+    };
+    return r;
+}
+
+__vmath__ mat3_t mat3(const float* data)
+{
+    mat3_t r = {
+        data[0], data[1], data[2],
+        data[3], data[4], data[5],
+        data[6], data[7], data[8]
+    };
+    return r;
+}
+#endif /* VMATH_BUILD_MAT3 */
+
+#if VMATH_BUILD_MAT4
+__vmath__ mat4_t mat4(vec4_t row0, vec4_t row1, vec4_t row2, vec4_t row3)
+{
+    mat4_t r;
+    r.rows[0] = row0;
+    r.rows[1] = row1;
+    r.rows[2] = row2;
+    r.rows[3] = row3;
+    return r;
+}
+
+__vmath__ mat4_t mat4(float m00, float m01, float m02, float m03,
+                      float m10, float m11, float m12, float m13,
+                      float m20, float m21, float m22, float m23,
+                      float m30, float m31, float m32, float m33)
+{
+    mat4_t r;
+    r.rows[0] = vec4(m00, m01, m02, m03);
+    r.rows[1] = vec4(m10, m11, m12, m13);
+    r.rows[2] = vec4(m20, m21, m22, m23);
+    r.rows[3] = vec4(m30, m31, m32, m33);
+    return r;
+}
+
+__vmath__ mat4_t mat4(const float* data)
+{
+    mat4_t r;
+    r.rows[0] = vec4(data +  0);
+    r.rows[1] = vec4(data +  4);
+    r.rows[2] = vec4(data +  8);
+    r.rows[3] = vec4(data + 12);
+    return r;
+}
+#endif /* VMATH_BUILD_MAT4 */
+
+/* END OF VMATH_FUNCTION_OVERLOADING */
+#endif /* VMATH_FUNCTION_OVERLOADING */
+
+#endif /* VMATH_GLSL_LIKE */
 
 /********
  * @region: Functions define
@@ -471,18 +999,6 @@ __vmath__ float vmath_fsqrt(float x)
  * Vector2D
  **************************/
 #if VMATH_BUILD_VEC2
-/**
- * Create vector2d
- */
-__vmath__ vec2_t vec2(float x, float y)
-{
-    vec2_t v;
-    v.x = x;
-    v.y = y;
-    return v;
-}
-
-
 /**
  * Addition of two vector2d
  */
@@ -686,22 +1202,6 @@ __vmath__ vec2_t vec2_reflect(vec2_t v, vec2_t n)
 **************************/
 #if VMATH_BUILD_VEC3
 /**
- * Create a Vector3D
- */
-__vmath__ vec3_t vec3(float x, float y, float z)
-{
-    vec3_t v;
-#if VMATH_SSE_ENABLE
-    v.data = _mm_set_ps(0, z, y, x);
-#else
-    v.x = x;
-    v.y = y;
-    v.z = z;
-#endif         
-    return v;
-}
-
-/**
  * Addition of two vector 3d
  */
 __vmath__ vec3_t vec3_add(vec3_t a, vec3_t b)
@@ -870,8 +1370,13 @@ __vmath__ vec3_t vec3_neg(vec3_t v)
  */
 __vmath__ float vec3_dot(vec3_t a, vec3_t b)
 {
-#if VMATH_SSE_ENABLE && defined(__SSE4_1__)
+#if VMATH_SSE_ENABLE
+# if defined(__SSE4_1__)
     return _mm_cvtss_f32(_mm_dp_ps(a.data, b.data, 0x71));
+# else
+    const vec3_t tmp = vec3_mul(a, b);
+    return tmp.x + tmp.y + tmp.z; 
+# endif
 #else
     return a.x * b.x + a.y * b.y + a.z * b.z;
 #endif
@@ -888,13 +1393,13 @@ __vmath__ vec3_t vec3_cross(vec3_t a, vec3_t b)
         _mm_mul_ps(_mm_shuffle_ps(a.data, a.data, _MM_SHUFFLE(3, 0, 2, 1)),
                    _mm_shuffle_ps(b.data, b.data, _MM_SHUFFLE(3, 1, 0, 2))),
         _mm_mul_ps(_mm_shuffle_ps(a.data, a.data, _MM_SHUFFLE(3, 1, 0, 2)),
-		   _mm_shuffle_ps(b.data, b.data, _MM_SHUFFLE(3, 0, 2, 1)))
+		           _mm_shuffle_ps(b.data, b.data, _MM_SHUFFLE(3, 0, 2, 1)))
 	);
     return r;
 #else
     return vec3(a.y * b.z - a.z * b.y,					
-		a.z * b.x - a.x * b.z,		
-		a.x * b.y - a.y * b.x);
+		        a.z * b.x - a.x * b.z,		
+		        a.x * b.y - a.y * b.x);
 #endif
 }
 
@@ -939,7 +1444,7 @@ __vmath__ float vec3_distancesquared(vec3_t a, vec3_t b)
  */
 __vmath__ vec3_t vec3_normalize(vec3_t v)
 {
-#if VMATH_SSE_ENABLE
+#if VMATH_SSE_ENABLE && defined(__SSE4_1__)
     vec3_t r;
     r.data = _mm_mul_ps(v.data, _mm_rsqrt_ps(_mm_dp_ps(v.data, v.data, 0x77)));
     return r;
@@ -970,26 +1475,6 @@ __vmath__ vec3_t vec3_reflect(vec3_t v, vec3_t n)
 * Vector4D
 **************************/
 #if VMATH_BUILD_VEC4
-/**
- * Create a Vector4D
- */
-__vmath__ vec4_t vec4(float x, float y, float z, float w)
-{
-    vec4_t v;
-    
-#if (VMATH_SSE_ENABLE != 0)
-    v.data = _mm_set_ps(w, z, y, x);
-#else
-    v.x = x;
-    v.y = y;
-    v.z = z;
-    v.w = w;
-#endif
-    
-    return v;
-}
-
-
 /**
  * Addition of two Vector4D
  */
@@ -1240,20 +1725,8 @@ __vmath__ vec4_t vec4_reflect(vec4_t v, vec4_t n)
 * Quaternion
 **************************/
 #if VMATH_BUILD_QUAT
-
 /**
- * Create quaternion
- * @return: Created quaternion
- */
-__vmath__ quat_t quat(float x, float y, float z, float w)
-{           
-    quat_t r;
-    r.vec4 = vec4(x, y, z, w);
-    return r;
-}
-
-/**
- *
+ * Addition of two quaternions
  */
 __vmath__ quat_t quat_add(quat_t a, quat_t b)
 {
@@ -1263,7 +1736,7 @@ __vmath__ quat_t quat_add(quat_t a, quat_t b)
 }
 
 /**
- *
+ * Subtraction of two quaternions
  */
 __vmath__ quat_t quat_sub(quat_t a, quat_t b)
 {
@@ -1273,7 +1746,7 @@ __vmath__ quat_t quat_sub(quat_t a, quat_t b)
 }
 
 /**
- *
+ * Addition of a quaternion with a scalar
  */
 __vmath__ quat_t quat_addf(quat_t q, float s)
 {
@@ -1283,7 +1756,7 @@ __vmath__ quat_t quat_addf(quat_t q, float s)
 }
 
 /**
- *
+ * Subtraction of a quaternion with a scalar
  */
 __vmath__ quat_t quat_subf(quat_t q, float s)
 {
@@ -1293,7 +1766,7 @@ __vmath__ quat_t quat_subf(quat_t q, float s)
 }
 
 /**
- *
+ * Multiplication of a quaternion with a scalar (scale quaternion up)
  */
 __vmath__ quat_t quat_mulf(quat_t q, float s)
 {
@@ -1303,7 +1776,7 @@ __vmath__ quat_t quat_mulf(quat_t q, float s)
 }
 
 /**
- *
+ * Division of a quaternion with a scalar (scale quaternion down)
  */
 __vmath__ quat_t quat_divf(quat_t q, float s)
 {
@@ -1313,7 +1786,7 @@ __vmath__ quat_t quat_divf(quat_t q, float s)
 }
 
 /**
- *
+ * Get negative version of given quaternion
  */
 __vmath__ quat_t quat_neg(quat_t q)
 {
@@ -1323,7 +1796,7 @@ __vmath__ quat_t quat_neg(quat_t q)
 }
 
 /**
- *
+ * Test if two quaternions is equal
  */
 __vmath__ bool   quat_equal(quat_t a, quat_t b)
 {
@@ -1331,7 +1804,7 @@ __vmath__ bool   quat_equal(quat_t a, quat_t b)
 }
 
 /**
- *
+ * Normalize the quaternion (force length equal 1)
  */
 __vmath__ quat_t quat_normalize(quat_t q)
 {
@@ -1461,23 +1934,6 @@ __vmath__ quat_t quat_mul(quat_t a, quat_t b)
 * Matrix 2x2
 **************************/
 #if VMATH_BUILD_MAT2
-
-/**
- * Create a matrix 2x2 with 4 components of its
- *
- * @param m00 component at [0, 0]
- * @param m01 component at [0, 1]
- * @param m10 component at [1, 0]
- * @param m11 component at [1, 1]
- * @return result matrix
- */
-__vmath__ mat2_t mat2(float m00, float m01, float m10, float m11)
-{
-    mat2_t r;
-    r.vec4 = vec4(m00, m01, m10, m11);
-    return r;
-}
-
 /**
  *
  */
@@ -1617,15 +2073,6 @@ __vmath__ vec2_t mat2_transform(mat2_t m, vec2_t v)
 * Matrix 3x3
 **************************/
 #if VMATH_BUILD_MAT3
-
-/**
- * Create a identify matrix 3x3
- */
-__vmath__ mat3_t mat3()
-{
-    return MAT3_IDENTITY;
-}
-
 /**
  *
  */
@@ -1813,15 +2260,6 @@ __vmath__ vec3_t mat3_transform(mat3_t m, vec3_t v)
 * Matrix 4x4
 **************************/
 #if VMATH_BUILD_MAT4
-
-/**
- * Create a identity matrix 4x4
- */
-__vmath__ mat4_t mat4()
-{
-    return MAT4_IDENTITY;
-}
-
 /**
  * Convert matrix 4x4 to matrix 2x2
  */
@@ -2298,12 +2736,7 @@ __vmath__ mat4_t mat4_inverse(mat4_t m)
 
 /********
  * @endregion: Functions define
- ********/    
-
-#ifdef __cplusplus
-}
-#endif
-
+ ********/
 
 /**************************
 * Functions overloading
@@ -2314,32 +2747,6 @@ __vmath__ mat4_t mat4_inverse(mat4_t m)
 * Vector2D constructor
 **************************/
 #if VMATH_BUILD_VEC2
-
-__vmath__ vec2_t vec2(void)
-{
-    return vec2(0, 0);
-}
-
-__vmath__ vec2_t vec2(float s)
-{
-    return vec2(s, s);
-}
-
-__vmath__ vec2_t vec2(const float* data)
-{
-    return vec2(data[0], data[1]);
-}
-
-__vmath__ vec2_t vec2(vec3_t v)
-{
-    return vec2(v.x, v.y);
-}
-
-__vmath__ vec2_t vec2(vec4_t v)
-{
-    return vec2(v.x, v.y);
-}
-
 __vmath__ vec2_t add(vec2_t a, vec2_t b)
 {
     return vec2_add(a, b);
@@ -2442,43 +2849,10 @@ __vmath__ vec2_t normalize(vec2_t v)
 /* END OF VMATH_BUILD_VEC2 */
 #endif
 
-
 /**************************
-* Vector3D constructor
-**************************/ 
+ * Vector3D constructor
+ **************************/ 
 #if VMATH_BUILD_VEC3
-
-__vmath__ vec3_t vec3()
-{
-    return vec3(0, 0, 0);
-}
-
-__vmath__ vec3_t vec3(float s)
-{
-#if VMATH_SSE_ENABLE
-    vec3_t r;
-    r.data = _mm_set_ps1(s);
-    return r;
-#else
-    return vec3(s, s, s);
-#endif
-} 
-
-__vmath__ vec3_t vec3(const float* data)
-{
-    return vec3(data[0], data[1], data[2]);
-}
-
-__vmath__ vec3_t vec3(vec2_t v, float z = 0.0f)
-{
-    return vec3(v.x, v.y, z);
-}
-
-__vmath__ vec3_t vec3(vec4_t v)
-{
-    return vec3(v.x, v.y, v.z);
-}
-
 __vmath__ vec3_t add(vec3_t a, vec3_t b)
 {
     return vec3_add(a, b);
@@ -2588,63 +2962,9 @@ __vmath__ vec3_t normalize(vec3_t v)
 #endif
 
 /**************************
-* Vector4D constructor
-**************************/
+ * Vector4D constructor
+ **************************/
 #if VMATH_BUILD_VEC4
-
-__vmath__ vec4_t vec4()
-{
-    return vec4(0, 0, 0, 0);
-}
-
-__vmath__ vec4_t vec4(float s)
-{
-#if VMATH_SSE_ENABLE
-    vec4_t r;
-    r.data = _mm_set_ps1(s);
-    return r;
-#else
-    return vec4(s, s, s, s);
-#endif
-}
-
-__vmath__ vec4_t vec4(const float* data)
-{
-#if VMATH_SSE_ENABLE
-    vec4_t r;
-    r.data = _mm_load_ps(data);
-    return r;
-#else
-    return vec4(data[0], data[1], data[2], data[3]);
-#endif
-}
-
-__vmath__ vec4_t vec4(vec2_t v)
-{
-    return vec4(v.x, v.y, 0, 0);
-}
-
-__vmath__ vec4_t vec4(vec2_t xy, vec2_t zw)
-{
-    return vec4(xy.x, xy.y, zw.x, zw.y);
-}
-
-__vmath__ vec4_t vec4(vec3_t v)
-{
-#if VMATH_SSE_ENABLE || VMATH_NEON_ENABLE
-    vec4_t r;
-    r.data = v.data;
-    return r;
-#else
-    return vec4(v.x, v.y, v.z, w);
-#endif
-}        
-
-__vmath__ vec4_t vec4(vec3_t v, float w)
-{
-    return vec4(v.x, v.y, v.z, w);
-}
-
 __vmath__ vec4_t add(vec4_t a, vec4_t b)
 {
     return vec4_add(a, b);
@@ -2752,11 +3072,6 @@ __vmath__ vec4_t normalize(vec4_t v)
  * Quaternion functions
  **************************/
 #if VMATH_BUILD_QUAT
-__vmath__ quat_t quat(float s)
-{
-    return quat(s, s, s, s);
-}
-
 __vmath__ quat_t add(quat_t a, quat_t b)
 {
     return quat_add(a, b);
@@ -2792,17 +3107,6 @@ __vmath__ quat_t neg(quat_t q)
  * Matrix 2x2 constructor
  **************************/
 #if VMATH_BUILD_MAT2
-
-__vmath__ mat2_t mat2(float s)
-{
-    return mat2(s, 0, 0, s);
-}
-
-__vmath__ mat2_t mat2(vec2_t row0, vec2_t row1)
-{
-    return mat2(row0.x, row0.y, row1.x, row1.y);
-}
-
 __vmath__ mat2_t neg(mat2_t m)
 {
     return mat2_neg(m);
@@ -2845,39 +3149,6 @@ __vmath__ vec2_t mul(mat2_t m, vec2_t v)
 * Matrix 3x3 constructor
 **************************/
 #if VMATH_BUILD_MAT3
-
-__vmath__ mat3_t mat3(float s)
-{
-    mat3_t r = {
-        s, 0, 0,
-        0, s, 0,
-        0, 0, s,
-    };
-    return r;
-}
-
-__vmath__ mat3_t mat3(vec3_t row0, vec3_t row1, vec3_t row2)
-{
-    mat3_t r = {
-        row0.x, row0.y, row0.z,
-        row1.x, row1.y, row1.z,
-        row2.z, row2.y, row2.z,
-    };
-    return r;
-}
-
-__vmath__ mat3_t mat3(float m00, float m01, float m02,
-                      float m10, float m11, float m12,
-                      float m20, float m21, float m22)
-{
-    mat3_t r = {
-        m00, m01, m02,
-        m10, m11, m12,
-        m20, m21, m22,
-    };
-    return r;
-}
-
 __vmath__ mat3_t neg(mat3_t m)
 {
     return mat3_neg(m);
@@ -2920,41 +3191,6 @@ __vmath__ vec3_t mul(mat3_t m, vec3_t v)
 * Matrix 4x4 overloading
 **************************/
 #if VMATH_BUILD_MAT4
-
-__vmath__ mat4_t mat4(float s)
-{
-    mat4_t r = {
-        s, 0, 0, 0,
-        0, s, 0, 0,
-        0, 0, s, 0,
-        0, 0, 0, s,
-    };
-    return r;
-}
-
-__vmath__ mat4_t mat4(vec4_t row0, vec4_t row1, vec4_t row2, vec4_t row3)
-{
-    mat4_t r;
-    r.rows[0] = row0;
-    r.rows[1] = row1;
-    r.rows[2] = row2;
-    r.rows[3] = row3;
-    return r;
-}
-
-__vmath__ mat4_t mat4(float m00, float m01, float m02, float m03,
-                      float m10, float m11, float m12, float m13,
-                      float m20, float m21, float m22, float m23,
-                      float m30, float m31, float m32, float m33)
-{
-    mat4_t r;
-    r.rows[0] = vec4(m00, m01, m02, m03);
-    r.rows[1] = vec4(m10, m11, m12, m13);
-    r.rows[2] = vec4(m20, m21, m22, m23);
-    r.rows[3] = vec4(m30, m31, m32, m33);
-    return r;
-}
-
 __vmath__ mat4_t neg(mat4_t m)
 {
     return mat4_neg(m);

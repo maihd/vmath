@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <assert.h>
 
+#define VMATH_GLSL_LIKE 1
 #include "../vmath.h"
 
 void vec2_test(void);
@@ -28,6 +29,7 @@ int main(int argc, char* argv[])
     mat4_test();
     quat_test();    
     
+    fgetc(stdin);
     return 0;
 }
 
@@ -36,9 +38,12 @@ void vec2_test(void)
     vec2_t a = vec2(1, 2);
     vec2_t b = vec2(3, 4);
     vec2_t c = add(a, b);
-    assert(c == vec2(4, 6));
+    vec2_t d = vec2(4, 6);
 
     printf("vec2(%f, %f)\n", c.x, c.y);
+    printf("vec2(%f, %f)\n", d.x, d.y);
+
+    assert(c == d);
 }
 
 void vec3_test(void)
