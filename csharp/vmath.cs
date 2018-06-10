@@ -385,6 +385,12 @@ public static class vmath
         }
 
         [MethodImpl(MethodInlineOptions)]
+        public static vec4 operator+(float s, vec4 v)
+        {
+            return add(v, s);
+        }
+
+        [MethodImpl(MethodInlineOptions)]
         public static bool operator==(vec4 a, vec4 b)
         {
             return a.Equals(b);
@@ -603,21 +609,48 @@ public static class vmath
     }
 
     [MethodImpl(MethodInlineOptions)]
-    public static float lensqr(vec2 v)
+    public static float lengthsquared(vec2 v)
     {
         return dot(v, v);
     }
 
     [MethodImpl(MethodInlineOptions)]
-    public static float len(vec2 v)
+    public static float length(vec2 v)
     {
-        return (float)Math.Sqrt(lensqr(v));
+        return (float)Math.Sqrt(lengthsquared(v));
+    }
+
+    [MethodImpl(MethodInlineOptions)]
+    public static float distance(vec2 a, vec2 b)
+    {
+        return length(sub(a, b));
+    }
+
+    [MethodImpl(MethodInlineOptions)]
+    public static float distancesquared(vec2 a, vec2 b)
+    {
+        return lengthsquared(sub(a, b));
     }
 
     [MethodImpl(MethodInlineOptions)]
     public static vec2 reflect(vec2 v, vec2 n)
     {
         return sub(v, mul(n, 2.0f * dot(v, n)));
+    }
+
+    [MethodImpl(MethodInlineOptions)]
+    public static vec2 normalize(vec2 v)
+    {
+        float lsqr = lengthsquared(v);
+        if (lsqr != 1.0f && lsqr > 0.0f)
+        {
+            float l = 1.0f / (float)Math.Sqrt(lsqr);
+            return new vec2(v.x * l, v.y * l);
+        }
+        else
+        {
+            return v;
+        }
     }
     #endregion vec2 functions
     /* * */
@@ -696,21 +729,48 @@ public static class vmath
     }
 
     [MethodImpl(MethodInlineOptions)]
-    public static float lensqr(vec3 v)
+    public static float lengthsquared(vec3 v)
     {
         return dot(v, v);
     }
 
     [MethodImpl(MethodInlineOptions)]
-    public static float len(vec3 v)
+    public static float length(vec3 v)
     {
-        return (float)Math.Sqrt(lensqr(v));
+        return (float)Math.Sqrt(length(v));
+    }
+
+    [MethodImpl(MethodInlineOptions)]
+    public static float distancesquared(vec3 a, vec3 b)
+    {
+        return lengthsquared(sub(a, b));
+    }
+
+    [MethodImpl(MethodInlineOptions)]
+    public static float distance(vec3 a, vec3 b)
+    {
+        return length(sub(a, b));
     }
 
     [MethodImpl(MethodInlineOptions)]
     public static vec3 reflect(vec3 v, vec3 n)
     {
         return sub(v, mul(n, 2.0f * dot(v, n)));
+    }
+
+    [MethodImpl(MethodInlineOptions)]
+    public static vec3 normalize(vec3 v)
+    {
+        float lsqr = lengthsquared(v);
+        if (lsqr != 1.0f && lsqr > 0.0f)
+        {
+            float l = 1.0f / (float)Math.Sqrt(lsqr);
+            return new vec3(v.x * l, v.y * l, v.z * l);
+        }
+        else
+        {
+            return v;
+        }
     }
     #endregion vec3 functions
     /* * */
@@ -778,21 +838,48 @@ public static class vmath
     }
 
     [MethodImpl(MethodInlineOptions)]
-    public static float lensqr(vec4 v)
+    public static float lengthsquared(vec4 v)
     {
         return dot(v, v);
     }
 
     [MethodImpl(MethodInlineOptions)]
-    public static float len(vec4 v)
+    public static float length(vec4 v)
     {
-        return (float)Math.Sqrt(lensqr(v));
+        return (float)Math.Sqrt(lengthsquared(v));
+    }
+
+    [MethodImpl(MethodInlineOptions)]
+    public static float distancesquared(vec4 a, vec4 b)
+    {
+        return lengthsquared(sub(a, b));
+    }
+
+    [MethodImpl(MethodInlineOptions)]
+    public static float distance(vec4 a, vec4 b)
+    {
+        return length(sub(a, b));
     }
 
     [MethodImpl(MethodInlineOptions)]
     public static vec4 reflect(vec4 v, vec4 n)
     {
         return sub(v, mul(n, 2.0f * dot(v, n)));
+    }
+
+    [MethodImpl(MethodInlineOptions)]
+    public static vec4 normalize(vec4 v)
+    {
+        float lsqr = lengthsquared(v);
+        if (lsqr != 1.0f && lsqr > 0.0f)
+        {
+            float l = 1.0f / (float)Math.Sqrt(lsqr);
+            return new vec4(v.x * l, v.y * l, v.z * l, v.w * l);
+        }
+        else
+        {
+            return v;
+        }
     }
     #endregion vec4 functions
     /* * */
