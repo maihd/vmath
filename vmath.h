@@ -50,7 +50,7 @@
 #endif
 
 #ifdef __GNUC__ /* GCC */
-# define __vmath_attr__     __attribute__((pure)) __vmath_nothrow__
+# define __vmath_attr__     __attribute__((always_inline)) __vmath_nothrow__
 #else /* Windows MSVC */
 # define __vmath_attr__     __forceinline __vmath_nothrow__
 #endif
@@ -93,11 +93,6 @@
 #endif
 
 #ifndef VMATH_GLSL_LIKE
-#define VMATH_GLSL_LIKE 0
-#endif
-
-#if !defined(_MSC_VER)
-#undef  VMATH_GLSL_LIKE
 #define VMATH_GLSL_LIKE 0
 #endif
 
@@ -145,17 +140,17 @@
 /**
  * SSE support checking
  */
-//#if defined(__SSSE3__)
-//# define VMATH_SSE_SUPPORT 1
-//#endif
+#if defined(__SSSE3__)
+# define VMATH_SSE_SUPPORT 1
+#endif
 
 #if defined(__SSE__) || defined(__SSE2__) || defined(__SSE3__)
 # define VMATH_SSE_SUPPORT 1
 #endif
 
-//#if defined(__SSE4_1__) || defined(__SSE4_2__) || defined(__SSE_MATH__)
-//# define VMATH_SSE_SUPPORT 1
-//#endif
+#if defined(__SSE4_1__) || defined(__SSE4_2__) || defined(__SSE_MATH__)
+# define VMATH_SSE_SUPPORT 1
+#endif
 
 #if defined(_MSC_VER) && (defined(_M_IX86) || defined(_M_IX64))
 # if defined(_M_HYBRID_X86_ARM64)
@@ -177,7 +172,6 @@
 #  define VMATH_SSE_ENABLE 0
 #endif
 
-
 /**
  * Boolean type support
  */
@@ -191,6 +185,15 @@
 # define false 0
 #endif
 
+/**
+ * Static assert support
+ */
+#if !defined(__cplusplus) && !defined(static_assert)    
+#define STATIC_ASSERT_CONCAT_IN(a, b)  a ## b
+#define STATIC_ASSERT_CONCAT(a, b)     STATIC_ASSERT_CONCAT_IN(a, b)
+#define STATIC_ASSERT_GENSYM()         STATIC_ASSERT_CONCAT(__SA, __LINE__)
+#define static_assert(exp, msg) struct STATIC_ASSERT_GENSYM() { char test[(exp) && (msg) ? 1 : 0]; }
+#endif
 
 /**
  * Turn off annoy warning
@@ -232,6 +235,7 @@ typedef union vmath_vec2
         float x, y;
     };
     
+    float    m[2];
     float2_t data;
 } vec2_t;
 
@@ -255,6 +259,7 @@ typedef union vmath_vec3
     };
 
     vec2_t   xy;
+    float    m[3];
     float3_t data;
 } vec3_t;
 
@@ -283,6 +288,7 @@ typedef union vmath_vec4
     };
 
     vec3_t   xyz;
+    float    m[4];
     float4_t data;
 } vec4_t;
 
@@ -298,6 +304,8 @@ typedef union vmath_quat
         float x, y, z, w;
     }; 
     vec4_t   vec4;
+
+    float    m[4];
     float4_t data;
 } quat_t;
 
@@ -349,47 +357,183 @@ typedef union vmath_mat4
     float  data[16];
 } mat4_t;
 
+static_assert(sizeof(vec2_t) == sizeof(float2_t)  , "Size of vec2_t is not valid");
+static_assert(sizeof(vec3_t) == sizeof(float3_t)  , "Size of vec3_t is not valid");
+static_assert(sizeof(vec4_t) == sizeof(float4_t)  , "Size of vec3_t is not valid");
+static_assert(sizeof(quat_t) == sizeof(float4_t)  , "Size of quat_t is not valid");
+static_assert(sizeof(mat2_t) == 4  * sizeof(float), "Size of mat2_t is not valid");
+static_assert(sizeof(mat3_t) == 9  * sizeof(float), "Size of mat3_t is not valid");
+static_assert(sizeof(mat4_t) == 16 * sizeof(float), "Size of mat4_t is not valid");
+
+
 #if defined(__cplusplus) && VMATH_GLSL_LIKE
 
 #if defined(_MSC_VER)
-#define __vmath_novtable__ __declspec(novtable)
+# define __vmath_ctor__ /*{space}*/ __vmath_attr__ __vmath_inline__ 
+# define __vmath_mthd__ /*{space}*/ __vmath_attr__ __vmath_inline__
 #else
-#define __vmath_novtable__
+# define __vmath_ctor__ /*{space}*/ __attribute__((always_inline)) __vmath_nothrow__ __vmath_inline__ 
+# define __vmath_mthd__ /*{space}*/ __attribute__((always_inline)) __vmath_nothrow__ __vmath_inline__
 #endif
 
-#define __vmath_ctor__ /*{space}*/ __vmath_attr__ __vmath_inline__ 
+#define __vmath_vec2_property(_1, _2)                       \
+    union {                                                 \
+    private:                                                \
+        struct                                              \
+        {                                                   \
+            float x;                                        \
+            float y;                                        \
+        };                                                  \
+                                                            \
+    public:                                                 \
+        __vmath_mthd__ vec2 operator=(const vec2& other)    \
+        {                                                   \
+            _1 = other.x;                                   \
+            _2 = other.y;                                   \
+            return vec2(_1, _2);                            \
+        }                                                   \
+                                                            \
+        __vmath_mthd__ operator vec2() const                \
+        {                                                   \
+            return vec2(_1, _2);                            \
+        }                                                   \
+    }                                                        
+#define __vmath_vec3_property2(_1, _2)                      \
+    union {                                                 \
+    private:                                                \
+        struct { float x; float y; float z; };              \
+    public:                                                 \
+        __vmath_mthd__ vec2 operator=(const vec2& other)    \
+        {                                                   \
+            _1 = other.x;                                   \
+            _2 = other.y;                                   \
+            return vec2(_1, _2);                            \
+        }                                                   \
+                                                            \
+        __vmath_mthd__ operator vec2() const                \
+        {                                                   \
+            return vec2(_1, _2);                            \
+        }                                                   \
+    }                         
 
-union vec2;
-union vec3;
-union vec4;
-union quat;
-union mat2;
-union mat3;
-union mat4;
+#define __vmath_vec3_property3(_1, _2, _3)                  \
+    union {                                                 \
+    private:                                                \
+        struct { float x; float y; float z; };              \
+    public:                                                 \
+        __vmath_mthd__ vec3 operator=(const vec3& other)    \
+        {                                                   \
+            _1 = other.x;                                   \
+            _2 = other.y;                                   \
+            _3 = other.z;                                   \
+            return vec3(_1, _2, _3);                        \
+        }                                                   \
+                                                            \
+        __vmath_mthd__ operator vec3() const                \
+        {                                                   \
+            return vec3(_1, _2, _3);                        \
+        }                                                   \
+    }                                
 
-union __vmath_novtable__ vec2 
+#define __vmath_vec4_property2(_1, _2)                      \
+    union {                                                 \
+    private:                                                \
+        struct { float x; float y; float z; float w;};      \
+    public:                                                 \
+        __vmath_mthd__ vec2 operator=(const vec2& other)    \
+        {                                                   \
+            _1 = other.x;                                   \
+            _2 = other.y;                                   \
+            return vec2(_1, _2);                            \
+        }                                                   \
+                                                            \
+        __vmath_mthd__ operator vec4() const                \
+        {                                                   \
+            return vec2(_1, _2);                            \
+        }                                                   \
+    }
+
+#define __vmath_vec4_property3(_1, _2, _3)                  \
+    union  {                                                \
+    private:                                                \
+        struct { float x; float y; float z; float w;};      \
+    public:                                                 \
+        __vmath_mthd__ vec3 operator=(const vec3& other)    \
+        {                                                   \
+            _1 = other.x;                                   \
+            _2 = other.y;                                   \
+            _3 = other.z;                                   \
+            return vec3(_1, _2, _3);                        \
+        }                                                   \
+                                                            \
+        __vmath_mthd__ operator vec3() const                \
+        {                                                   \
+            return vec4(_1, _2, _3);                        \
+        }                                                   \
+    }
+
+#define __vmath_vec4_property4(_1, _2, _3, _4)              \
+    union  {                                                \
+    private:                                                \
+        struct { float x; float y; float z; float w;};      \
+    public:                                                 \
+        __vmath_mthd__ vec4 operator=(const vec4& other)    \
+        {                                                   \
+            _1 = other.x;                                   \
+            _2 = other.y;                                   \
+            _3 = other.z;                                   \
+            _4 = other.w;                                   \
+            return vec4(_1, _2, _3, _4);                    \
+        }                                                   \
+                                                            \
+        __vmath_mthd__ operator vec4() const                \
+        {                                                   \
+            return vec4(_1, _2, _3, _4);                    \
+        }                                                   \
+    }
+
+
+union vec2 
 {
 public: /* Fields */
-    struct
-    {
-        float x, y;
-    };
-
-    float2_t data;
+    struct { float x, y; };
 
 public: /* Constructor */
     __vmath_ctor__ vec2(void)             : vec2(0, 0) {}
     __vmath_ctor__ explicit vec2(float s) : vec2(s, s) {}
-    __vmath_ctor__ vec2(float x, float y) : x(x), y(y) {}
+    __vmath_ctor__ vec2(float x, float y) { this->x = x; this->y = y; }
 
     __vmath_ctor__ vec2(const vec2_t& v) : pure(v) {}
-    __vmath_ctor__ operator vec2_t() const { return pure; }
+    __vmath_ctor__ operator       vec2_t&()       { return pure; }
+    __vmath_ctor__ operator const vec2_t&() const { return pure; }
+    
+public: /* Operator */
+    __vmath_mthd__ vec2& operator=(const vec2_t& v)
+    {
+        pure = v;
+        return *this;
+    }
+
+    __vmath_mthd__ float& operator[](int index)
+    {
+        assert(index >= 0 && index < 2);
+        return ((float*)this)[index];
+    }
+
+    __vmath_mthd__ float operator[](int index) const
+    {
+        assert(index >= 0 && index < 2);
+        return ((float*)this)[index];
+    }
+
+public: /* Properties */
+    __vmath_vec2_property(y, x) yx;
 
 private:
     vec2_t pure;
 };
 
-union __vmath_novtable__ vec3 
+union vec3 
 {
 public: /* Fields */
     struct
@@ -406,21 +550,49 @@ public: /* Fields */
         vec2_t yz;
     };
 
-    float3_t data;
-
 public: /* Constructors */
     __vmath_ctor__ vec3(void)    : vec3(0, 0, 0) {}
-    __vmath_ctor__ explicit vec3(float s) : vec3(s, s, s) {}
-    __vmath_ctor__ vec3(float x, float y, float z) : x(x), y(y), z(z) {}
+    __vmath_ctor__ vec3(float x, float y, float z = 0.0f) : x(x), y(y), z(z) {}
+
+    __vmath_ctor__ explicit vec3(float s)        : vec3(s, s, s)          {}
+    __vmath_ctor__ explicit vec3(const float* s) : vec3(s[0], s[1], s[2]) {}
+
+    __vmath_ctor__ explicit vec3(const vec2&   v, float z = 0.0f) : vec3(v.x, v.y, z) {}
+    __vmath_ctor__ explicit vec3(const vec2_t& v, float z = 0.0f) : vec3(v.x, v.y, z) {}
 
     __vmath_ctor__ vec3(const vec3_t& v) : pure(v) {}
-    __vmath_ctor__ operator vec3_t() const { return pure; }
+    __vmath_ctor__ operator       vec3_t&()       { return pure; }
+    __vmath_ctor__ operator const vec3_t&() const { return pure; }
+
+public: /* Operator */
+    __vmath_mthd__ float& operator[](int index)
+    {
+        assert(index >= 0 && index < 3);
+        return pure.m[index];
+    }
+
+    __vmath_mthd__ float operator[](int index) const
+    {
+        assert(index >= 0 && index < 3);
+        return pure.m[index];
+    }
+
+public: /* Properties */           
+    __vmath_vec3_property2(x, z)    xz;
+    __vmath_vec3_property2(y, x)    yx;
+    __vmath_vec3_property2(z, x)    zx;
+    __vmath_vec3_property2(z, y)    zy;
+    __vmath_vec3_property3(x, z, y) xzy;
+    __vmath_vec3_property3(y, x, z) yxz;
+    __vmath_vec3_property3(y, z, x) yzx;
+    __vmath_vec3_property3(z, x, y) zxy;
+    __vmath_vec3_property3(z, y, x) zyx;
 
 private:
     vec3_t pure;
 };
 
-union __vmath_novtable__ vec4 
+union vec4 
 {
 public: /* Fields */
     struct
@@ -438,27 +610,49 @@ public: /* Fields */
         vec2_t yz;
     };
     vec3_t   xyz;
-    float4_t data;  
 
 public: /* Constructors */
-    __vmath_ctor__ vec4(void)          : vec4(0, 0, 0, 0)       {}
-    __vmath_ctor__ explicit vec4(float s)       : vec4(s, s, s, s)       {}
-    __vmath_ctor__ vec4(const vec3& v) : vec4(v.x, v.y, v.z, 0) {}
-    __vmath_ctor__ vec4(float x, float y, float z, float w) : x(x), y(y), z(z), w(w) {}
+    __vmath_ctor__ vec4(void) : vec4(0, 0, 0, 0) {}
     
+    __vmath_ctor__ vec4(float x, float y, float z, float w) 
+        #if VMATH_SSE_ENABLE != 0
+        { pure.data = _mm_set_ps(x, y, z, w); }
+        #else
+        : x(x), y(y), z(z), w(w) {}
+        #endif
+    
+    __vmath_ctor__ explicit vec4(float s)         : vec4(s, s, s, s)             {}
+    __vmath_ctor__ explicit vec4(const float* s)  : vec4(s[0], s[1], s[2], s[3]) {}
+    __vmath_ctor__ explicit vec4(const vec2& v)   : vec4(v.x, v.y, 0, 0)         {}
+    __vmath_ctor__ explicit vec4(const vec2_t& v) : vec4(v.x, v.y, 0, 0)         {}
+    __vmath_ctor__ explicit vec4(const vec3& v)   : vec4(v.x, v.y, v.z, 0)       {}
+    __vmath_ctor__ explicit vec4(const vec3_t& v) : vec4(v.x, v.y, v.z, 0)       {}
+
     __vmath_ctor__ vec4(const vec4_t& v) : pure(v) {}
-    __vmath_ctor__ operator vec4_t() const { return pure; }
+    __vmath_ctor__ operator       vec4_t&()       { return pure; }
+    __vmath_ctor__ operator const vec4_t&() const { return pure; }
+
+public: /* Operator */
+    __vmath_mthd__ float& operator[](int index)
+    {
+        assert(index >= 0 && index < 4);
+        return pure.m[index];
+    }
+
+    __vmath_mthd__ float operator[](int index) const
+    {
+        assert(index >= 0 && index < 4);
+        return pure.m[index];
+    }
 
 private:
-    vec4_t   pure;
+    vec4_t pure;
 };
 
 /**
  * Quaternion data structure
- *
- * @hint: to convert to vec4_t, just get the 'vec4' member
  */
-union __vmath_novtable__ quat
+union quat
 {
 public: /* Fields */
     union
@@ -467,24 +661,31 @@ public: /* Fields */
         {
             float x, y, z, w;
         }; 
-        vec4_t   vec4;
-        float4_t data;
     };
 
 public: /* Constructors */
+    __vmath_ctor__ quat(void)    : quat(0, 0, 0, 0) {}
+    __vmath_ctor__ quat(float s) : quat(0, 0, 0, s) {} 
     __vmath_ctor__ quat(float x, float y, float z, float w) : vec4(::vec4(x, y, z, w)) {}
     
+    __vmath_ctor__ quat(const vec4&   v) : vec4(v) {}
+    __vmath_ctor__ quat(const vec4_t& v) : vec4(v) {}
+    __vmath_ctor__ operator       vec4&()       { return *((::vec4*)this); }
+    __vmath_ctor__ operator const vec4&() const { return *((::vec4*)this); }
+
     __vmath_ctor__ quat(const quat_t& v) : pure(v) {}
-    __vmath_ctor__ operator quat_t() const { return pure; }
+    __vmath_ctor__ operator       quat_t&()       { return pure; }
+    __vmath_ctor__ operator const quat_t&() const { return pure; }
 
 private:
+    vec4_t vec4;
     quat_t pure;
 };
 
 /**
  * Matrix 2x2 data structure
  */
-union __vmath_novtable__ mat2
+union mat2
 {
 public: /* Fields */
     struct
@@ -492,14 +693,40 @@ public: /* Fields */
         float m00, m01;
         float m10, m11;
     };
-    vec4_t vec4;
-    vec2_t rows[2];
-    float  m[2][2];
-    float  data[4];
 
 public: /* Constructors */
     __vmath_ctor__ mat2(const mat2_t& v) : pure(v) {}
-    __vmath_ctor__ operator mat2_t() const { return pure; }
+    __vmath_ctor__ operator       mat2_t&()       { return pure; }
+    __vmath_ctor__ operator const mat2_t&() const { return pure; }
+
+    __vmath_ctor__ mat2(void) : mat2(0) {}
+    __vmath_ctor__ mat2(float s)
+        : m00(s), m01(0)
+        , m10(0), m11(s) {}
+
+    __vmath_ctor__ mat2(float m00, float m01, float m10, float m11)
+        : m00(m00), m01(m01)
+        , m10(m10), m11(m11) {}
+
+    __vmath_ctor__ mat2(const vec2& row0, const vec2& row1)
+        : mat2(row0.x, row0.y, 
+               row1.x, row1.y) {}
+
+    __vmath_ctor__ operator       float*()       { return pure.data; }
+    __vmath_ctor__ operator const float*() const { return pure.data; }
+
+public: /* Operator */
+    __vmath_mthd__ vec2& operator[](int index)
+    {
+        assert(index >= 0 && index < 2);
+        return *(vec2*)(pure.m + index);
+    }
+
+    __vmath_mthd__ const vec2& operator[](int index) const
+    {
+        assert(index >= 0 && index < 2);
+        return *(const vec2*)(pure.m + index);
+    }
 
 private:
     mat2_t pure;
@@ -508,7 +735,7 @@ private:
 /**
  * Matrix3x3 data structure
  */
-union __vmath_novtable__ mat3
+union mat3
 {
 public: /* Fields */
     struct
@@ -517,12 +744,45 @@ public: /* Fields */
         float m10, m11, m12;
         float m20, m21, m22;
     };
-    float m[3][3];
-    float data[9];
     
 public: /* Constructors */
     __vmath_ctor__ mat3(const mat3_t& v) : pure(v) {}
-    __vmath_ctor__ operator mat3_t() const { return pure; }
+    __vmath_ctor__ operator       mat3_t&()       { return pure; }
+    __vmath_ctor__ operator const mat3_t&() const { return pure; }
+
+    __vmath_ctor__ mat3(void) : mat3(0) {}
+    __vmath_ctor__ mat3(float s)
+        : m00(s), m01(0), m02(0)
+        , m10(0), m11(s), m12(0)
+        , m20(0), m21(0), m22(s) {}
+
+    __vmath_ctor__ mat3(float m00, float m01, float m02, 
+                        float m10, float m11, float m12,
+                        float m20, float m21, float m22)
+        : m00(m00), m01(m01), m02(m02)
+        , m10(m10), m11(m11), m12(m12)
+        , m20(m20), m21(m21), m22(m22) {}
+
+    __vmath_ctor__ mat3(const vec3& row0, const vec3& row1, const vec3& row2)
+        : mat3(row0.x, row0.y, row0.z, 
+               row1.x, row1.y, row1.z,
+               row2.x, row2.y, row2.z) {}
+
+    __vmath_ctor__ operator       float*()       { return pure.data; }
+    __vmath_ctor__ operator const float*() const { return pure.data; }
+
+public: /* Operators */
+    __vmath_mthd__ vec3& operator[](int index)
+    {
+        assert(index >= 0 || index < 3);
+        return *(vec3*)(pure.m + index);
+    }
+
+    __vmath_mthd__ const vec3& operator[](int index) const
+    {
+        assert(index >= 0 || index < 3);
+        return *(const vec3*)(pure.m + index);
+    }
 
 private:
     mat3_t pure;
@@ -531,7 +791,7 @@ private:
 /**
  * Matrix4x4 data structure
  */
-union __vmath_novtable__ mat4
+union mat4
 {
 public: /* Fields */
     struct
@@ -541,17 +801,63 @@ public: /* Fields */
         float m20, m21, m22, m23;
         float m30, m31, m32, m33;
     };
-    vec4_t rows[4];
-    float  m[4][4];
-    float  data[16];
 
 public: /* Constructors */
     __vmath_ctor__ mat4(const mat4_t& v) : pure(v) {}
-    __vmath_ctor__ operator mat4_t() const { return pure; }
+    __vmath_ctor__ operator       mat4_t&()       { return pure; }
+    __vmath_ctor__ operator const mat4_t&() const { return pure; }
+
+    __vmath_ctor__ operator       float*()       { return pure.data; }
+    __vmath_ctor__ operator const float*() const { return pure.data; }
+
+    __vmath_ctor__ mat4(void) : mat4(0) {}
+    __vmath_ctor__ mat4(float s)
+        : m00(s), m01(0), m02(0), m03(0)
+        , m10(0), m11(s), m12(0), m13(0)
+        , m20(0), m21(0), m22(s), m23(0)
+        , m30(0), m31(0), m32(0), m33(s) {}
+
+    __vmath_ctor__ mat4(float m00, float m01, float m02, float m03, 
+                        float m10, float m11, float m12, float m13,
+                        float m20, float m21, float m22, float m23,
+                        float m30, float m31, float m32, float m33)
+        : m00(m00), m01(m01), m02(m02), m03(m03)
+        , m10(m10), m11(m11), m12(m12), m13(m13)
+        , m20(m20), m21(m21), m22(m22), m23(m23)
+        , m30(m30), m31(m31), m32(m32), m33(m33) {}
+
+    __vmath_ctor__ mat4(const vec4& row0, const vec4& row1, const vec4& row2, const vec4& row3)
+        : mat4(row0.x, row0.y, row0.z, row0.w,
+               row1.x, row1.y, row1.z, row1.w,
+               row2.x, row2.y, row2.z, row2.w,
+               row3.x, row3.y, row3.z, row3.w) {}
+
+public: /* Operators */
+    __vmath_mthd__ vec4& operator[](int index)
+    {
+        assert(index >= 0 && index < 4);
+        return *(vec4*)(pure.rows + index);
+    }
+
+    __vmath_mthd__ const vec4& operator[](int index) const
+    {
+        assert(index >= 0 && index < 4);
+        return *(const vec4*)(pure.m + index);
+    }
+
+private: /* Operator */
 
 private:
     mat4_t pure;
 };
+
+static_assert(sizeof(vec2) == sizeof(vec2_t), "Size of vec2 is not equal vec2_t");
+static_assert(sizeof(vec3) == sizeof(vec3_t), "Size of vec3 is not equal vec3_t");
+static_assert(sizeof(vec4) == sizeof(vec4_t), "Size of vec4 is not equal vec4_t");
+static_assert(sizeof(quat) == sizeof(quat_t), "Size of quat is not equal quat_t");
+static_assert(sizeof(mat2) == sizeof(mat2_t), "Size of mat2 is not equal mat2_t");
+static_assert(sizeof(mat3) == sizeof(mat3_t), "Size of mat3 is not equal mat3_t");
+static_assert(sizeof(mat4) == sizeof(mat4_t), "Size of mat4 is not equal mat4_t");
 
 #else
 #endif /* VMATH_GLSL_LIKE */
@@ -984,7 +1290,10 @@ __vmath__ float vmath_rsqrt(float x)
  */
 __vmath__ float vmath_fsqrt(float x)
 {
+    return sqrtf(x);
+    /* This code work but has non-exact value in some cases
     return x == 0.0f ? 0.0f : 1.0f / vmath_rsqrt(x);
+    */
 }
 #else
 # ifndef vmath_rsqrt
