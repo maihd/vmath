@@ -7,7 +7,8 @@ open vmath
 let main argv =
     printfn "Hello World from F#!"
 
-    let v = neg(vec2(1.0, 2.0))
+    let a = vec2(1.0f, 2.0f)
+    let v = a + 1.0f
 
     printfn "%s" (v.ToString())
     
