@@ -8,8 +8,7 @@
 
 module vmath
 
-open Microsoft.FSharp.Core.Operators
-open System.Numerics
+open Microsoft.FSharp.Core;
 
 type vec2 =
     struct
@@ -81,10 +80,11 @@ type vec2 =
 
     static member inline normalize (v : vec2) : vec2 =
         let lsqr = vec2.lengthsquared(v)
-        if lsqr > 0.0f then
+        match lsqr with
+        | 0.0f | 1.0f -> v
+        | _           ->
             let l = 1.0f / sqrt(lsqr)
             vec2(v.x * l, v.y * l)
-        else v
        
     override this.ToString() : string = 
         "vec2(" + this.x.ToString() + ", " + this.y.ToString() + ")"
@@ -162,10 +162,11 @@ type vec3 =
 
     static member inline normalize (v : vec3) : vec3 =
         let lsqr = vec3.lengthsquared(v)
-        if lsqr > 0.0f then
+        match lsqr with
+        | 0.0f | 1.0f -> v
+        | _           ->
             let l = 1.0f / sqrt(lsqr)
             vec3(v.x * l, v.y * l, v.z * l)
-        else v
 
     static member inline cross (a : vec3, b : vec3) : vec3 =
         vec3(a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x) 
@@ -255,10 +256,11 @@ type vec4 =
 
     static member inline normalize (v : vec4) : vec4 =
         let lsqr = vec4.lengthsquared(v)
-        if lsqr > 0.0f then
+        match lsqr with
+        | 0.0f | 1.0f -> v
+        | _           ->
             let l = 1.0f / sqrt(lsqr)
             vec4(v.x * l, v.y * l, v.z * l, v.w * l)
-        else v
 
     override this.ToString() : string = 
         "vec4(" + this.x.ToString() + ", " + this.y.ToString() + ", " + this.z.ToString() + ", " + this.w.ToString() + ")"
@@ -318,10 +320,11 @@ type quat =
 
     static member inline normalize (v : quat) : quat =
         let lsqr = v.x * v.x + v.y * v.y + v.z * v.z + v.w * v.w
-        if lsqr > 0.0f then
+        match lsqr with
+        | 0.0f | 1.0f -> v
+        | _           ->
             let l = 1.0f / sqrt(lsqr)
             quat(v.x * l, v.y * l, v.z * l, v.w * l)
-        else v
 
     override this.ToString() : string = 
         "quat(" + this.x.ToString() + ", " + this.y.ToString() + ", " + this.z.ToString() + ", " + this.w.ToString() + ")"

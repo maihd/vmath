@@ -192,7 +192,7 @@
 #define STATIC_ASSERT_CONCAT_IN(a, b)  a ## b
 #define STATIC_ASSERT_CONCAT(a, b)     STATIC_ASSERT_CONCAT_IN(a, b)
 #define STATIC_ASSERT_GENSYM()         STATIC_ASSERT_CONCAT(__SA, __LINE__)
-#define static_assert(exp, msg) struct STATIC_ASSERT_GENSYM() { char test[(exp) && (msg) ? 1 : 0]; }
+#define static_assert(exp, msg) struct STATIC_ASSERT_GENSYM() { char test[(exp) ? 0 : -1]; }
 #endif
 
 /**
