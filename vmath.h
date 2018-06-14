@@ -10,7 +10,7 @@
 #define __VMATH_H__
 
 #define VMATH_LIBNAME "libvmath"
-#define VMATH_VERSION "v1.1.0" 
+#define VMATH_VERSION "v1.1.1" 
 
 /**
  * Include dependencies
@@ -4313,8 +4313,8 @@ __vmath__ vec3_t operator*(const mat3_t& a, const vec3_t& b)
 #endif
 
 /************************
-* Matrix4x4
-************************/
+ * Matrix4x4
+ ************************/
 #if VMATH_BUILD_MAT4
 
 __vmath__ mat4_t operator-(const mat4_t& m)

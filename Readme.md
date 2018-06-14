@@ -11,6 +11,12 @@
 8. GLSL-like API design (C++ only)
 9. With some other languages implement (experimental): C#, F#
 
+## Compatibility: platforms and compilers
+1. GCC and clang: MacOS tested
+2. Cygwin: Windows 7, 10 Desktop testing
+3. NDK: Android tested
+4. MSVisualC++: 2017 Community - Windows 7, 10 Desktop C/C++ tested
+
 ## Examples
 C language example:
 ```C
@@ -59,11 +65,8 @@ mat4 proj = mat4_perspective(M_PI * 0.25f, WIDTH / HEIGHT, 0.0f, 100.0f);
 ... apply matrix to render ...
 ```
 
-## Compatibility: platforms and compilers
-1. GCC and clang: MacOS tested
-2. Cygwin: Windows 7, 10 Desktop testing
-3. NDK: Android tested
-4. MSVisualC++: 2017 Community - Windows 7, 10 Desktop C/C++ tested
+## Project use vmath
+1. Mai's OpenGL examples, (https://github.com/maihd/opengl.git)
 
 ## Metadata
 1. License: NULL
