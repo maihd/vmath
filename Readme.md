@@ -66,7 +66,7 @@ mat4 proj = mat4_perspective(M_PI * 0.25f, WIDTH / HEIGHT, 0.0f, 100.0f);
 ```
 
 ## Project use vmath
-1. Mai's OpenGL examples, (https://github.com/maihd/opengl.git)
+1. MaiHD's OpenGL examples, (https://github.com/maihd/opengl.git)
 
 ## Metadata
 1. License: NULL

@@ -274,6 +274,11 @@ typedef union vmath_vec4
     {
         float x, y, z, w;
     };
+    
+    struct
+    {
+        float r, g, b, a;
+    };
 
     struct
     {
@@ -288,6 +293,7 @@ typedef union vmath_vec4
     };
 
     vec3_t   xyz;
+    vec3_t   rgb;
     float    m[4];
     float4_t data;
 } vec4_t;
@@ -466,7 +472,7 @@ typedef mat4_t        mat4_arg_t;
             return vec2(_1, _2);                            \
         }                                                   \
                                                             \
-        __vmath_mthd__ operator vec4() const                \
+        __vmath_mthd__ operator vec2() const                \
         {                                                   \
             return vec2(_1, _2);                            \
         }                                                   \
@@ -487,7 +493,7 @@ typedef mat4_t        mat4_arg_t;
                                                             \
         __vmath_mthd__ operator vec3() const                \
         {                                                   \
-            return vec4(_1, _2, _3);                        \
+            return vec3(_1, _2, _3);                        \
         }                                                   \
     }
 
@@ -620,6 +626,10 @@ public: /* Fields */
     };
     struct
     {
+        float r, g, b, a;
+    };
+    struct
+    {
         vec2_t xy;
         vec2_t zw;
     };
@@ -629,6 +639,7 @@ public: /* Fields */
         vec2_t yz;
     };
     vec3_t   xyz;
+    vec3_t   rgb;
 
 public: /* Constructors */
     __vmath_ctor__ vec4(void) : vec4(0, 0, 0, 0) {}
@@ -664,6 +675,8 @@ public: /* Operator */
         return pure.m[index];
     }
 
+public: /* Properties */
+
 private:
     vec4_t pure;
 };
@@ -695,6 +708,19 @@ public: /* Constructors */
     __vmath_ctor__ quat(const quat_t& v) : pure(v) {}
     __vmath_ctor__ operator       quat_t&()       { return pure; }
     __vmath_ctor__ operator const quat_t&() const { return pure; }
+
+public: /* Operator */
+    __vmath_mthd__ float& operator[](int index)
+    {
+        assert(index >= 0 && index < 4);
+        return pure.m[index];
+    }
+
+    __vmath_mthd__ float operator[](int index) const
+    {
+        assert(index >= 0 && index < 4);
+        return pure.m[index];
+    }
 
 private:
     vec4_t vec4;
