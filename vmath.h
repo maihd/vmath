@@ -19,7 +19,6 @@
 #include <float.h>
 #include <limits.h> 
 
-
 /**
  * Custom modifier
  */
@@ -188,6 +187,7 @@
 /**
  * Static assert support
  */
+#include <assert.h>
 #if !defined(__cplusplus) && !defined(static_assert)    
 #define STATIC_ASSERT_CONCAT_IN(a, b)  a ## b
 #define STATIC_ASSERT_CONCAT(a, b)     STATIC_ASSERT_CONCAT_IN(a, b)
@@ -366,21 +366,22 @@ static_assert(sizeof(mat3_t) == 9  * sizeof(float), "Size of mat3_t is not valid
 static_assert(sizeof(mat4_t) == 16 * sizeof(float), "Size of mat4_t is not valid");
 
 #if defined(__cplusplus)
-typedef const vec2_t& vec2_ref;
-typedef const vec3_t& vec3_ref;
-typedef const vec4_t& vec4_ref;
-typedef const quat_t& quat_ref;
-typedef const mat2_t& mat2_ref;
-typedef const mat3_t& mat3_ref;
-typedef const mat4_t& mat4_ref;
+typedef const vec2_t& vec2_arg_t;
+typedef const vec2_t& vec2_arg_t;
+typedef const vec3_t& vec3_arg_t;
+typedef const vec4_t& vec4_arg_t;
+typedef const quat_t& quat_arg_t;
+typedef const mat2_t& mat2_arg_t;
+typedef const mat3_t& mat3_arg_t;
+typedef const mat4_t& mat4_arg_t;
 #else
-typedef vec2_t  vec2_ref;
-typedef vec3_t  vec3_ref;
-typedef vec4_t  vec4_ref;
-typedef quat_t  quat_ref;
-typedef mat2_t  mat2_ref;
-typedef mat3_t  mat3_ref;
-typedef mat4_t  mat4_ref;
+typedef vec2_t        vec2_arg_t;
+typedef vec3_t        vec3_arg_t;
+typedef vec4_t        vec4_arg_t;
+typedef quat_t        quat_arg_t;
+typedef mat2_t        mat2_arg_t;
+typedef mat3_t        mat3_arg_t;
+typedef mat4_t        mat4_arg_t;
 #endif
 
 
@@ -1325,7 +1326,7 @@ __vmath__ float vmath_fsqrt(float x)
 /**
  * Addition of two vector2d
  */
-__vmath__ vec2_t vec2_add(vec2_ref a, vec2_ref b)
+__vmath__ vec2_t vec2_add(vec2_arg_t a, vec2_arg_t b)
 {
 #if VMATH_NEON_ENABLE
     return (vec2_t){ .data = vadd_f32(a.data, b.data) };
@@ -1337,7 +1338,7 @@ __vmath__ vec2_t vec2_add(vec2_ref a, vec2_ref b)
 /**
  * Subtraction of two vector2d
  */
-__vmath__ vec2_t vec2_sub(vec2_ref a, vec2_ref b)
+__vmath__ vec2_t vec2_sub(vec2_arg_t a, vec2_arg_t b)
 {
 #if VMATH_NEON_ENABLE
     return (vec2_t){ .data = vsub_s32(a.data, b.data) };
@@ -1349,7 +1350,7 @@ __vmath__ vec2_t vec2_sub(vec2_ref a, vec2_ref b)
 /**
 * Multiplication of two vector2d
 */
-__vmath__ vec2_t vec2_mul(vec2_ref a, vec2_ref b)
+__vmath__ vec2_t vec2_mul(vec2_arg_t a, vec2_arg_t b)
 {
 #if VMATH_NEON_ENABLE
     return (vec2_t){ .data = vmul_f32(a.data, b.data) };
@@ -1361,7 +1362,7 @@ __vmath__ vec2_t vec2_mul(vec2_ref a, vec2_ref b)
 /**
  * Division of two vector2d
  */
-__vmath__ vec2_t vec2_div(vec2_ref a, vec2_ref b)
+__vmath__ vec2_t vec2_div(vec2_arg_t a, vec2_arg_t b)
 {
 #if VMATH_NEON_ENABLE
     return (vec2_t){ .data = vdiv_s32(a.data, b.data) };
@@ -1373,7 +1374,7 @@ __vmath__ vec2_t vec2_div(vec2_ref a, vec2_ref b)
 /**
  * Add of a vector2d with a scalar
  */
-__vmath__ vec2_t vec2_addf(vec2_ref v, float s)
+__vmath__ vec2_t vec2_addf(vec2_arg_t v, float s)
 {
 #if VMATH_NEON_ENABLE
     return (vec2_t){ .data = vadd_n_f32(v.data, s) };
@@ -1385,7 +1386,7 @@ __vmath__ vec2_t vec2_addf(vec2_ref v, float s)
 /**
 * Subtract of a vector2d with a scalar
 */
-__vmath__ vec2_t vec2_subf(vec2_ref v, float s)
+__vmath__ vec2_t vec2_subf(vec2_arg_t v, float s)
 {
 #if VMATH_NEON_ENABLE
     return (vec2_t){ .data = vsub_n_f32(v.data, s) };
@@ -1397,7 +1398,7 @@ __vmath__ vec2_t vec2_subf(vec2_ref v, float s)
 /**
  * Multiply of a vector2d with a scalar
  */
-__vmath__ vec2_t vec2_mulf(vec2_ref v, float s)
+__vmath__ vec2_t vec2_mulf(vec2_arg_t v, float s)
 {
 #if VMATH_NEON_ENABLE
     return (vec2_t){ .data = vmul_n_f32(v.data, s) };
@@ -1409,7 +1410,7 @@ __vmath__ vec2_t vec2_mulf(vec2_ref v, float s)
 /**
  * Division of a vector2d with a scalar
  */
-__vmath__ vec2_t vec2_divf(vec2_ref v, float s)
+__vmath__ vec2_t vec2_divf(vec2_arg_t v, float s)
 {
     return vec2_mulf(v, 1.0f / s);
 }
@@ -1417,7 +1418,7 @@ __vmath__ vec2_t vec2_divf(vec2_ref v, float s)
 /**
  * Compare two vector2d is equal or not
  */
-__vmath__ bool vec2_equal(vec2_ref a, vec2_ref b)
+__vmath__ bool vec2_equal(vec2_arg_t a, vec2_arg_t b)
 {
     return a.x == b.x && a.y == b.y;
 }
@@ -1425,7 +1426,7 @@ __vmath__ bool vec2_equal(vec2_ref a, vec2_ref b)
 /**
  * Create a negative vector
  */
-__vmath__ vec2_t vec2_neg(vec2_ref v)
+__vmath__ vec2_t vec2_neg(vec2_arg_t v)
 {
 #if VMATH_NEON_ENABLE
     return (vec2_t){ .data = vneg_f32(v.data) };
@@ -1437,7 +1438,7 @@ __vmath__ vec2_t vec2_neg(vec2_ref v)
 /**
  * Dot product of two vector 2d
  */
-__vmath__ float vec2_dot(vec2_ref a, vec2_ref b)
+__vmath__ float vec2_dot(vec2_arg_t a, vec2_arg_t b)
 {
 #if VMATH_NEON_ENABLE
     vec2_t v = (vec2_t){ .data = vmul_f32(a.data, b.data) };
@@ -1450,7 +1451,7 @@ __vmath__ float vec2_dot(vec2_ref a, vec2_ref b)
 /**
  * Squared length of vector 2d
  */
-__vmath__ float vec2_lengthsquared(vec2_ref v)
+__vmath__ float vec2_lengthsquared(vec2_arg_t v)
 {
     return vec2_dot(v, v);
 }
@@ -1458,7 +1459,7 @@ __vmath__ float vec2_lengthsquared(vec2_ref v)
 /**
  * Length of vector 2d
  */
-__vmath__ float vec2_length(vec2_ref v)
+__vmath__ float vec2_length(vec2_arg_t v)
 {
     return vmath_fsqrt(vec2_lengthsquared(v));
 }
@@ -1466,7 +1467,7 @@ __vmath__ float vec2_length(vec2_ref v)
 /**
  * Distance of two vector 2d
  */
-__vmath__ float vec2_distance(vec2_ref a, vec2_ref b)
+__vmath__ float vec2_distance(vec2_arg_t a, vec2_arg_t b)
 {
     return vec2_length(vec2_sub(b, a));
 }
@@ -1474,7 +1475,7 @@ __vmath__ float vec2_distance(vec2_ref a, vec2_ref b)
 /**
  * Squared distance of two vector 2d
  */
-__vmath__ float vec2_distancesquared(vec2_ref a, vec2_ref b)
+__vmath__ float vec2_distancesquared(vec2_arg_t a, vec2_arg_t b)
 {
     return vec2_lengthsquared(vec2_sub(b, a));
 }
@@ -1482,7 +1483,7 @@ __vmath__ float vec2_distancesquared(vec2_ref a, vec2_ref b)
 /**
  * Angle of vector 2d
  */
-__vmath__ float vec2_angle(vec2_ref v)
+__vmath__ float vec2_angle(vec2_arg_t v)
 {
     return atan2f(v.y, v.x);
 }
@@ -1490,7 +1491,7 @@ __vmath__ float vec2_angle(vec2_ref v)
 /**
  * Get normalized Vector2D, force direction only and unit length
  */
-__vmath__ vec2_t vec2_normalize(vec2_ref v)
+__vmath__ vec2_t vec2_normalize(vec2_arg_t v)
 {
     const float lsqr = vec2_lengthsquared(v);
     if (lsqr != 1.0f && lsqr > 0)
@@ -1504,7 +1505,7 @@ __vmath__ vec2_t vec2_normalize(vec2_ref v)
 /**
  * Calculate reflection vector
  */ 
-__vmath__ vec2_t vec2_reflect(vec2_ref v, vec2_ref n)
+__vmath__ vec2_t vec2_reflect(vec2_arg_t v, vec2_arg_t n)
 {
     /* equation: ref = v - 2 * n * dot(v, n) */
     return vec2_sub(v, vec2_mulf(n, 2 * vec2_dot(n, v)));
@@ -1520,7 +1521,7 @@ __vmath__ vec2_t vec2_reflect(vec2_ref v, vec2_ref n)
 /**
  * Addition of two vector 3d
  */
-__vmath__ vec3_t vec3_add(vec3_ref a, vec3_ref b)
+__vmath__ vec3_t vec3_add(vec3_arg_t a, vec3_arg_t b)
 {
 #if VMATH_NEON_ENABLE
     vec3_t r;
@@ -1538,7 +1539,7 @@ __vmath__ vec3_t vec3_add(vec3_ref a, vec3_ref b)
 /**
  * subtraction of two vector 3d
  */
-__vmath__ vec3_t vec3_sub(vec3_ref a, vec3_ref b)
+__vmath__ vec3_t vec3_sub(vec3_arg_t a, vec3_arg_t b)
 {
 #if VMATH_NEON_ENABLE
     vec3_t r;
@@ -1556,7 +1557,7 @@ __vmath__ vec3_t vec3_sub(vec3_ref a, vec3_ref b)
 /**
  * Multiplication of two vector 3d
  */
-__vmath__ vec3_t vec3_mul(vec3_ref a, vec3_ref b)
+__vmath__ vec3_t vec3_mul(vec3_arg_t a, vec3_arg_t b)
 {
 #if VMATH_NEON_ENABLE
     vec3_t r;
@@ -1574,7 +1575,7 @@ __vmath__ vec3_t vec3_mul(vec3_ref a, vec3_ref b)
 /**
  * Division of two vector 3d
  */
-__vmath__ vec3_t vec3_div(vec3_ref a, vec3_ref b)
+__vmath__ vec3_t vec3_div(vec3_arg_t a, vec3_arg_t b)
 {
 #if VMATH_NEON_ENABLE
     vec3_t r;
@@ -1592,7 +1593,7 @@ __vmath__ vec3_t vec3_div(vec3_ref a, vec3_ref b)
 /**
  * Addition of a vector 3d with a scalar, also called as scale
  */
-__vmath__ vec3_t vec3_addf(vec3_ref v, float s)
+__vmath__ vec3_t vec3_addf(vec3_arg_t v, float s)
 {
 #if VMATH_NEON_ENABLE
     vec3_t r;
@@ -1610,7 +1611,7 @@ __vmath__ vec3_t vec3_addf(vec3_ref v, float s)
 /**
  * Subtraction of a vector 3d with a scalar, also called as scale down 
  */
-__vmath__ vec3_t vec3_subf(vec3_ref v, float s)
+__vmath__ vec3_t vec3_subf(vec3_arg_t v, float s)
 {
 #if VMATH_NEON_ENABLE
     vec3_t r;
@@ -1628,7 +1629,7 @@ __vmath__ vec3_t vec3_subf(vec3_ref v, float s)
 /**
  * Multiply of a vector 3d with a scalar, also called as scale
  */
-__vmath__ vec3_t vec3_mulf(vec3_ref v, float s)
+__vmath__ vec3_t vec3_mulf(vec3_arg_t v, float s)
 {
 #if VMATH_NEON_ENABLE
     vec3_t r;
@@ -1646,7 +1647,7 @@ __vmath__ vec3_t vec3_mulf(vec3_ref v, float s)
 /**
  * Division of a vector 3d with a scalar, also called as scale down 
  */
-__vmath__ vec3_t vec3_divf(vec3_ref v, float s)
+__vmath__ vec3_t vec3_divf(vec3_arg_t v, float s)
 {
     return vec3_mulf(v, 1.0f / s);
 }
@@ -1654,7 +1655,7 @@ __vmath__ vec3_t vec3_divf(vec3_ref v, float s)
 /**
  * Compare two vector3d is equal or not
  */
-__vmath__ bool vec3_equal(vec3_ref a, vec3_ref b)
+__vmath__ bool vec3_equal(vec3_arg_t a, vec3_arg_t b)
 {
 #if VMATH_SSE_ENABLE
     return (_mm_movemask_ps(_mm_cmpeq_ps(a.data, b.data)) & 0x7) == 0x7;
@@ -1666,7 +1667,7 @@ __vmath__ bool vec3_equal(vec3_ref a, vec3_ref b)
 /**
  * Negative version of a Vector3D
  */
-__vmath__ vec3_t vec3_neg(vec3_ref v)
+__vmath__ vec3_t vec3_neg(vec3_arg_t v)
 {
 #if VMATH_NEON_ENABLE
     vec3_t r;
@@ -1684,7 +1685,7 @@ __vmath__ vec3_t vec3_neg(vec3_ref v)
 /**
  * Dot product of two vector 3d
  */
-__vmath__ float vec3_dot(vec3_ref a, vec3_ref b)
+__vmath__ float vec3_dot(vec3_arg_t a, vec3_arg_t b)
 {
 #if VMATH_SSE_ENABLE
 # if defined(__SSE4_1__)
@@ -1701,7 +1702,7 @@ __vmath__ float vec3_dot(vec3_ref a, vec3_ref b)
 /**
  * Cross product of two vector 3d
  */
-__vmath__ vec3_t vec3_cross(vec3_ref a, vec3_ref b)
+__vmath__ vec3_t vec3_cross(vec3_arg_t a, vec3_arg_t b)
 {
 #if VMATH_SSE_ENABLE
     vec3_t r;
@@ -1722,7 +1723,7 @@ __vmath__ vec3_t vec3_cross(vec3_ref a, vec3_ref b)
 /**
  * Squared length of vector 3d
  */
-__vmath__ float vec3_lengthsquared(vec3_ref v)
+__vmath__ float vec3_lengthsquared(vec3_arg_t v)
 {
     return vec3_dot(v, v);
 }
@@ -1730,7 +1731,7 @@ __vmath__ float vec3_lengthsquared(vec3_ref v)
 /**
  * Length of vector 3d
  */
-__vmath__ float vec3_length(vec3_ref v)
+__vmath__ float vec3_length(vec3_arg_t v)
 {
 #if VMATH_SSE_ENABLE && defined(__SSE4_1__)
     return _mm_cvtss_f32(_mm_sqrt_ss(_mm_dp_ps(v.data, v.data, 0x71)));
@@ -1742,7 +1743,7 @@ __vmath__ float vec3_length(vec3_ref v)
 /**
  * Distance of two vector 3d
  */
-__vmath__ float vec3_distance(vec3_ref a, vec3_ref b)
+__vmath__ float vec3_distance(vec3_arg_t a, vec3_arg_t b)
 {
     return vec3_length(vec3_sub(b, a));
 }
@@ -1750,7 +1751,7 @@ __vmath__ float vec3_distance(vec3_ref a, vec3_ref b)
 /**
  * Squared distance of two vector 3d
  */
-__vmath__ float vec3_distancesquared(vec3_ref a, vec3_ref b)
+__vmath__ float vec3_distancesquared(vec3_arg_t a, vec3_arg_t b)
 {
     return vec3_lengthsquared(vec3_sub(b, a));
 }
@@ -1758,7 +1759,7 @@ __vmath__ float vec3_distancesquared(vec3_ref a, vec3_ref b)
 /**
  * Get normalized vector3D (force to direction only, unit length)
  */
-__vmath__ vec3_t vec3_normalize(vec3_ref v)
+__vmath__ vec3_t vec3_normalize(vec3_arg_t v)
 {
 #if VMATH_SSE_ENABLE && defined(__SSE4_1__)
     vec3_t r;
@@ -1778,7 +1779,7 @@ __vmath__ vec3_t vec3_normalize(vec3_ref v)
 /**
  * Calculate reflection vector
  */ 
-__vmath__ vec3_t vec3_reflect(vec3_ref v, vec3_ref n)
+__vmath__ vec3_t vec3_reflect(vec3_arg_t v, vec3_arg_t n)
 {
     /* equation: ref = v - 2 * n * dot(v, n) */
     return vec3_sub(v, vec3_mulf(n, 2 * vec3_dot(n, v)));
@@ -1794,7 +1795,7 @@ __vmath__ vec3_t vec3_reflect(vec3_ref v, vec3_ref n)
 /**
  * Addition of two Vector4D
  */
-__vmath__ vec4_t vec4_add(vec4_ref a, vec4_ref b)
+__vmath__ vec4_t vec4_add(vec4_arg_t a, vec4_arg_t b)
 {
 #if VMATH_NEON_ENABLE
     vec4_t r;
@@ -1812,7 +1813,7 @@ __vmath__ vec4_t vec4_add(vec4_ref a, vec4_ref b)
 /**
  * Subtraction of two vector4d
  */
-__vmath__ vec4_t vec4_sub(vec4_ref a, vec4_ref b)
+__vmath__ vec4_t vec4_sub(vec4_arg_t a, vec4_arg_t b)
 {
 #if VMATH_NEON_ENABLE
     vec4_t r;
@@ -1830,7 +1831,7 @@ __vmath__ vec4_t vec4_sub(vec4_ref a, vec4_ref b)
 /**
  * Mutiplication of two Vector4D
  */
-__vmath__ vec4_t vec4_mul(vec4_ref a, vec4_ref b)
+__vmath__ vec4_t vec4_mul(vec4_arg_t a, vec4_arg_t b)
 {
 #if VMATH_NEON_ENABLE
     vec4_t r;
@@ -1848,7 +1849,7 @@ __vmath__ vec4_t vec4_mul(vec4_ref a, vec4_ref b)
 /**
  * Division of two vector4d
  */
-__vmath__ vec4_t vec4_div(vec4_ref a, vec4_ref b)
+__vmath__ vec4_t vec4_div(vec4_arg_t a, vec4_arg_t b)
 {
 #if VMATH_NEON_ENABLE
     vec4_t r;
@@ -1866,7 +1867,7 @@ __vmath__ vec4_t vec4_div(vec4_ref a, vec4_ref b)
 /**
  * Addition of a vector4d with a scalar
  */
-__vmath__ vec4_t vec4_addf(vec4_ref v, float s)
+__vmath__ vec4_t vec4_addf(vec4_arg_t v, float s)
 {
 #if VMATH_NEON_ENABLE
     vec4_t r;
@@ -1884,7 +1885,7 @@ __vmath__ vec4_t vec4_addf(vec4_ref v, float s)
 /**
  * Subtraction of a vector4d with a scalar
  */
-__vmath__ vec4_t vec4_subf(vec4_ref v, float s)
+__vmath__ vec4_t vec4_subf(vec4_arg_t v, float s)
 {
 #if VMATH_NEON_ENABLE
     vec4_t r;
@@ -1902,7 +1903,7 @@ __vmath__ vec4_t vec4_subf(vec4_ref v, float s)
 /**
  * Multiplication of a vector4d with a scalar
  */
-__vmath__ vec4_t vec4_mulf(vec4_ref v, float s)
+__vmath__ vec4_t vec4_mulf(vec4_arg_t v, float s)
 {
 #if VMATH_NEON_ENABLE
     vec4_t r;
@@ -1920,7 +1921,7 @@ __vmath__ vec4_t vec4_mulf(vec4_ref v, float s)
 /**
  * Division of a vector4d with a scalar
  */
-__vmath__ vec4_t vec4_divf(vec4_ref v, float s)
+__vmath__ vec4_t vec4_divf(vec4_arg_t v, float s)
 {
     return vec4_mulf(v, 1.0f / s);
 }
@@ -1928,7 +1929,7 @@ __vmath__ vec4_t vec4_divf(vec4_ref v, float s)
 /**
  * Compare two vector4d is equal or not
  */
-__vmath__ bool vec4_equal(vec4_ref a, vec4_ref b)
+__vmath__ bool vec4_equal(vec4_arg_t a, vec4_arg_t b)
 {
 #if VMATH_NEON_ENABLE
     return vec2_equal(a.xy, b.xy) && vec2_equal(a.zw, b.zw);
@@ -1942,7 +1943,7 @@ __vmath__ bool vec4_equal(vec4_ref a, vec4_ref b)
 /**
  * Negative version of a Vector4D
  */
-__vmath__ vec4_t vec4_neg(vec4_ref v)
+__vmath__ vec4_t vec4_neg(vec4_arg_t v)
 {
 #if VMATH_NEON_ENABLE
     vec4_t r;
@@ -1960,7 +1961,7 @@ __vmath__ vec4_t vec4_neg(vec4_ref v)
 /**
  * Dot product of two vector4d
  */
-__vmath__ float vec4_dot(vec4_ref a, vec4_ref b)
+__vmath__ float vec4_dot(vec4_arg_t a, vec4_arg_t b)
 {
 #if VMATH_NEON_ENABLE
     vec4_t v;
@@ -1976,7 +1977,7 @@ __vmath__ float vec4_dot(vec4_ref a, vec4_ref b)
 /**
  * Squared length of vector4d
  */
-__vmath__ float vec4_lengthsquared(vec4_ref v)
+__vmath__ float vec4_lengthsquared(vec4_arg_t v)
 {
     return vec4_dot(v, v);
 }
@@ -1984,7 +1985,7 @@ __vmath__ float vec4_lengthsquared(vec4_ref v)
 /**
  * Length of vector4d
  */
-__vmath__ float vec4_length(vec4_ref v)
+__vmath__ float vec4_length(vec4_arg_t v)
 {
     return vmath_fsqrt(vec4_lengthsquared(v));
 }
@@ -1992,7 +1993,7 @@ __vmath__ float vec4_length(vec4_ref v)
 /**
  * Distance of two vector4d
  */
-__vmath__ float vec4_distance(vec4_ref a, vec4_ref b)
+__vmath__ float vec4_distance(vec4_arg_t a, vec4_arg_t b)
 {
     return vec4_length(vec4_sub(b, a));
 }
@@ -2000,7 +2001,7 @@ __vmath__ float vec4_distance(vec4_ref a, vec4_ref b)
 /**
  * Squared distance of two vector4d
  */
-__vmath__ float vec4_distancesquared(vec4_ref a, vec4_ref b)
+__vmath__ float vec4_distancesquared(vec4_arg_t a, vec4_arg_t b)
 {
     return vec4_lengthsquared(vec4_sub(b, a));
 }
@@ -2008,7 +2009,7 @@ __vmath__ float vec4_distancesquared(vec4_ref a, vec4_ref b)
 /**
  * Get normalized Vector4D, force direction only with unit length
  */
-__vmath__ vec4_t vec4_normalize(vec4_ref v)
+__vmath__ vec4_t vec4_normalize(vec4_arg_t v)
 {
 #if VMATH_SSE_ENABLE
     vec4_t r;
@@ -2028,7 +2029,7 @@ __vmath__ vec4_t vec4_normalize(vec4_ref v)
 /**
  * Calculate reflection vector
  */ 
-__vmath__ vec4_t vec4_reflect(vec4_ref v, vec4_ref n)
+__vmath__ vec4_t vec4_reflect(vec4_arg_t v, vec4_arg_t n)
 {
     /* equation: ref = v - 2 * n * dot(v, n) */
     return vec4_sub(v, vec4_mulf(n, 2 * vec4_dot(n, v)));
@@ -2044,7 +2045,7 @@ __vmath__ vec4_t vec4_reflect(vec4_ref v, vec4_ref n)
 /**
  * Addition of two quaternions
  */
-__vmath__ quat_t quat_add(quat_ref a, quat_ref b)
+__vmath__ quat_t quat_add(quat_arg_t a, quat_arg_t b)
 {
     quat_t r;
     r.vec4 = vec4_add(a.vec4, b.vec4);
@@ -2054,7 +2055,7 @@ __vmath__ quat_t quat_add(quat_ref a, quat_ref b)
 /**
  * Subtraction of two quaternions
  */
-__vmath__ quat_t quat_sub(quat_ref a, quat_ref b)
+__vmath__ quat_t quat_sub(quat_arg_t a, quat_arg_t b)
 {
     quat_t r;
     r.vec4 = vec4_sub(a.vec4, b.vec4);
@@ -2064,7 +2065,7 @@ __vmath__ quat_t quat_sub(quat_ref a, quat_ref b)
 /**
  * Addition of a quaternion with a scalar
  */
-__vmath__ quat_t quat_addf(quat_ref q, float s)
+__vmath__ quat_t quat_addf(quat_arg_t q, float s)
 {
     quat_t r;
     r.vec4 = vec4_addf(q.vec4, s);
@@ -2074,7 +2075,7 @@ __vmath__ quat_t quat_addf(quat_ref q, float s)
 /**
  * Subtraction of a quaternion with a scalar
  */
-__vmath__ quat_t quat_subf(quat_ref q, float s)
+__vmath__ quat_t quat_subf(quat_arg_t q, float s)
 {
     quat_t r;
     r.vec4 = vec4_subf(q.vec4, s);
@@ -2084,7 +2085,7 @@ __vmath__ quat_t quat_subf(quat_ref q, float s)
 /**
  * Multiplication of a quaternion with a scalar (scale quaternion up)
  */
-__vmath__ quat_t quat_mulf(quat_ref q, float s)
+__vmath__ quat_t quat_mulf(quat_arg_t q, float s)
 {
     quat_t r;
     r.vec4 = vec4_mulf(q.vec4, s);
@@ -2094,7 +2095,7 @@ __vmath__ quat_t quat_mulf(quat_ref q, float s)
 /**
  * Division of a quaternion with a scalar (scale quaternion down)
  */
-__vmath__ quat_t quat_divf(quat_ref q, float s)
+__vmath__ quat_t quat_divf(quat_arg_t q, float s)
 {
     quat_t r;
     r.vec4 = vec4_divf(q.vec4, s);
@@ -2104,7 +2105,7 @@ __vmath__ quat_t quat_divf(quat_ref q, float s)
 /**
  * Get negative version of given quaternion
  */
-__vmath__ quat_t quat_neg(quat_ref q)
+__vmath__ quat_t quat_neg(quat_arg_t q)
 {
     quat_t r;
     r.vec4 = vec4_neg(q.vec4);
@@ -2114,7 +2115,7 @@ __vmath__ quat_t quat_neg(quat_ref q)
 /**
  * Test if two quaternions is equal
  */
-__vmath__ bool quat_equal(quat_ref a, quat_ref b)
+__vmath__ bool quat_equal(quat_arg_t a, quat_arg_t b)
 {
     return vec4_equal(a.vec4, b.vec4);
 }
@@ -2122,7 +2123,7 @@ __vmath__ bool quat_equal(quat_ref a, quat_ref b)
 /**
  * Normalize the quaternion (force length equal 1)
  */
-__vmath__ quat_t quat_normalize(const quat_ref q)
+__vmath__ quat_t quat_normalize(quat_arg_t q)
 {
     quat_t r;
     r.vec4 = vec4_normalize(q.vec4);
@@ -2158,7 +2159,7 @@ __vmath__ quat_t quat_euler(float y, float p, float r)
  * Create a quaternion with euler coordinate
  * @return: result quaternion
  */
-__vmath__ quat_t quat_eulerv3(vec3_ref e)
+__vmath__ quat_t quat_eulerv3(vec3_arg_t e)
 {
     return quat_euler(e.x, e.y, e.z);
 }
@@ -2167,7 +2168,7 @@ __vmath__ quat_t quat_eulerv3(vec3_ref e)
  * Convert to an axis-angle representation.
  * @return: a axis-angle representation store in vec4_t union
  */
-__vmath__ vec4_t quat_toaxis(quat_ref q)
+__vmath__ vec4_t quat_toaxis(quat_arg_t q)
 {
     quat_t c = q;
     if (c.w != 0.0f)
@@ -2192,7 +2193,7 @@ __vmath__ vec4_t quat_toaxis(quat_ref q)
 /**
  * Convert axis-angle representation to quaternion 
  */
-__vmath__ quat_t quat_fromaxis(vec3_ref axis, float angle)
+__vmath__ quat_t quat_fromaxis(vec3_arg_t axis, float angle)
 {
     if (vec3_lengthsquared(axis) == 0.0f)
     {
@@ -2208,7 +2209,7 @@ __vmath__ quat_t quat_fromaxis(vec3_ref axis, float angle)
 /**
  * Get invert quaternion
  */
-__vmath__ quat_t quat_inverse(quat_ref q)
+__vmath__ quat_t quat_inverse(quat_arg_t q)
 {
     return quat(q.x, q.y, q.z, -q.w);
 }
@@ -2216,7 +2217,7 @@ __vmath__ quat_t quat_inverse(quat_ref q)
 /**
  * Get conjugate quaternion
  */
-__vmath__ quat_t quat_conjugate(quat_ref q)
+__vmath__ quat_t quat_conjugate(quat_arg_t q)
 {
     return quat(-q.x, -q.y, -q.z, q.w);
 }
@@ -2224,7 +2225,7 @@ __vmath__ quat_t quat_conjugate(quat_ref q)
 /**
  * Multiplication of two quaternions 
  */
-__vmath__ quat_t quat_mul(quat_ref a, quat_ref b)
+__vmath__ quat_t quat_mul(quat_arg_t a, quat_arg_t b)
 {
 #if VMATH_QUAT_MUL_SIMPLE   
     return quat(
@@ -2254,7 +2255,7 @@ __vmath__ quat_t quat_mul(quat_ref a, quat_ref b)
 /**
  *
  */
-__vmath__ mat2_t mat2_neg(mat2_ref m)
+__vmath__ mat2_t mat2_neg(mat2_arg_t m)
 {
     mat2_t r;
     r.vec4 = vec4_neg(m.vec4);
@@ -2264,7 +2265,7 @@ __vmath__ mat2_t mat2_neg(mat2_ref m)
 /**
  * Addition of 2 matrix 2x2
  */
-__vmath__ mat2_t mat2_add(mat2_ref a, mat2_ref b)
+__vmath__ mat2_t mat2_add(mat2_arg_t a, mat2_arg_t b)
 {
     mat2_t r;
     r.vec4 = vec4_add(a.vec4, b.vec4);
@@ -2274,7 +2275,7 @@ __vmath__ mat2_t mat2_add(mat2_ref a, mat2_ref b)
 /**
  * Subtraction of 2 matrix 2x2
  */
-__vmath__ mat2_t mat2_sub(mat2_ref a, mat2_ref b)
+__vmath__ mat2_t mat2_sub(mat2_arg_t a, mat2_arg_t b)
 {
     mat2_t r;
     r.vec4 = vec4_sub(a.vec4, b.vec4);
@@ -2284,7 +2285,7 @@ __vmath__ mat2_t mat2_sub(mat2_ref a, mat2_ref b)
 /**
  * Multiplication of 2 matrix 2x2
  */
-__vmath__ mat2_t mat2_mul(mat2_ref a, mat2_ref b)
+__vmath__ mat2_t mat2_mul(mat2_arg_t a, mat2_arg_t b)
 {
 #if VMATH_SSE_ENABLE
     mat2_t r;
@@ -2315,7 +2316,7 @@ __vmath__ mat2_t mat2_mul(mat2_ref a, mat2_ref b)
 /**
  * Multiplication of a matrix 2x2 with a scalar (scaling the components)
  */
-__vmath__ mat2_t mat2_mulf(mat2_ref m, float s)
+__vmath__ mat2_t mat2_mulf(mat2_arg_t m, float s)
 {
     mat2_t r;
     r.vec4 = vec4_mulf(m.vec4, s);
@@ -2325,7 +2326,7 @@ __vmath__ mat2_t mat2_mulf(mat2_ref m, float s)
 /**
  * Division of a matrix 2x2 with a scalar (invert scaling the components)
  */
-__vmath__ mat2_t mat2_divf(mat2_ref m, float s)
+__vmath__ mat2_t mat2_divf(mat2_arg_t m, float s)
 {
     mat2_t r;
     r.vec4 = vec4_divf(m.vec4, s);
@@ -2335,7 +2336,7 @@ __vmath__ mat2_t mat2_divf(mat2_ref m, float s)
 /**
  * Test if 2 matrix 2x2 is equal
  */                             
-__vmath__ bool   mat2_equal(mat2_ref a, mat2_ref b)
+__vmath__ bool   mat2_equal(mat2_arg_t a, mat2_arg_t b)
 {
     return vec4_equal(a.vec4, b.vec4);
 }
@@ -2343,7 +2344,7 @@ __vmath__ bool   mat2_equal(mat2_ref a, mat2_ref b)
 /**
  * Get the transpose version of the given matrix 2x2 (rotate left the matrix)
  */
-__vmath__ mat2_t mat2_transpose(mat2_ref m)
+__vmath__ mat2_t mat2_transpose(mat2_arg_t m)
 {
 #if VMATH_SSE_ENABLE
     mat2_t r;
@@ -2357,7 +2358,7 @@ __vmath__ mat2_t mat2_transpose(mat2_ref m)
 /**
  *
  */
-__vmath__ float  mat2_det(mat2_ref m)
+__vmath__ float mat2_det(mat2_arg_t m)
 {
     (void)m;
     return 0.0f;
@@ -2366,7 +2367,7 @@ __vmath__ float  mat2_det(mat2_ref m)
 /**
  *
  */
-__vmath__ mat2_t mat2_inverse(mat2_ref m)
+__vmath__ mat2_t mat2_inverse(mat2_arg_t m)
 {
     (void)m;
     return MAT2_IDENTITY;
@@ -2375,7 +2376,7 @@ __vmath__ mat2_t mat2_inverse(mat2_ref m)
 /**
  *
  */
-__vmath__ vec2_t mat2_transform(mat2_ref m, vec2_ref v)
+__vmath__ vec2_t mat2_transform(mat2_arg_t m, vec2_arg_t v)
 {
     return vec2(
         vec2_dot(vec2(m.m00, m.m01), v),
@@ -2393,7 +2394,7 @@ __vmath__ vec2_t mat2_transform(mat2_ref m, vec2_ref v)
 /**
  *
  */
-__vmath__ mat2_t mat3_tomat2(mat3_ref m)
+__vmath__ mat2_t mat3_tomat2(mat3_arg_t m)
 {
     mat2_t r;
     r.m00 = m.m00;
@@ -2406,7 +2407,7 @@ __vmath__ mat2_t mat3_tomat2(mat3_ref m)
 /**
  *
  */
-__vmath__ mat4_t mat3_tomat4(mat3_ref m)
+__vmath__ mat4_t mat3_tomat4(mat3_arg_t m)
 {
     mat4_t r;
     r.rows[0] = vec4(m.m00, m.m01, m.m02, 0);
@@ -2419,7 +2420,7 @@ __vmath__ mat4_t mat3_tomat4(mat3_ref m)
 /**
  * Transpose matrix3x3
  */
-__vmath__ mat3_t mat3_transpose(mat3_ref m)
+__vmath__ mat3_t mat3_transpose(mat3_arg_t m)
 {
     mat3_t r;
     r.m00 = m.m00; r.m01 = m.m10; r.m02 = m.m20;
@@ -2431,7 +2432,7 @@ __vmath__ mat3_t mat3_transpose(mat3_ref m)
 /**
  * Addition of two matrix 3x3
  */
-__vmath__ mat3_t mat3_add(mat3_ref a, mat3_ref b)
+__vmath__ mat3_t mat3_add(mat3_arg_t a, mat3_arg_t b)
 {
     mat3_t r;
     r.m00 = a.m00 + b.m00; r.m01 = a.m01 + b.m01; r.m02 = a.m02 + b.m02;
@@ -2443,7 +2444,7 @@ __vmath__ mat3_t mat3_add(mat3_ref a, mat3_ref b)
 /**
  * Subtraction of two matrix 3x3
  */
-__vmath__ mat3_t mat3_sub(mat3_ref a, mat3_ref b)
+__vmath__ mat3_t mat3_sub(mat3_arg_t a, mat3_arg_t b)
 {
     mat3_t r;
     r.m00 = a.m00 - b.m00; r.m01 = a.m01 - b.m01; r.m02 = a.m02 - b.m02;
@@ -2455,7 +2456,7 @@ __vmath__ mat3_t mat3_sub(mat3_ref a, mat3_ref b)
 /**
  * Multiplication of two matrix 3x3
  */
-__vmath__ mat3_t mat3_mul(mat3_ref a, mat3_ref b)
+__vmath__ mat3_t mat3_mul(mat3_arg_t a, mat3_arg_t b)
 {
     mat3_t r;
     r.m00 = a.m00 * b.m00 + a.m10 * b.m01 + a.m20 * b.m02;
@@ -2475,7 +2476,7 @@ __vmath__ mat3_t mat3_mul(mat3_ref a, mat3_ref b)
 /**
  *
  */
-__vmath__ mat3_t mat3_mulf(mat3_ref m, float s)
+__vmath__ mat3_t mat3_mulf(mat3_arg_t m, float s)
 {
     mat3_t r;
     r.m00 = m.m00 * s; r.m01 = m.m01 * s; r.m02 = m.m02 * s;
@@ -2487,7 +2488,7 @@ __vmath__ mat3_t mat3_mulf(mat3_ref m, float s)
 /**
  *
  */
-__vmath__ mat3_t mat3_divf(mat3_ref m, float s)
+__vmath__ mat3_t mat3_divf(mat3_arg_t m, float s)
 {
     return mat3_mulf(m, 1.0f / s);
 }
@@ -2496,7 +2497,7 @@ __vmath__ mat3_t mat3_divf(mat3_ref m, float s)
  * Compare if two matrices is equal or not
  * @return: true is equal, false otherwise
  */
-__vmath__ bool mat3_equal(mat3_ref a, mat3_ref b)
+__vmath__ bool mat3_equal(mat3_arg_t a, mat3_arg_t b)
 {
     return
         a.m00 == b.m00 && a.m01 == b.m01 && a.m02 == b.m02 &&
@@ -2507,7 +2508,7 @@ __vmath__ bool mat3_equal(mat3_ref a, mat3_ref b)
 /**
  *
  */
-__vmath__ mat3_t mat3_neg(mat3_ref m)
+__vmath__ mat3_t mat3_neg(mat3_arg_t m)
 {
     mat3_t r;
     r.m00 = -m.m00; r.m01 = -m.m01; r.m02 = -m.m02;
@@ -2519,7 +2520,7 @@ __vmath__ mat3_t mat3_neg(mat3_ref m)
 /**
  * Calculate determinant of a matrix3x3
  */
-__vmath__ float mat3_det(mat3_ref m)
+__vmath__ float mat3_det(mat3_arg_t m)
 {
     return 
           m.m00 * m.m11 * m.m22 - m.m00 * m.m12 * m.m21
@@ -2530,7 +2531,7 @@ __vmath__ float mat3_det(mat3_ref m)
 /**
  * Get inverted version of a matrix3x3
  */
-__vmath__ mat3_t mat3_inverse(mat3_ref m)
+__vmath__ mat3_t mat3_inverse(mat3_arg_t m)
 {
     float d = mat3_det(m);
     if (d == 0.0f)
@@ -2558,7 +2559,7 @@ __vmath__ mat3_t mat3_inverse(mat3_ref m)
 /**
  * Apply transform (Matrix3x3) for Vector3D
  */
-__vmath__ vec3_t mat3_transform(mat3_ref m, vec3_ref v)
+__vmath__ vec3_t mat3_transform(mat3_arg_t m, vec3_arg_t v)
 {
     const vec3_t c0 = vec3(m.m00, m.m10, m.m20);
     const vec3_t c1 = vec3(m.m01, m.m11, m.m21);
@@ -2580,7 +2581,7 @@ __vmath__ vec3_t mat3_transform(mat3_ref m, vec3_ref v)
 /**
  * Convert matrix 4x4 to matrix 2x2
  */
-__vmath__ mat2_t mat4_tomat2(const mat4_ref m)
+__vmath__ mat2_t mat4_tomat2(mat4_arg_t m)
 {
     mat2_t r;
     r.rows[0] = vec2(m.m00, m.m01);
@@ -2591,7 +2592,7 @@ __vmath__ mat2_t mat4_tomat2(const mat4_ref m)
 /**
  * Convert matrix 4x4 to matrix 3x3
  */
-__vmath__ mat3_t mat4_tomat3(const mat4_ref m)
+__vmath__ mat3_t mat4_tomat3(mat4_arg_t m)
 {
     mat3_t r;
     r.m00 = m.m00; r.m01 = m.m01, r.m02 = m.m02;
@@ -2624,7 +2625,7 @@ __vmath__ mat4_t mat4_translate2f(float x, float y)
 /**
  *
  */
-__vmath__ mat4_t mat4_translatev2(vec2_ref v)
+__vmath__ mat4_t mat4_translatev2(vec2_arg_t v)
 {
     return mat4_translate3f(v.x, v.y, 0.0);
 }
@@ -2632,7 +2633,7 @@ __vmath__ mat4_t mat4_translatev2(vec2_ref v)
 /**
  *
  */
-__vmath__ mat4_t mat4_translatev3(vec3_ref v)
+__vmath__ mat4_t mat4_translatev3(vec3_arg_t v)
 {
     return mat4_translate3f(v.x, v.y, v.z);
 }
@@ -2669,7 +2670,7 @@ __vmath__ mat4_t mat4_scale2f(float x, float y)
 /**
  *
  */
-__vmath__ mat4_t mat4_scalev2(vec2_ref v)
+__vmath__ mat4_t mat4_scalev2(vec2_arg_t v)
 {
     return mat4_scale3f(v.x, v.y, 1.0);
 }
@@ -2677,7 +2678,7 @@ __vmath__ mat4_t mat4_scalev2(vec2_ref v)
 /**
  *
  */
-__vmath__ mat4_t mat4_scalev3(vec3_ref v)
+__vmath__ mat4_t mat4_scalev3(vec3_arg_t v)
 {
     return mat4_scale3f(v.x, v.y, v.z);
 }
@@ -2766,7 +2767,7 @@ __vmath__ mat4_t mat4_rotate3f(float x, float y, float z, float angle)
 /**
  * Create rotate matrix with axis and angle
  */
-__vmath__ mat4_t mat4_rotatev3(vec3_ref v, float angle)
+__vmath__ mat4_t mat4_rotatev3(vec3_arg_t v, float angle)
 {
     return mat4_rotate3f(v.x, v.y, v.z, angle);
 }
@@ -2774,7 +2775,7 @@ __vmath__ mat4_t mat4_rotatev3(vec3_ref v, float angle)
 /**
  * Create rotation matrix from quaternion
  */
-__vmath__ mat4_t mat4_rotateq(quat_ref q)
+__vmath__ mat4_t mat4_rotateq(quat_arg_t q)
 {
     const vec4_t aa = quat_toaxis(q); /* axis-angle form of quaternion */
     return mat4_rotatev3(aa.xyz, aa.w);
@@ -2783,7 +2784,7 @@ __vmath__ mat4_t mat4_rotateq(quat_ref q)
 /**
  * Apply transform (Matrix4x4) for Vector4D
  */
-__vmath__ vec4_t mat4_transform(mat4_ref m, vec4_ref v)
+__vmath__ vec4_t mat4_transform(mat4_arg_t m, vec4_arg_t v)
 {
     const vec4_t c0 = vec4(m.m00, m.m10, m.m20, m.m30);
     const vec4_t c1 = vec4(m.m01, m.m11, m.m21, m.m31);
@@ -2801,7 +2802,7 @@ __vmath__ vec4_t mat4_transform(mat4_ref m, vec4_ref v)
 /**
  * Addidtion of two matrix4x4
  */
-__vmath__ mat4_t mat4_add(mat4_ref a, mat4_ref b)
+__vmath__ mat4_t mat4_add(mat4_arg_t a, mat4_arg_t b)
 {
     mat4_t r;
     r.rows[0] = vec4_add(a.rows[0], b.rows[0]);
@@ -2814,7 +2815,7 @@ __vmath__ mat4_t mat4_add(mat4_ref a, mat4_ref b)
 /**
  * Subtraction of two matrix4x4
  */
-__vmath__ mat4_t mat4_sub(mat4_ref a, mat4_ref b)
+__vmath__ mat4_t mat4_sub(mat4_arg_t a, mat4_arg_t b)
 {
     mat4_t r;
     r.rows[0] = vec4_sub(a.rows[0], b.rows[0]);
@@ -2827,7 +2828,7 @@ __vmath__ mat4_t mat4_sub(mat4_ref a, mat4_ref b)
 /**
  * Multiplication of two matrix4x4
  */
-__vmath__ mat4_t mat4_mul(mat4_ref a, mat4_ref b)
+__vmath__ mat4_t mat4_mul(mat4_arg_t a, mat4_arg_t b)
 {
     mat4_t r;
     r.rows[0] = mat4_transform(a, b.rows[0]);
@@ -2840,7 +2841,7 @@ __vmath__ mat4_t mat4_mul(mat4_ref a, mat4_ref b)
 /**
  * Multiplication of a matrix 4x4 with a scalar
  */
-__vmath__ mat4_t mat4_mulf(mat4_ref m, float s)
+__vmath__ mat4_t mat4_mulf(mat4_arg_t m, float s)
 {
     mat4_t r;
     r.rows[0] = vec4_mulf(m.rows[0], s);
@@ -2853,7 +2854,7 @@ __vmath__ mat4_t mat4_mulf(mat4_ref m, float s)
 /**
  * Multiplication of a matrix 4x4 with a scalar
  */
-__vmath__ mat4_t mat4_divf(mat4_ref m, float s)
+__vmath__ mat4_t mat4_divf(mat4_arg_t m, float s)
 {
     return mat4_mulf(m, 1.0f / s);
 }
@@ -2862,7 +2863,7 @@ __vmath__ mat4_t mat4_divf(mat4_ref m, float s)
  * Compare if two matrix is equal or not
  * @return: true if equal, false otherwise
  */
-__vmath__ bool mat4_equal(mat4_ref a, mat4_ref b)
+__vmath__ bool mat4_equal(mat4_arg_t a, mat4_arg_t b)
 {
     return
         vec4_equal(a.rows[0], b.rows[0]) &&
@@ -2874,7 +2875,7 @@ __vmath__ bool mat4_equal(mat4_ref a, mat4_ref b)
 /**
  *
  */
-__vmath__ mat4_t mat4_neg(mat4_ref m)
+__vmath__ mat4_t mat4_neg(mat4_arg_t m)
 {
     mat4_t r;
     r.rows[0] = vec4_neg(m.rows[0]);
@@ -2887,7 +2888,7 @@ __vmath__ mat4_t mat4_neg(mat4_ref m)
 /**
  * Transpose matrix4x4
  */
-__vmath__ mat4_t mat4_transpose(mat4_ref m)
+__vmath__ mat4_t mat4_transpose(mat4_arg_t m)
 {
     mat4_t r;
     r.rows[0] = vec4(m.m00, m.m10, m.m20, m.m30);
@@ -2958,7 +2959,7 @@ __vmath__ mat4_t mat4_perspective(float fov, float aspect,
 /**
  * Create view matrix when focus on the position
  */
-__vmath__ mat4_t mat4_lookat(vec3_ref eye, vec3_ref target, vec3_ref up)
+__vmath__ mat4_t mat4_lookat(vec3_arg_t eye, vec3_arg_t target, vec3_arg_t up)
 {
     const vec3_t z = vec3_normalize(vec3_sub(eye, target));
     const vec3_t x = vec3_normalize(vec3_cross(up, z));
@@ -2980,7 +2981,7 @@ __vmath__ mat4_t mat4_lookat(vec3_ref eye, vec3_ref target, vec3_ref up)
 /**
  * Calculate deternimant value
  */
-__vmath__ float mat4_det(mat4_ref m)
+__vmath__ float mat4_det(mat4_arg_t m)
 {
     const float s1 = m.m00 * m.m11 - m.m10 * m.m01;
     const float s2 = m.m00 * m.m12 - m.m10 * m.m02;
@@ -3002,7 +3003,7 @@ __vmath__ float mat4_det(mat4_ref m)
 /**
  * Get inverse version of matrix4x4
  */
-__vmath__ mat4_t mat4_inverse(mat4_ref m)
+__vmath__ mat4_t mat4_inverse(mat4_arg_t m)
 {
     const float s1 = m.m00 * m.m11 - m.m10 * m.m01;
     const float s2 = m.m00 * m.m12 - m.m10 * m.m02;
