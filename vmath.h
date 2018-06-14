@@ -10,7 +10,7 @@
 #define __VMATH_H__
 
 #define VMATH_LIBNAME "libvmath"
-#define VMATH_VERSION "v1.0.7" 
+#define VMATH_VERSION "v1.1.0" 
 
 /**
  * Include dependencies
@@ -93,7 +93,7 @@
 #endif
 
 #ifndef VMATH_GLSL_LIKE
-#define VMATH_GLSL_LIKE 0
+#define VMATH_GLSL_LIKE 1
 #endif
 
 #ifndef VMATH_OPERATOR_OVERLOADING
@@ -634,7 +634,7 @@ public: /* Constructors */
     
     __vmath_ctor__ vec4(float x, float y, float z, float w) 
         #if VMATH_SSE_ENABLE != 0
-        { pure.data = _mm_set_ps(x, y, z, w); }
+        { pure.data = _mm_set_ps(w, z, y, x); }
         #else
         : x(x), y(y), z(z), w(w) {}
         #endif

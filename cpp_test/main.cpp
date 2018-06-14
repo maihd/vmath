@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <assert.h>
 
-#define VMATH_GLSL_LIKE  1
 #include "../vmath.h"
 
 void vec2_test(void);
