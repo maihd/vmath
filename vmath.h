@@ -390,7 +390,86 @@ typedef mat3_t        mat3_arg_t;
 typedef mat4_t        mat4_arg_t;
 #endif
 
+/********
+ * @endregion: Data types definitions
+ ********/
 
+
+/********************
+ * Contants define
+ ********************/
+#if VMATH_CONSTANTS
+
+static const vec2_t VEC2_ZERO  = {  0,  0 };
+static const vec2_t VEC2_UNIT  = {  1,  1 };
+static const vec2_t VEC2_UNITX = {  1,  1 };
+static const vec2_t VEC2_UNITY = {  0,  1 };
+static const vec2_t VEC2_LEFT  = { -1,  0 };
+static const vec2_t VEC2_RIGHT = {  1,  0 };
+static const vec2_t VEC2_UP    = {  0,  1 };
+static const vec2_t VEC2_DOWN  = {  0, -1 };
+
+static const vec3_t VEC3_ZERO  = {  0,  0,  0 };
+static const vec3_t VEC3_UNIT  = {  1,  1,  1 };
+static const vec3_t VEC3_UNITX = {  1,  0,  0 };
+static const vec3_t VEC3_UNITY = {  0,  1,  0 };
+static const vec3_t VEC3_UNITZ = {  0,  0,  1 };
+static const vec3_t VEC3_LEFT  = { -1,  0,  0 };
+static const vec3_t VEC3_RIGHT = {  1,  0,  0 };
+static const vec3_t VEC3_UP    = {  0,  1,  0 };
+static const vec3_t VEC3_DOWN  = {  0, -1,  0 };
+static const vec3_t VEC3_BACK  = {  0,  0, -1 };
+static const vec3_t VEC3_FORE  = {  0,  0,  1 };
+
+static const vec4_t VEC4_ZERO  = {  0,  0,  0, 0 };
+static const vec4_t VEC4_UNIT  = {  1,  1,  1, 1 };
+static const vec4_t VEC4_UNITX = {  1,  0,  0, 0 };
+static const vec4_t VEC4_UNITY = {  0,  1,  0, 0 };
+static const vec4_t VEC4_UNITZ = {  0,  0,  1, 0 };
+static const vec4_t VEC4_UNITW = {  0,  0,  0, 1 };
+static const vec4_t VEC4_LEFT  = { -1,  0,  0, 0 };
+static const vec4_t VEC4_RIGHT = {  1,  0,  0, 0 };
+static const vec4_t VEC4_UP    = {  0,  1,  0, 0 };
+static const vec4_t VEC4_DOWN  = {  0, -1,  0, 0 };
+static const vec4_t VEC4_BACK  = {  0,  0, -1, 0 };
+static const vec4_t VEC4_FORE  = {  0,  0,  1, 0 };
+
+static const quat_t QUAT_ZERO     = { 0, 0, 0, 0 };
+static const quat_t QUAT_IDENTITY = { 0, 0, 0, 1 };
+
+static const mat2_t MAT2_ZERO     = { 1, 0, 0, 1 };
+static const mat2_t MAT2_IDENTITY = { 1, 0, 0, 1 };
+
+static const mat3_t MAT3_ZERO     = {
+    0, 0, 0,
+    0, 0, 0,
+    0, 0, 0,
+};
+static const mat3_t MAT3_IDENTITY = {
+    1, 0, 0,
+    0, 1, 0,
+    0, 0, 1,
+};
+
+static const mat4_t MAT4_ZERO     = {
+    0, 0, 0, 0,
+    0, 0, 0, 0,
+    0, 0, 0, 0,
+    0, 0, 0, 0,
+};
+static const mat4_t MAT4_IDENTITY = {
+    1, 0, 0, 0,
+    0, 1, 0, 0,
+    0, 0, 1, 0,
+    0, 0, 0, 1,
+};
+
+/* END OF VMATH_CONSTANTS */
+#endif
+
+/*****************************
+ * @region: Constructors
+ *****************************/
 #if defined(__cplusplus) && VMATH_GLSL_LIKE
 
 #if defined(_MSC_VER)
@@ -816,6 +895,12 @@ public: /* Constructors */
     __vmath_ctor__ operator       float*()       { return pure.data; }
     __vmath_ctor__ operator const float*() const { return pure.data; }
 
+    __vmath_ctor__ explicit operator mat2() 
+    { 
+        return mat2(m00, m01,
+                    m10, m11); 
+    }
+
 public: /* Operators */
     __vmath_mthd__ vec3& operator[](int index)
     {
@@ -855,21 +940,43 @@ public: /* Constructors */
     __vmath_ctor__ operator       float*()       { return pure.data; }
     __vmath_ctor__ operator const float*() const { return pure.data; }
 
+    __vmath_ctor__ explicit operator mat2() 
+    { 
+        return mat2(m00, m01,
+                    m10, m11); 
+    }
+
+    __vmath_ctor__ explicit operator mat3() 
+    { 
+        return mat3(m00, m01, m02,
+                    m10, m11, m12,
+                    m20, m21, m22); 
+    }
+
     __vmath_ctor__ mat4(void) : mat4(0) {}
     __vmath_ctor__ mat4(float s)
-        : m00(s), m01(0), m02(0), m03(0)
-        , m10(0), m11(s), m12(0), m13(0)
-        , m20(0), m21(0), m22(s), m23(0)
-        , m30(0), m31(0), m32(0), m33(s) {}
+        : mat4(s, 0, 0, 0,
+               0, s, 0, 0,
+               0, 0, s, 0,
+               0, 0, 0, s) {}
 
     __vmath_ctor__ mat4(float m00, float m01, float m02, float m03, 
                         float m10, float m11, float m12, float m13,
                         float m20, float m21, float m22, float m23,
                         float m30, float m31, float m32, float m33)
+        #if VMATH_SSE_ENABLE != 0
+        {
+            pure.rows[0] = vec4(m00, m01, m02, m03);
+            pure.rows[1] = vec4(m10, m11, m12, m13);
+            pure.rows[2] = vec4(m20, m21, m22, m23);
+            pure.rows[3] = vec4(m30, m31, m32, m33);
+        }
+        #else
         : m00(m00), m01(m01), m02(m02), m03(m03)
         , m10(m10), m11(m11), m12(m12), m13(m13)
         , m20(m20), m21(m21), m22(m22), m23(m23)
         , m30(m30), m31(m31), m32(m32), m33(m33) {}
+        #endif
 
     __vmath_ctor__ mat4(const vec4& row0, const vec4& row1, const vec4& row2, const vec4& row3)
         : mat4(row0.x, row0.y, row0.z, row0.w,
@@ -905,89 +1012,7 @@ static_assert(sizeof(mat3) == sizeof(mat3_t), "Size of mat3 is not equal mat3_t"
 static_assert(sizeof(mat4) == sizeof(mat4_t), "Size of mat4 is not equal mat4_t");
 
 #else
-#endif /* VMATH_GLSL_LIKE */
 
-/********
- * @endregion: Data types definitions
- ********/
-
-
-/********************
- * Contants define
- ********************/
-#if VMATH_CONSTANTS
-
-static const vec2_t VEC2_ZERO  = {  0,  0 };
-static const vec2_t VEC2_UNIT  = {  1,  1 };
-static const vec2_t VEC2_UNITX = {  1,  1 };
-static const vec2_t VEC2_UNITY = {  0,  1 };
-static const vec2_t VEC2_LEFT  = { -1,  0 };
-static const vec2_t VEC2_RIGHT = {  1,  0 };
-static const vec2_t VEC2_UP    = {  0,  1 };
-static const vec2_t VEC2_DOWN  = {  0, -1 };
-
-static const vec3_t VEC3_ZERO  = {  0,  0,  0 };
-static const vec3_t VEC3_UNIT  = {  1,  1,  1 };
-static const vec3_t VEC3_UNITX = {  1,  0,  0 };
-static const vec3_t VEC3_UNITY = {  0,  1,  0 };
-static const vec3_t VEC3_UNITZ = {  0,  0,  1 };
-static const vec3_t VEC3_LEFT  = { -1,  0,  0 };
-static const vec3_t VEC3_RIGHT = {  1,  0,  0 };
-static const vec3_t VEC3_UP    = {  0,  1,  0 };
-static const vec3_t VEC3_DOWN  = {  0, -1,  0 };
-static const vec3_t VEC3_BACK  = {  0,  0, -1 };
-static const vec3_t VEC3_FORE  = {  0,  0,  1 };
-
-static const vec4_t VEC4_ZERO  = {  0,  0,  0, 0 };
-static const vec4_t VEC4_UNIT  = {  1,  1,  1, 1 };
-static const vec4_t VEC4_UNITX = {  1,  0,  0, 0 };
-static const vec4_t VEC4_UNITY = {  0,  1,  0, 0 };
-static const vec4_t VEC4_UNITZ = {  0,  0,  1, 0 };
-static const vec4_t VEC4_UNITW = {  0,  0,  0, 1 };
-static const vec4_t VEC4_LEFT  = { -1,  0,  0, 0 };
-static const vec4_t VEC4_RIGHT = {  1,  0,  0, 0 };
-static const vec4_t VEC4_UP    = {  0,  1,  0, 0 };
-static const vec4_t VEC4_DOWN  = {  0, -1,  0, 0 };
-static const vec4_t VEC4_BACK  = {  0,  0, -1, 0 };
-static const vec4_t VEC4_FORE  = {  0,  0,  1, 0 };
-
-static const quat_t QUAT_ZERO     = { 0, 0, 0, 0 };
-static const quat_t QUAT_IDENTITY = { 0, 0, 0, 1 };
-
-static const mat2_t MAT2_ZERO     = { 1, 0, 0, 1 };
-static const mat2_t MAT2_IDENTITY = { 1, 0, 0, 1 };
-
-static const mat3_t MAT3_ZERO     = {
-    0, 0, 0,
-    0, 0, 0,
-    0, 0, 0,
-};
-static const mat3_t MAT3_IDENTITY = {
-    1, 0, 0,
-    0, 1, 0,
-    0, 0, 1,
-};
-
-static const mat4_t MAT4_ZERO     = {
-    0, 0, 0, 0,
-    0, 0, 0, 0,
-    0, 0, 0, 0,
-    0, 0, 0, 0,
-};
-static const mat4_t MAT4_IDENTITY = {
-    1, 0, 0, 0,
-    0, 1, 0, 0,
-    0, 0, 1, 0,
-    0, 0, 0, 1,
-};
-
-/* END OF VMATH_CONSTANTS */
-#endif
-
-/*****************************
- * Non GLSL-like constructors
- *****************************/
-#if !(defined(__cplusplus) && (VMATH_GLSL_LIKE != 0))
 /**
  * Create Vector2D
  */
@@ -1301,9 +1326,10 @@ __vmath__ mat4_t mat4(const float* data)
 
 #endif /* VMATH_GLSL_LIKE */
 
-/********
+
+/*******************************
  * @region: Functions define
- ********/
+ *******************************/
 #ifndef VMATH_UTILS
 #define VMATH_UTILS 1
 #endif
@@ -3088,8 +3114,8 @@ __vmath__ mat4_t mat4_inverse(mat4_arg_t m)
 #if defined(__cplusplus) && VMATH_FUNCTION_OVERLOADING != 0
 
 /**************************
-* Vector2D constructor
-**************************/
+ * Vector2D functions
+ **************************/
 #if VMATH_BUILD_VEC2
 __vmath__ vec2_t add(const vec2_t& a, const vec2_t& b)
 {
@@ -3194,7 +3220,7 @@ __vmath__ vec2_t normalize(const vec2_t& v)
 #endif
 
 /**************************
- * Vector3D constructor
+ * Vector3D functions
  **************************/ 
 #if VMATH_BUILD_VEC3
 __vmath__ vec3_t add(const vec3_t& a, const vec3_t& b)
@@ -3306,7 +3332,7 @@ __vmath__ vec3_t normalize(const vec3_t& v)
 #endif
 
 /**************************
- * Vector4D constructor
+ * Vector4D functions
  **************************/
 #if VMATH_BUILD_VEC4
 __vmath__ vec4_t add(const vec4_t& a, const vec4_t& b)
@@ -3445,10 +3471,15 @@ __vmath__ quat_t neg(const quat_t& q)
 {
     return quat_neg(q);
 }
+
+__vmath__ quat_t inverse(const quat_t& q)
+{
+    return quat_inverse(q);
+}
 #endif
 
 /**************************
- * Matrix 2x2 constructor
+ * Matrix 2x2 functions
  **************************/
 #if VMATH_BUILD_MAT2
 __vmath__ mat2_t neg(const mat2_t& m)
@@ -3486,12 +3517,22 @@ __vmath__ vec2_t mul(const mat2_t& m, const vec2_t& v)
     return mat2_transform(m, v);
 }
 
+__vmath__ mat2_t inverse(const mat2_t& m)
+{
+    return mat2_inverse(m);
+}
+
+__vmath__ mat2_t transpose(const mat2_t& m)
+{
+    return mat2_transpose(m);
+}
+
 /* END OF VMATH_BUILD_MAT2 */
 #endif
 
 /**************************
-* Matrix 3x3 constructor
-**************************/
+ * Matrix 3x3 functions
+ **************************/
 #if VMATH_BUILD_MAT3
 __vmath__ mat3_t neg(const mat3_t& m)
 {
@@ -3528,12 +3569,22 @@ __vmath__ vec3_t mul(const mat3_t& m, const vec3_t& v)
     return mat3_transform(m, v);
 }
 
+__vmath__ mat3_t inverse(const mat3_t& m)
+{
+    return mat3_inverse(m);
+}
+
+__vmath__ mat3_t transpose(const mat3_t& m)
+{
+    return mat3_transpose(m);
+}
+
 /* END OF VMATH_BUILD_MAT3 */
 #endif  
 
 /**************************
-* Matrix 4x4 overloading
-**************************/
+ * Matrix 4x4 functions overloading
+ **************************/
 #if VMATH_BUILD_MAT4
 __vmath__ mat4_t neg(const mat4_t& m)
 {
@@ -3568,6 +3619,16 @@ __vmath__ mat4_t mul(float s, const mat4_t& m)
 __vmath__ vec4_t mul(const mat4_t& m, const vec4_t& v)
 {
     return mat4_transform(m, v);
+}
+
+__vmath__ mat4_t inverse(const mat4_t& m)
+{
+    return mat4_inverse(m);
+}
+
+__vmath__ mat4_t transpose(const mat4_t& m)
+{
+    return mat4_transpose(m);
 }
 
 __vmath__ mat4_t mat4_scale(float s)
@@ -3663,9 +3724,9 @@ __vmath__ vec3_t mul(const mat4_t& m, const vec3_t& v)
  ***********************************/
 #if defined(__cplusplus) && VMATH_OPERATOR_OVERLOADING != 0
 
- /************************
-* Vector2D
-************************/
+/************************
+ * Vector2D
+ ************************/
 #if VMATH_BUILD_VEC2
 __vmath__ vec2_t operator-(const vec2_t& v)
 {
@@ -4438,12 +4499,13 @@ __vmath__ vec4_t operator*(const mat4_t& a, const vec4_t& b)
  * Turn on annoy warning
  */
 #if __GNUC__
-# pragma GCC   diagnostic warning "-Wmissing-braces"
+#  pragma GCC   diagnostic warning "-Wmissing-braces"
 #elif __clang__
-# pragma clang diagnostic warning "-Wmissing-braces"
-#else
-# pragma warning(default : 4141) /* Shutup announce missing braces warning */
-# pragma warning(default : 4201) /* Shutup announce anonymous union warning */
+#  pragma clang diagnostic warning "-Wmissing-braces"
+#elif defined(_MSC_VER)
+#  pragma warning(default : 4141) /* Shutup announce missing braces warning */
+#  pragma warning(default : 4201) /* Shutup announce anonymous union warning */
 #endif
 
 #endif /* __VMATH_H__ */
+

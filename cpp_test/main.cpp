@@ -99,6 +99,14 @@ void mat3_test(void)
 
 void mat4_test(void)
 {
+    mat4 proj = mat4_ortho(-400.0f, 400.0f, -300.0f, 300.0f, 0.1f, 100.0f);
+
+    /* Test casting */
+    mat3 to_mat3 = (mat3)proj;
+    mat2 to_mat2 = (mat2)proj;
+
+    (void)to_mat3;
+    (void)to_mat2;
 }
 
 void quat_test(void)
