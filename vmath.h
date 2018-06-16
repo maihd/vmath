@@ -604,12 +604,16 @@ public: /* Fields */
 
 public: /* Constructor */
     __vmath_ctor__ vec2(void)             : vec2(0, 0) {}
-    __vmath_ctor__ explicit vec2(float s) : vec2(s, s) {}
     __vmath_ctor__ vec2(float x, float y) { this->x = x; this->y = y; }
 
     __vmath_ctor__ vec2(const vec2_t& v) : pure(v) {}
     __vmath_ctor__ operator       vec2_t&()       { return pure; }
     __vmath_ctor__ operator const vec2_t&() const { return pure; }
+
+    __vmath_ctor__ explicit vec2(float s)         : vec2(s, s)       {}
+    __vmath_ctor__ explicit vec2(const float* s)  : vec2(s[0], s[1]) {}
+    __vmath_ctor__ explicit vec2(const vec3_t& v) : vec2(v.x, v.y)   {}
+    __vmath_ctor__ explicit vec2(const vec4_t& v) : vec2(v.x, v.y)   {}
     
 public: /* Operator */
     __vmath_mthd__ vec2& operator=(const vec2_t& v)
@@ -646,6 +650,10 @@ public: /* Fields */
     };
     struct
     {
+        float r, g, b;
+    };
+    struct
+    {
         vec2_t xy;
     };
     struct
@@ -661,8 +669,8 @@ public: /* Constructors */
     __vmath_ctor__ explicit vec3(float s)        : vec3(s, s, s)          {}
     __vmath_ctor__ explicit vec3(const float* s) : vec3(s[0], s[1], s[2]) {}
 
-    __vmath_ctor__ explicit vec3(const vec2&   v, float z = 0.0f) : vec3(v.x, v.y, z) {}
-    __vmath_ctor__ explicit vec3(const vec2_t& v, float z = 0.0f) : vec3(v.x, v.y, z) {}
+    __vmath_ctor__ explicit vec3(const vec2_t& v, float z = 0.0f) : vec3(v.x, v.y, z)   {}
+    __vmath_ctor__ explicit vec3(const vec4_t& v)                 : vec3(v.x, v.y, v.z) {}
 
     __vmath_ctor__ vec3(const vec3_t& v) : pure(v) {}
     __vmath_ctor__ operator       vec3_t&()       { return pure; }
@@ -732,10 +740,9 @@ public: /* Constructors */
     
     __vmath_ctor__ explicit vec4(float s)         : vec4(s, s, s, s)             {}
     __vmath_ctor__ explicit vec4(const float* s)  : vec4(s[0], s[1], s[2], s[3]) {}
-    __vmath_ctor__ explicit vec4(const vec2& v)   : vec4(v.x, v.y, 0, 0)         {}
-    __vmath_ctor__ explicit vec4(const vec2_t& v) : vec4(v.x, v.y, 0, 0)         {}
-    __vmath_ctor__ explicit vec4(const vec3& v)   : vec4(v.x, v.y, v.z, 0)       {}
-    __vmath_ctor__ explicit vec4(const vec3_t& v) : vec4(v.x, v.y, v.z, 0)       {}
+
+    __vmath_ctor__ vec4(const vec2_t& v, float z = 0.0f, float w = 0.0f) : vec4(v.x, v.y,   z, w) {}
+    __vmath_ctor__ vec4(const vec3_t& v, float w = 0.0f)                 : vec4(v.x, v.y, v.z, w) {}
 
     __vmath_ctor__ vec4(const vec4_t& v) : pure(v) {}
     __vmath_ctor__ operator       vec4_t&()       { return pure; }
@@ -779,7 +786,6 @@ public: /* Constructors */
     __vmath_ctor__ quat(float s) : quat(0, 0, 0, s) {} 
     __vmath_ctor__ quat(float x, float y, float z, float w) : vec4(::vec4(x, y, z, w)) {}
     
-    __vmath_ctor__ quat(const vec4&   v) : vec4(v) {}
     __vmath_ctor__ quat(const vec4_t& v) : vec4(v) {}
     __vmath_ctor__ operator       vec4&()       { return *((::vec4*)this); }
     __vmath_ctor__ operator const vec4&() const { return *((::vec4*)this); }
@@ -981,6 +987,24 @@ public: /* Constructors */
                row1.x, row1.y, row1.z, row1.w,
                row2.x, row2.y, row2.z, row2.w,
                row3.x, row3.y, row3.z, row3.w) {}
+
+    __vmath_ctor__ explicit mat4(const mat2_t& m)
+        : mat4(m.m00, m.m01, 0, 0,
+               m.m10, m.m11, 0, 0,
+                   0,     0, 0, 0,
+                   0,     0, 0, 0) {}            
+
+    __vmath_ctor__ explicit mat4(const mat3_t& m)
+        : mat4(m.m00, m.m01, m.m02, 0,
+               m.m10, m.m11, m.m12, 0,
+               m.m20, m.m21, m.m22, 0,
+                   0,     0,     0, 0) {}        
+
+    __vmath_ctor__ mat4(const mat2_t& m0, const mat2_t& m1, const mat2_t& m2, const mat2_t& m3)
+        : mat4(m0.m00, m0.m01, m1.m00, m1.m01,
+               m0.m10, m0.m11, m1.m10, m1.m11,
+               m2.m00, m2.m01, m3.m00, m3.m01,
+               m2.m10, m2.m11, m3.m10, m3.m11) {}
 
 public: /* Operators */
     __vmath_mthd__ vec4& operator[](int index)
@@ -1328,11 +1352,11 @@ __vmath__ mat4_t mat4(const float* data)
 /*******************************
  * @region: Functions define
  *******************************/
-#ifndef VMATH_UTILS
-#define VMATH_UTILS 1
+#ifndef VMATH_FAST_MATH
+#define VMATH_FAST_MATH 1
 #endif
 
-#if (VMATH_UTILS != 0)
+#if (VMATH_FAST_MATH != 0)
 /** 
  * Fast inverse square root
  */
@@ -1355,10 +1379,7 @@ __vmath__ float vmath_rsqrt(float x)
  */
 __vmath__ float vmath_fsqrt(float x)
 {
-    return sqrtf(x);
-    /* This code work but has non-exact value in some cases
     return x == 0.0f ? 0.0f : 1.0f / vmath_rsqrt(x);
-    */
 }
 #else
 # ifndef vmath_rsqrt

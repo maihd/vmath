@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <assert.h>
 
+#define VMATH_FAST_MATH 0 // Fast math cause non-totally exact result
 #include "../vmath.h"
 
 void vec2_test(void);
