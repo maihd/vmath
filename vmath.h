@@ -823,6 +823,13 @@ public: /* Constructors */
     __vmath_ctor__ operator       mat2_t&()       { return pure; }
     __vmath_ctor__ operator const mat2_t&() const { return pure; }
 
+    __vmath_ctor__ explicit mat2(const mat3_t& m)
+        : mat2(m.m00, m.m01,
+               m.m10, m.m11) {}
+    __vmath_ctor__ explicit mat2(const mat4_t& m)
+        : mat2(m.m00, m.m01,
+               m.m10, m.m11) {}
+
     __vmath_ctor__ mat2(void) : mat2(0) {}
     __vmath_ctor__ mat2(float s)
         : m00(s), m01(0)
@@ -874,6 +881,16 @@ public: /* Constructors */
     __vmath_ctor__ operator       mat3_t&()       { return pure; }
     __vmath_ctor__ operator const mat3_t&() const { return pure; }
 
+    __vmath_ctor__ explicit mat3(const mat2_t& m)
+        : mat3(m.m00, m.m01, 0,
+               m.m10, m.m11, 0,
+                   0,     0, 0) {}
+
+    __vmath_ctor__ explicit mat3(const mat4_t& m)
+        : mat3(m.m00, m.m01, m.m02,
+               m.m10, m.m11, m.m12,
+               m.m20, m.m21, m.m22) {}
+
     __vmath_ctor__ mat3(void) : mat3(0) {}
     __vmath_ctor__ mat3(float s)
         : m00(s), m01(0), m02(0)
@@ -894,12 +911,6 @@ public: /* Constructors */
 
     __vmath_ctor__ operator       float*()       { return pure.data; }
     __vmath_ctor__ operator const float*() const { return pure.data; }
-
-    __vmath_ctor__ explicit operator mat2() 
-    { 
-        return mat2(m00, m01,
-                    m10, m11); 
-    }
 
 public: /* Operators */
     __vmath_mthd__ vec3& operator[](int index)
@@ -939,19 +950,6 @@ public: /* Constructors */
 
     __vmath_ctor__ operator       float*()       { return pure.data; }
     __vmath_ctor__ operator const float*() const { return pure.data; }
-
-    __vmath_ctor__ explicit operator mat2() 
-    { 
-        return mat2(m00, m01,
-                    m10, m11); 
-    }
-
-    __vmath_ctor__ explicit operator mat3() 
-    { 
-        return mat3(m00, m01, m02,
-                    m10, m11, m12,
-                    m20, m21, m22); 
-    }
 
     __vmath_ctor__ mat4(void) : mat4(0) {}
     __vmath_ctor__ mat4(float s)

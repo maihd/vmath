@@ -105,6 +105,9 @@ void mat4_test(void)
     mat3 to_mat3 = (mat3)proj;
     mat2 to_mat2 = (mat2)proj;
 
+    to_mat3 = mat3(proj);
+    to_mat2 = mat2(proj);
+
     (void)to_mat3;
     (void)to_mat2;
 }
