@@ -38,13 +38,13 @@ C++ language example:
 vec3_t position  = vec3(100.0f, 200.0f, 10.0f);
 quat_t rotation  = quat_euler(0.0f, 0.0f, 0.0f);
 vec3_t scalation = VEC3_ONE;
-mat4_t model     = mat4_translate(position)
-                 * mat4_rotate(rotation)
-                 * mat4_scale(scalation);
+mat4_t model     = mat4_translatev3(position)
+                 * mat4_rotateq(rotation)
+                 * mat4_scalev3(scalation);
 /* OR
-mat4_t model    = mul(mul(mat4_translate(position), 
-                          mat4_rotate(rotation)), 
-                      mat4_scale(scale));
+mat4_t model    = mul(mul(mat4_translatev3(position), 
+                          mat4_rotateq(rotation)), 
+                      mat4_scalev3(scale));
  */
 
 /* Perspective matrix with 45 degree fov */
@@ -60,7 +60,7 @@ mat4 model     = translate(position)
                * scale(scalation);
 
 /* Perspective matrix with 45 degree fov */
-mat4 proj = mat4_perspective(M_PI * 0.25f, WIDTH / HEIGHT, 0.0f, 100.0f);
+mat4 proj = perspective(M_PI * 0.25f, WIDTH / HEIGHT, 0.0f, 100.0f);
 
 ... apply matrix to render ...
 ```
@@ -78,4 +78,4 @@ Q. Why plain-old data?<br/>
 A. First, C and C++ are both supported. Second, Data-oriented design. Lastly, design based on GLSL.<br/>
 <br/>  
 Q. Are GLSL-like types (name without _t postfix), C++ object-oriented type?<br/>
-A. Shortly, yes. Long answer, we cannot naming functions with data types' name. The types, are defined separate from default types (name with _t postfix), and has auto conversion.<br/>
+A. Shortly, yes. Long answer, we cannot naming functions with data types' name. The types, are defined separate from default types (name with _t postfix), and has implicit conversion.<br/>
