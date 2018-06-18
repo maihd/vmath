@@ -35,12 +35,12 @@ mat4_t proj = mat4_perspective(M_PI * 0.25f, WIDTH / HEIGHT, 0.0f, 100.0f);
 
 C++ language example:
 ```C++
-vec3_t position = vec3(100.0f, 200.0f, 10.0f);
-quat_t rotation = quat_euler(0.0f, 0.0f, 0.0f);
-vec3_t scale    = VEC3_ONE;
-mat4_t model    = mat4_translate(position)
-                * mat4_rotate(rotation)
-		        * mat4_scale(scale);
+vec3_t position  = vec3(100.0f, 200.0f, 10.0f);
+quat_t rotation  = quat_euler(0.0f, 0.0f, 0.0f);
+vec3_t scalation = VEC3_ONE;
+mat4_t model     = mat4_translate(position)
+                 * mat4_rotate(rotation)
+                 * mat4_scale(scalation);
 /* OR
 mat4_t model    = mul(mul(mat4_translate(position), 
                           mat4_rotate(rotation)), 
@@ -52,12 +52,12 @@ mat4_t proj = mat4_perspective(M_PI * 0.25f, WIDTH / HEIGHT, 0.0f, 100.0f);
 
 /** GLSL-like types version */
 
-vec3 position = vec3(100.0f, 200.0f, 10.0f);
-quat rotation = quat_euler(0.0f, 0.0f, 0.0f);
-vec3 scale    = VEC3_ONE;
-mat4 model    = mat4_translate(position)
-              * mat4_rotate(rotation)
-	          * mat4_scale(scale);
+vec3 position  = vec3(100.0f, 200.0f, 10.0f);
+quat rotation  = quat(0.0f, 0.0f, 0.0f); /* create quat with roll-pitch-yaw */
+vec3 scalation = vec3(1.0f);
+mat4 model     = translate(position)
+               * rotate(rotation)
+               * scale(scalation);
 
 /* Perspective matrix with 45 degree fov */
 mat4 proj = mat4_perspective(M_PI * 0.25f, WIDTH / HEIGHT, 0.0f, 100.0f);

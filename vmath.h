@@ -778,15 +778,60 @@ public: /* Fields */
         struct
         {
             float x, y, z, w;
-        }; 
+        };
     };
 
 public: /* Constructors */
-    __vmath_ctor__ quat(void)    : quat(0, 0, 0, 0) {}
-    __vmath_ctor__ quat(float s) : quat(0, 0, 0, s) {} 
+    __vmath_ctor__ quat(void) : quat(0, 0, 0, 0) {}
     __vmath_ctor__ quat(float x, float y, float z, float w) : vec4(::vec4(x, y, z, w)) {}
-    
-    __vmath_ctor__ quat(const vec4_t& v) : vec4(v) {}
+
+    __vmath_ctor__ quat(const vec3_t& euler) : quat(euler.x, euler.y, euler.z) {}
+    __vmath_ctor__ quat(float r, float p, float y)
+    {
+        r *= 0.5f;
+        p *= 0.5f;
+        y *= 0.5f;
+
+        const float c1 = cosf(y);
+        const float c2 = cosf(p);
+        const float c3 = cosf(r);
+        const float s1 = sinf(y);
+        const float s2 = sinf(p);
+        const float s3 = sinf(r);
+
+        x = s1 * s2 * c3 + c1 * c2 * s3;
+        y = s1 * c2 * c3 + c1 * s2 * s3;
+        z = c1 * s2 * c3 - s1 * c2 * s3;
+        w = c1 * c2 * c3 - s1 * s2 * s3;
+    }
+
+
+    __vmath_ctor__ quat(const vec3_t& axis, float angle)
+    {
+        const float lsqr = axis.x * axis.x + axis.y * axis.y + axis.z * axis.z;
+        if (lsqr == 0.0f)
+        {
+            x = 0.0f;
+            y = 0.0f;
+            z = 0.0f;
+            w = 1.0f;
+        }
+        else
+        {
+            const float s = sinf(angle * 0.5f) * sqrtf(lsqr);
+            const float c = cosf(angle * 0.5f);
+
+            x = axis.x * s;
+            y = axis.y * s;
+            z = axis.z * s;
+            w = c;
+        }
+    }
+
+    __vmath_ctor__ explicit quat(float s) : quat(0, 0, 0, s) {}
+    __vmath_ctor__ explicit quat(const float* s) : quat(s[0], s[1], s[2], s[3]) {}
+
+    __vmath_ctor__ explicit quat(const vec4_t& v) : vec4(v) {}
     __vmath_ctor__ operator       vec4&()       { return *((::vec4*)this); }
     __vmath_ctor__ operator const vec4&() const { return *((::vec4*)this); }
 
@@ -836,10 +881,16 @@ public: /* Constructors */
         : mat2(m.m00, m.m01,
                m.m10, m.m11) {}
 
-    __vmath_ctor__ mat2(void) : mat2(0) {}
-    __vmath_ctor__ mat2(float s)
-        : m00(s), m01(0)
-        , m10(0), m11(s) {}
+    __vmath_ctor__ mat2(void) : mat2(0.0f) {}
+    __vmath_ctor__ explicit mat2(float s)
+        : mat2(s, 0, 
+               0, s) {}
+
+#if 0
+    __vmath_ctor__ explicit mat2(const float* s)
+        : mat2(s[0], s[1], 
+               s[2], s[3]) {}
+#endif
 
     __vmath_ctor__ mat2(float m00, float m01, float m10, float m11)
         : m00(m00), m01(m01)
@@ -897,11 +948,18 @@ public: /* Constructors */
                m.m10, m.m11, m.m12,
                m.m20, m.m21, m.m22) {}
 
-    __vmath_ctor__ mat3(void) : mat3(0) {}
-    __vmath_ctor__ mat3(float s)
-        : m00(s), m01(0), m02(0)
-        , m10(0), m11(s), m12(0)
-        , m20(0), m21(0), m22(s) {}
+    __vmath_ctor__ mat3(void) : mat3(0.0f) {}
+    __vmath_ctor__ explicit mat3(float s)
+        : mat3(s, 0, 0, 
+               0, s, 0,
+               0, 0, s) {} 
+
+#if 0
+    __vmath_ctor__ explicit mat3(const float* s)
+        : mat3(s[0], s[1], s[2], 
+               s[3], s[4], s[5],
+               s[6], s[7], s[8]) {}
+#endif
 
     __vmath_ctor__ mat3(float m00, float m01, float m02, 
                         float m10, float m11, float m12,
@@ -957,12 +1015,20 @@ public: /* Constructors */
     __vmath_ctor__ operator       float*()       { return pure.data; }
     __vmath_ctor__ operator const float*() const { return pure.data; }
 
-    __vmath_ctor__ mat4(void) : mat4(0) {}
-    __vmath_ctor__ mat4(float s)
+    __vmath_ctor__ mat4(void) : mat4(0.0f) {}
+    __vmath_ctor__ explicit mat4(float s)
         : mat4(s, 0, 0, 0,
                0, s, 0, 0,
                0, 0, s, 0,
                0, 0, 0, s) {}
+
+#if 0
+    __vmath_ctor__ explicit mat4(const float* s)
+        : mat4(s[ 0], s[ 1], s[ 2], s[ 3],
+               s[ 4], s[ 5], s[ 6], s[ 7],
+               s[ 8], s[ 9], s[10], s[11],
+               s[12], s[13], s[14], s[15]) {}
+#endif
 
     __vmath_ctor__ mat4(float m00, float m01, float m02, float m03, 
                         float m10, float m11, float m12, float m13,
@@ -1389,6 +1455,22 @@ __vmath__ float vmath_fsqrt(float x)
 # define vmath_fsqrt(x) sqrtf(x)
 # endif
 #endif
+
+#ifndef PI
+#define PI 3.14159265358979f
+#endif 
+
+__vmath__ float radians(float d)
+{
+    const float f = PI / 180.0f;
+    return d * f;
+}
+
+__vmath__ float degrees(float r)
+{
+    const float f = 180.0f / PI;
+    return r * f;
+}
 
 /**************************
  * Vector2D
@@ -2205,11 +2287,11 @@ __vmath__ quat_t quat_normalize(quat_arg_t q)
  * Create a quaternion with euler coordinate
  * @return: result quaternion
  */
-__vmath__ quat_t quat_euler(float y, float p, float r)
+__vmath__ quat_t quat_euler(float r, float p, float y)
 {
-    y *= 0.5f;
-    p *= 0.5f;
     r *= 0.5f;
+    p *= 0.5f;
+    y *= 0.5f;
 
     const float c1 = cosf(y);
     const float c2 = cosf(p);
@@ -2314,6 +2396,25 @@ __vmath__ quat_t quat_mul(quat_arg_t a, quat_arg_t b)
     r.vec4.w   = a.w * b.w - vec3_dot(a.vec4.xyz, b.vec4.xyz);
     return r;
 #endif
+}
+
+
+/**
+ * Get euler values present in Vector3D   
+ */
+__vmath__ vec3_t euler(quat_arg_t q)
+{
+    float s = 2.0f * (q.w * q.x + q.y * q.z);
+    float c = 1.0f - 2.0f * (q.x * q.x + q.y * q.y);
+    const float r = atan2f(s, c);
+
+    s = 2.0f * (q.w * q.y - q.z * q.x);
+    const float p = fabsf(s >= 1.0f) >= 1.0f ? PI * 0.5f : s;
+
+    s = 2.0f * (q.w * q.z + q.y * q.x);
+    c = 1.0f - 2.0f * (q.y * q.y + q.z * q.z);
+    const float y = atan2f(s, c);
+    return vec3(r, p, y);
 }
 
 /* END OF VMATH_BUILD_QUAT */
@@ -3650,62 +3751,77 @@ __vmath__ mat4_t transpose(const mat4_t& m)
     return mat4_transpose(m);
 }
 
-__vmath__ mat4_t mat4_scale(float s)
+__vmath__ mat4_t ortho(float l, float r, float b, float t, float n, float f)
+{
+    return mat4_ortho(l, r, b, t, n, f);
+}
+
+__vmath__ mat4_t frustum(float l, float r, float b, float t, float n, float f)
+{
+    return mat4_frustum(l, r, b, t, n, f);
+}
+
+__vmath__ mat4_t perspective(float fov, float aspect, float znear, float zfar)
+{
+    return mat4_perspective(fov, aspect, znear, zfar);
+}
+
+__vmath__ mat4_t scale(float s)
 {
     return mat4_scale1f(s);
 }
 
-__vmath__ mat4_t mat4_scale(float x, float y)
+__vmath__ mat4_t scale(float x, float y)
 {
     return mat4_scale2f(x, y);
 }
 
-__vmath__ mat4_t mat4_scale(float x, float y, float z)
+__vmath__ mat4_t scale(float x, float y, float z)
 {
     return mat4_scale3f(x, y, z);
 }
 
-__vmath__ mat4_t mat4_scale(const vec2_t& v)
+__vmath__ mat4_t scale(const vec2_t& v)
 {
     return mat4_scalev2(v);
 }
 
-__vmath__ mat4_t mat4_scale(const vec3_t& v)
+__vmath__ mat4_t scale(const vec3_t& v)
 {
     return mat4_scalev3(v);
 }
 
-__vmath__ mat4_t mat4_rotate(const quat_t& q)
+__vmath__ mat4_t rotate(const quat_t& q)
 {
     return mat4_rotateq(q);
 }
 
-__vmath__ mat4_t mat4_rotate(const vec3_t& axis, float angle)
+__vmath__ mat4_t rotate(const vec3_t& axis, float angle)
 {
     return mat4_rotatev3(axis, angle);
 }
 
-__vmath__ mat4_t mat4_rotate(float x, float y, float z, float angle)
+__vmath__ mat4_t rotate(float x, float y, float z, float angle)
 {
     return mat4_rotate3f(x, y, z, angle);
 }
 
-__vmath__ mat4_t mat4_translate(const vec2_t& v)
+__vmath__ mat4_t translate(const vec2_t& v)
 {
     return mat4_translatev2(v);
 }
 
-__vmath__ mat4_t mat4_translate(const vec3_t& v)
+__vmath__ mat4_t translate(const vec3_t& v)
 {
     return mat4_translatev3(v);
 }
 
-__vmath__ mat4_t mat4_translate(float x, float y)
+__vmath__ mat4_t translate(float x, float y)
 {
     return mat4_translate2f(x, y);
 }
 
-__vmath__ mat4_t mat4_translate(float x, float y, float z)
+__vmath__ mat4_t translate(float x, float y, float z)
 {
     return mat4_translate3f(x, y, z);
 }
