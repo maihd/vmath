@@ -24,7 +24,7 @@ vec3_t position = vec3(100.0f, 200.0f, 10.0f);
 quat_t rotation = quat_euler(0.0f, 0.0f, 0.0f);
 vec3_t scale    = VEC3_ONE;
 mat4_t model    = mat4_mul(mat4_mul(mat4_translatev3(position),
-				                    mat4_rotateq(rotation)),
+                                    mat4_rotateq(rotation)),
                            mat4_scalev3(scale));
 
 /* Perspective matrix with 45 degree fov */
