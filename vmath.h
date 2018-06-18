@@ -55,6 +55,9 @@
 #endif
 #define __vmath__ /*{space}*/ __vmath_attr__ static __vmath_inline__ 
 
+#ifndef PI
+#define PI 3.14159265358979f
+#endif 
 
 /**
  * Building configuration
@@ -467,6 +470,44 @@ static const mat4_t MAT4_IDENTITY = {
 /* END OF VMATH_CONSTANTS */
 #endif
 
+#ifndef VMATH_FAST_MATH
+#define VMATH_FAST_MATH 1
+#endif
+
+#if (VMATH_FAST_MATH != 0)
+/**
+* Fast inverse square root
+*/
+__vmath__ float vmath_rsqrt(float x)
+{
+    union
+    {
+        float x;
+        long  i;
+    } cvt; /* converter */
+
+    cvt.x = x;
+    cvt.i = 0x5F3759DF - (cvt.i >> 1);
+    cvt.x = cvt.x * (1.5f - 0.5f * x * cvt.x * cvt.x);
+    return cvt.x;
+}
+
+/**
+* Fast square root
+*/
+__vmath__ float vmath_fsqrt(float x)
+{
+    return x == 0.0f ? 0.0f : 1.0f / vmath_rsqrt(x);
+}
+#else
+# ifndef vmath_rsqrt
+# define vmath_rsqrt(x) (1.0f / sqrtf(x))
+# endif
+# ifndef vmath_fsqrt
+# define vmath_fsqrt(x) sqrtf(x)
+# endif
+#endif
+
 /*****************************
  * @region: Constructors
  *****************************/
@@ -785,7 +826,7 @@ public: /* Constructors */
     __vmath_ctor__ quat(void) : quat(0, 0, 0, 0) {}
     __vmath_ctor__ quat(float x, float y, float z, float w) : vec4(::vec4(x, y, z, w)) {}
 
-    __vmath_ctor__ quat(const vec3_t& euler) : quat(euler.x, euler.y, euler.z) {}
+    __vmath_ctor__ explicit quat(const vec3_t& euler) : quat(euler.x, euler.y, euler.z) {}
     __vmath_ctor__ quat(float r, float p, float y)
     {
         r *= 0.5f;
@@ -805,6 +846,21 @@ public: /* Constructors */
         w = c1 * c2 * c3 - s1 * s2 * s3;
     }
 
+    __vmath_ctor__ operator vec3() const
+    {
+        float s = 2.0f * (w * x + y * z);
+        float c = 1.0f - 2.0f * (x * x + y * y);
+        const float r = atan2f(s, c);
+
+        s = 2.0f * (w * y - z * x);
+        const float p = fabsf(s >= 1.0f) >= 1.0f ? copysignf(PI * 0.5f, s) : s;
+
+        s = 2.0f * (w * z + y * x);
+        c = 1.0f - 2.0f * (y * y + z * z);
+        const float y = atan2f(s, c);
+        return vec3(r, p, y);
+    }
+
 
     __vmath_ctor__ quat(const vec3_t& axis, float angle)
     {
@@ -818,7 +874,7 @@ public: /* Constructors */
         }
         else
         {
-            const float s = sinf(angle * 0.5f) * sqrtf(lsqr);
+            const float s = sinf(angle * 0.5f) / vmath_fsqrt(lsqr);
             const float c = cosf(angle * 0.5f);
 
             x = axis.x * s;
@@ -831,9 +887,36 @@ public: /* Constructors */
     __vmath_ctor__ explicit quat(float s) : quat(0, 0, 0, s) {}
     __vmath_ctor__ explicit quat(const float* s) : quat(s[0], s[1], s[2], s[3]) {}
 
-    __vmath_ctor__ explicit quat(const vec4_t& v) : vec4(v) {}
-    __vmath_ctor__ operator       vec4&()       { return *((::vec4*)this); }
-    __vmath_ctor__ operator const vec4&() const { return *((::vec4*)this); }
+    __vmath_ctor__ explicit quat(const vec4_t& v) : quat(v.xyz, v.w) {}
+    __vmath_ctor__ operator vec4() const 
+    { 
+        quat_t c = *this;
+        if (c.w != 0.0f)
+        {
+            const float f = 1.0f / vmath_fsqrt(x * x + y * y + z * z + w * w);
+            c.x *= f;
+            c.y *= f;
+            c.z *= f;
+            c.w *= f;
+        }
+
+        vec4_t r;
+        const float den = vmath_rsqrt(1.0f - c.w * c.w);
+        if (den > 0.0001f)
+        {
+            r.x = c.x * den;
+            r.y = c.y * den;
+            r.z = c.z * den;
+        }
+        else
+        {
+            r.x = 1;
+            r.y = 1;
+            r.z = 1;
+        }
+        r.w = 2.0f * cosf(c.w);
+        return r;
+    }
 
     __vmath_ctor__ quat(const quat_t& v) : pure(v) {}
     __vmath_ctor__ operator       quat_t&()       { return pure; }
@@ -1418,48 +1501,6 @@ __vmath__ mat4_t mat4(const float* data)
 /*******************************
  * @region: Functions define
  *******************************/
-#ifndef VMATH_FAST_MATH
-#define VMATH_FAST_MATH 1
-#endif
-
-#if (VMATH_FAST_MATH != 0)
-/** 
- * Fast inverse square root
- */
-__vmath__ float vmath_rsqrt(float x)
-{
-    union
-    {
-        float x;
-        long  i;
-    } cvt; /* converter */
-
-    cvt.x = x;
-    cvt.i = 0x5F3759DF - (cvt.i >> 1);
-    cvt.x = cvt.x * (1.5f - 0.5f * x * cvt.x * cvt.x);
-    return cvt.x;
-}
-
-/**
- * Fast square root
- */
-__vmath__ float vmath_fsqrt(float x)
-{
-    return x == 0.0f ? 0.0f : 1.0f / vmath_rsqrt(x);
-}
-#else
-# ifndef vmath_rsqrt
-# define vmath_rsqrt(x) (1.0f / sqrtf(x))
-# endif
-# ifndef vmath_fsqrt
-# define vmath_fsqrt(x) sqrtf(x)
-# endif
-#endif
-
-#ifndef PI
-#define PI 3.14159265358979f
-#endif 
-
 __vmath__ float radians(float d)
 {
     const float f = PI / 180.0f;
@@ -2409,7 +2450,7 @@ __vmath__ vec3_t euler(quat_arg_t q)
     const float r = atan2f(s, c);
 
     s = 2.0f * (q.w * q.y - q.z * q.x);
-    const float p = fabsf(s >= 1.0f) >= 1.0f ? PI * 0.5f : s;
+    const float p = fabsf(s >= 1.0f) >= 1.0f ? copysignf(PI * 0.5f, s) : s;
 
     s = 2.0f * (q.w * q.z + q.y * q.x);
     c = 1.0f - 2.0f * (q.y * q.y + q.z * q.z);
