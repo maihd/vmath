@@ -10,596 +10,768 @@ using System;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
-public static class vmath
+[System.Serializable]
+[DebuggerTypeProxy(typeof(DebuggerProxy))]
+public struct vec2 : IFormattable
 {
-    const MethodImplOptions MethodInlineOptions = (MethodImplOptions)0x100;
-
-    [System.Serializable]
-    [DebuggerTypeProxy(typeof(DebuggerProxy))]
-    public struct vec2 : IFormattable
+    #region DebuggerProxy
+    internal sealed class DebuggerProxy
     {
-        #region DebuggerProxy
-        internal sealed class DebuggerProxy
-        {
-            public float x;
-            public float y;
-
-            public DebuggerProxy(vec2 v)
-            {
-                x = v.x;
-                y = v.y;
-            }
-        }
-        #endregion  
-
         public float x;
         public float y;
 
-        [MethodImpl(MethodInlineOptions)]
-        public vec2(float x, float y)
+        public DebuggerProxy(vec2 v)
         {
-            this.x = x;
-            this.y = y;
+            x = v.x;
+            y = v.y;
         }
+    }
+    #endregion  
 
-        [MethodImpl(MethodInlineOptions)]
-        public vec2(float s)
-        {
-            x = y = s;
-        }
+    public float x;
+    public float y;
 
-        [MethodImpl(MethodInlineOptions)]
-        public bool Equals(vec2 other)
-        {
-            return x == other.x && y == other.y;
-        }
-
-        [MethodImpl(MethodInlineOptions)]
-        public override bool Equals(object obj)
-        {
-            if (obj == null || GetType() != obj.GetType())
-            {
-                return false;
-            }
-            
-            return Equals((vec2)obj);
-        }
-        
-        [MethodImpl(MethodInlineOptions)]
-        public override int GetHashCode()
-        {
-            return (x.GetHashCode()) ^ (y.GetHashCode());
-        }
-
-        #region Operators
-        [MethodImpl(MethodInlineOptions)]
-        public static vec2 operator+(vec2 a, vec2 b)
-        {
-            return add(a, b);
-        }
-
-        [MethodImpl(MethodInlineOptions)]
-        public static vec2 operator-(vec2 a, vec2 b)
-        {
-            return sub(a, b);
-        }
-
-        [MethodImpl(MethodInlineOptions)]
-        public static vec2 operator*(vec2 a, vec2 b)
-        {
-            return mul(a, b);
-        }
-
-        [MethodImpl(MethodInlineOptions)]
-        public static vec2 operator/(vec2 a, vec2 b)
-        {
-            return div(a, b);
-        }
-
-        [MethodImpl(MethodInlineOptions)]
-        public static vec2 operator+(vec2 v, float s)
-        {
-            return add(v, s);
-        }
-
-        [MethodImpl(MethodInlineOptions)]
-        public static vec2 operator-(vec2 v, float s)
-        {
-            return sub(v, s);
-        }
-
-        [MethodImpl(MethodInlineOptions)]
-        public static vec2 operator*(vec2 v, float s)
-        {
-            return mul(v, s);
-        }
-
-        [MethodImpl(MethodInlineOptions)]
-        public static vec2 operator/(vec2 v, float s)
-        {
-            return div(v, s);
-        }
-
-        [MethodImpl(MethodInlineOptions)]
-        public static bool operator==(vec2 a, vec2 b)
-        {
-            return a.Equals(b);
-        }
-
-        [MethodImpl(MethodInlineOptions)]
-        public static bool operator!=(vec2 a, vec2 b)
-        {
-            return !a.Equals(b);
-        }
-        #endregion
-
-        #if VMATH_UNITY
-        public static implicit operator UnityEngine.Vector2(vec2 v)
-        {
-            return new UnityEngine.Vector2(v.x, v.y);
-        }
-
-        public static implicit operator UnityEngine.Vector3(vec2 v)
-        {
-            return new UnityEngine.Vector3(v.x, v.y);
-        }
-        #endif
-
-        #region ToString
-        public override string ToString()
-        {
-            return string.Format("vec2({0:R}, {1:R})", x, y);
-        }
-
-        public string ToString(string format, IFormatProvider formatProvider)
-        {
-            return string.Format("vec2({0:R}, {1:R})", x.ToString(format, formatProvider), y.ToString(format, formatProvider));
-        }
-        #endregion
+    [MethodImpl(vmath.MethodInlineOptions)]
+    public bool Equals(vec2 other)
+    {
+        return x == other.x && y == other.y;
     }
 
-    [System.Serializable]
-    [DebuggerTypeProxy(typeof(DebuggerProxy))]
-    public struct vec3 : IFormattable
+    [MethodImpl(vmath.MethodInlineOptions)]
+    public override bool Equals(object obj)
     {
-        #region DebuggerProxy
-        internal sealed class DebuggerProxy
+        if (obj == null || GetType() != obj.GetType())
         {
-            public float x;
-            public float y;
-            public float z;
-
-            public DebuggerProxy(vec3 v)
-            {
-                x = v.x;
-                y = v.y;
-                z = v.z;
-            }
+            return false;
         }
-        #endregion  
+        
+        return Equals((vec2)obj);
+    }
+    
+    [MethodImpl(vmath.MethodInlineOptions)]
+    public override int GetHashCode()
+    {
+        return (x.GetHashCode()) ^ (y.GetHashCode());
+    }
 
+    #region Operators
+    [MethodImpl(vmath.MethodInlineOptions)]
+    public static vec2 operator+(vec2 a, vec2 b)
+    {
+        return vmath.add(a, b);
+    }
+
+    [MethodImpl(vmath.MethodInlineOptions)]
+    public static vec2 operator-(vec2 a, vec2 b)
+    {
+        return vmath.sub(a, b);
+    }
+
+    [MethodImpl(vmath.MethodInlineOptions)]
+    public static vec2 operator*(vec2 a, vec2 b)
+    {
+        return vmath.mul(a, b);
+    }
+
+    [MethodImpl(vmath.MethodInlineOptions)]
+    public static vec2 operator/(vec2 a, vec2 b)
+    {
+        return vmath.div(a, b);
+    }
+
+    [MethodImpl(vmath.MethodInlineOptions)]
+    public static vec2 operator+(vec2 v, float s)
+    {
+        return vmath.add(v, s);
+    }
+
+    [MethodImpl(vmath.MethodInlineOptions)]
+    public static vec2 operator+(float s, vec2 v)
+    {
+        return vmath.add(s, v);
+    }
+
+    [MethodImpl(vmath.MethodInlineOptions)]
+    public static vec2 operator-(vec2 v, float s)
+    {
+        return vmath.sub(v, s);
+    }
+
+    [MethodImpl(vmath.MethodInlineOptions)]
+    public static vec2 operator-(float s, vec2 v)
+    {
+        return vmath.sub(s, v);
+    }
+
+    [MethodImpl(vmath.MethodInlineOptions)]
+    public static vec2 operator*(vec2 v, float s)
+    {
+        return vmath.mul(v, s);
+    }
+
+    [MethodImpl(vmath.MethodInlineOptions)]
+    public static vec2 operator*(float s, vec2 v)
+    {
+        return vmath.mul(s, v);
+    }
+
+    [MethodImpl(vmath.MethodInlineOptions)]
+    public static vec2 operator/(vec2 v, float s)
+    {
+        return vmath.div(v, s);
+    }
+
+    [MethodImpl(vmath.MethodInlineOptions)]
+    public static vec2 operator/(float s, vec2 v)
+    {
+        return vmath.div(s, v);
+    }
+
+    [MethodImpl(vmath.MethodInlineOptions)]
+    public static bool operator==(vec2 a, vec2 b)
+    {
+        return a.Equals(b);
+    }
+
+    [MethodImpl(vmath.MethodInlineOptions)]
+    public static bool operator!=(vec2 a, vec2 b)
+    {
+        return !a.Equals(b);
+    }
+    #endregion
+
+    #if VMATH_UNITY
+    public static implicit operator UnityEngine.Vector2(vec2 v)
+    {
+        return new UnityEngine.Vector2(v.x, v.y);
+    }
+
+    public static implicit operator UnityEngine.Vector3(vec2 v)
+    {
+        return new UnityEngine.Vector3(v.x, v.y);
+    }
+    #endif
+
+    #region ToString
+    public override string ToString()
+    {
+        return string.Format("vec2({0:R}, {1:R})", x, y);
+    }
+
+    public string ToString(string format, IFormatProvider formatProvider)
+    {
+        return string.Format("vec2({0:R}, {1:R})", x.ToString(format, formatProvider), y.ToString(format, formatProvider));
+    }
+    #endregion
+}
+
+[System.Serializable]
+[DebuggerTypeProxy(typeof(DebuggerProxy))]
+public struct vec3 : IFormattable
+{
+    #region DebuggerProxy
+    internal sealed class DebuggerProxy
+    {
         public float x;
         public float y;
         public float z;
 
-        [MethodImpl(MethodInlineOptions)]
-        public vec3(float x, float y, float z)
+        public DebuggerProxy(vec3 v)
         {
-            this.x = x;
-            this.y = y;
-            this.z = z;
+            x = v.x;
+            y = v.y;
+            z = v.z;
         }
+    }
+    #endregion  
 
-        [MethodImpl(MethodInlineOptions)]
-        public vec3(float s)
-        {
-            x = y = z = s;
-        }
+    public float x;
+    public float y;
+    public float z;
 
-        [MethodImpl(MethodInlineOptions)]
-        public bool Equals(vec3 other)
-        {
-            return x == other.x && y == other.y && z == other.z;
-        }
-
-        [MethodImpl(MethodInlineOptions)]
-        public override bool Equals(object obj)
-        {
-            if (obj == null || GetType() != obj.GetType())
-            {
-                return false;
-            }
-            
-            return Equals((vec3)obj);
-        }
-        
-        [MethodImpl(MethodInlineOptions)]
-        public override int GetHashCode()
-        {
-            return (x.GetHashCode()) ^ (y.GetHashCode());
-        }
-
-        #region Operators
-        [MethodImpl(MethodInlineOptions)]
-        public static vec3 operator+(vec3 a, vec3 b)
-        {
-            return add(a, b);
-        }
-
-        [MethodImpl(MethodInlineOptions)]
-        public static vec3 operator-(vec3 a, vec3 b)
-        {
-            return sub(a, b);
-        }
-
-        [MethodImpl(MethodInlineOptions)]
-        public static vec3 operator*(vec3 a, vec3 b)
-        {
-            return mul(a, b);
-        }
-
-        [MethodImpl(MethodInlineOptions)]
-        public static vec3 operator/(vec3 a, vec3 b)
-        {
-            return div(a, b);
-        }
-
-        [MethodImpl(MethodInlineOptions)]
-        public static vec3 operator+(vec3 v, float s)
-        {
-            return add(v, s);
-        }
-
-        [MethodImpl(MethodInlineOptions)]
-        public static bool operator==(vec3 a, vec3 b)
-        {
-            return a.Equals(b);
-        }
-
-        [MethodImpl(MethodInlineOptions)]
-        public static bool operator!=(vec3 a, vec3 b)
-        {
-            return !a.Equals(b);
-        }
-        #endregion
-
-        #if VMATH_UNITY
-        public static implicit operator UnityEngine.Vector2(vec3 v)
-        {
-            return new UnityEngine.Vector2(v.x, v.y);
-        }
-
-        public static implicit operator UnityEngine.Vector3(vec3 v)
-        {
-            return new UnityEngine.Vector3(v.x, v.y, v.z);
-        }
-        #endif
-
-        #region ToString
-        public override string ToString()
-        {
-            return string.Format("vec3({0:R}, {1:R}, {2:R})", x, y, z);
-        }
-
-        public string ToString(string format, IFormatProvider formatProvider)
-        {
-            return string.Format(format, x.ToString(format, formatProvider), y.ToString(format, formatProvider), z.ToString(format, formatProvider));
-        }
-        #endregion
+    [MethodImpl(vmath.MethodInlineOptions)]
+    public bool Equals(vec3 other)
+    {
+        return x == other.x && y == other.y && z == other.z;
     }
 
-    [System.Serializable]
-    [DebuggerTypeProxy(typeof(DebuggerProxy))]
-    public struct vec4 : IFormattable
+    [MethodImpl(vmath.MethodInlineOptions)]
+    public override bool Equals(object obj)
     {
-        #region DebuggerProxy
-        internal sealed class DebuggerProxy
+        if (obj == null || GetType() != obj.GetType())
         {
-            public float x;
-            public float y;
-            public float z;
-            public float w;
-
-            public DebuggerProxy(vec4 v)
-            {
-                x = v.x;
-                y = v.y;
-                z = v.z;
-                w = v.w;
-            }
+            return false;
         }
-        #endregion  
+        
+        return Equals((vec3)obj);
+    }
+    
+    [MethodImpl(vmath.MethodInlineOptions)]
+    public override int GetHashCode()
+    {
+        return (x.GetHashCode()) ^ (y.GetHashCode());
+    }
 
+    #region Operators
+    [MethodImpl(vmath.MethodInlineOptions)]
+    public static vec3 operator+(vec3 a, vec3 b)
+    {
+        return vmath.add(a, b);
+    }
+
+    [MethodImpl(vmath.MethodInlineOptions)]
+    public static vec3 operator-(vec3 a, vec3 b)
+    {
+        return vmath.sub(a, b);
+    }
+
+    [MethodImpl(vmath.MethodInlineOptions)]
+    public static vec3 operator*(vec3 a, vec3 b)
+    {
+        return vmath.mul(a, b);
+    }
+
+    [MethodImpl(vmath.MethodInlineOptions)]
+    public static vec3 operator/(vec3 a, vec3 b)
+    {
+        return vmath.div(a, b);
+    }
+
+    [MethodImpl(vmath.MethodInlineOptions)]
+    public static vec3 operator+(vec3 v, float s)
+    {
+        return vmath.add(v, s);
+    }
+
+    [MethodImpl(vmath.MethodInlineOptions)]
+    public static vec3 operator+(float s, vec3 v)
+    {
+        return vmath.add(s, v);
+    }
+
+    [MethodImpl(vmath.MethodInlineOptions)]
+    public static vec3 operator-(vec3 v, float s)
+    {
+        return vmath.sub(v, s);
+    }
+
+    [MethodImpl(vmath.MethodInlineOptions)]
+    public static vec3 operator-(float s, vec3 v)
+    {
+        return vmath.sub(s, v);
+    }
+
+    [MethodImpl(vmath.MethodInlineOptions)]
+    public static vec3 operator*(vec3 v, float s)
+    {
+        return vmath.mul(v, s);
+    }
+
+    [MethodImpl(vmath.MethodInlineOptions)]
+    public static vec3 operator*(float s, vec3 v)
+    {
+        return vmath.mul(s, v);
+    }
+
+    [MethodImpl(vmath.MethodInlineOptions)]
+    public static vec3 operator/(vec3 v, float s)
+    {
+        return vmath.div(v, s);
+    }
+
+    [MethodImpl(vmath.MethodInlineOptions)]
+    public static vec3 operator/(float s, vec3 v)
+    {
+        return vmath.div(s, v);
+    }
+
+    [MethodImpl(vmath.MethodInlineOptions)]
+    public static bool operator==(vec3 a, vec3 b)
+    {
+        return a.Equals(b);
+    }
+
+    [MethodImpl(vmath.MethodInlineOptions)]
+    public static bool operator!=(vec3 a, vec3 b)
+    {
+        return !a.Equals(b);
+    }
+    #endregion
+
+    #if VMATH_UNITY
+    public static implicit operator UnityEngine.Vector2(vec3 v)
+    {
+        return new UnityEngine.Vector2(v.x, v.y);
+    }
+
+    public static implicit operator UnityEngine.Vector3(vec3 v)
+    {
+        return new UnityEngine.Vector3(v.x, v.y, v.z);
+    }
+    #endif
+
+    #region ToString
+    public override string ToString()
+    {
+        return string.Format("vec3({0:R}, {1:R}, {2:R})", x, y, z);
+    }
+
+    public string ToString(string format, IFormatProvider formatProvider)
+    {
+        return string.Format(format, x.ToString(format, formatProvider), y.ToString(format, formatProvider), z.ToString(format, formatProvider));
+    }
+    #endregion
+}
+
+[System.Serializable]
+[DebuggerTypeProxy(typeof(DebuggerProxy))]
+public struct vec4 : IFormattable
+{
+    #region DebuggerProxy
+    internal sealed class DebuggerProxy
+    {
         public float x;
         public float y;
         public float z;
         public float w;
 
-        [MethodImpl(MethodInlineOptions)]
-        public vec4(float x, float y, float z, float w)
+        public DebuggerProxy(vec4 v)
         {
-            this.x = x;
-            this.y = y;
-            this.z = z;
-            this.w = w;
+            x = v.x;
+            y = v.y;
+            z = v.z;
+            w = v.w;
         }
+    }
+    #endregion  
 
-        [MethodImpl(MethodInlineOptions)]
-        public vec4(float s)
-        {
-            x = y = z = w = s;
-        }
-        
-        [MethodImpl(MethodInlineOptions)]
-        public bool Equals(vec4 other)
-        {
-            return x == other.x && y == other.y && z == other.z && w == other.w;
-        }
-
-        [MethodImpl(MethodInlineOptions)]
-        public override bool Equals(object obj)
-        {
-            if (obj == null || GetType() != obj.GetType())
-            {
-                return false;
-            }
-            
-            return Equals((vec2)obj);
-        }
-        
-        [MethodImpl(MethodInlineOptions)]
-        public override int GetHashCode()
-        {
-            return (x.GetHashCode()) ^ (y.GetHashCode());
-        }
-
-        #region Operators
-        [MethodImpl(MethodInlineOptions)]
-        public static vec4 operator+(vec4 a, vec4 b)
-        {
-            return add(a, b);
-        }
-
-        [MethodImpl(MethodInlineOptions)]
-        public static vec4 operator-(vec4 a, vec4 b)
-        {
-            return sub(a, b);
-        }
-
-        [MethodImpl(MethodInlineOptions)]
-        public static vec4 operator*(vec4 a, vec4 b)
-        {
-            return mul(a, b);
-        }
-
-        [MethodImpl(MethodInlineOptions)]
-        public static vec4 operator/(vec4 a, vec4 b)
-        {
-            return div(a, b);
-        }
-
-        [MethodImpl(MethodInlineOptions)]
-        public static vec4 operator+(vec4 v, float s)
-        {
-            return add(v, s);
-        }
-
-        [MethodImpl(MethodInlineOptions)]
-        public static vec4 operator+(float s, vec4 v)
-        {
-            return add(v, s);
-        }
-
-        [MethodImpl(MethodInlineOptions)]
-        public static bool operator==(vec4 a, vec4 b)
-        {
-            return a.Equals(b);
-        }
-
-        [MethodImpl(MethodInlineOptions)]
-        public static bool operator!=(vec4 a, vec4 b)
-        {
-            return !a.Equals(b);
-        }
-        #endregion
-
-        #if VMATH_UNITY
-        public static implicit operator UnityEngine.Vector4(vec4 v)
-        {
-            return new UnityEngine.Vector4(v.x, v.y, v.z, v.w);
-        }
-        #endif
-
-        #region ToString
-        public override string ToString()
-        {
-            return string.Format("vec4({0:R}, {1:R}, {2:R}, {3:R})", x, y, z, w);
-        }
-
-        public string ToString(string format, IFormatProvider formatProvider)
-        {
-            return string.Format(format, 
-                x.ToString(format, formatProvider),
-                y.ToString(format, formatProvider), 
-                z.ToString(format, formatProvider), 
-                w.ToString(format, formatProvider));
-        }
-        #endregion
+    public float x;
+    public float y;
+    public float z;
+    public float w;
+    
+    [MethodImpl(vmath.MethodInlineOptions)]
+    public bool Equals(vec4 other)
+    {
+        return x == other.x && y == other.y && z == other.z && w == other.w;
     }
 
-    [System.Serializable]
-    [DebuggerTypeProxy(typeof(DebuggerProxy))]
-    public struct mat2 : IFormattable
+    [MethodImpl(vmath.MethodInlineOptions)]
+    public override bool Equals(object obj)
     {
-        #region DebuggerProxy
-        internal sealed class DebuggerProxy
+        if (obj == null || GetType() != obj.GetType())
         {
-            public float m00;
-            public float m01;
-            public float m10;
-            public float m11;
-
-            public DebuggerProxy(mat2 m)
-            {
-                m00 = m.m00;
-                m01 = m.m01;
-                m10 = m.m10;
-                m11 = m.m11;
-            }
+            return false;
         }
-        #endregion
         
+        return Equals((vec2)obj);
+    }
+    
+    [MethodImpl(vmath.MethodInlineOptions)]
+    public override int GetHashCode()
+    {
+        return (x.GetHashCode()) ^ (y.GetHashCode());
+    }
+
+    #region Operators
+    [MethodImpl(vmath.MethodInlineOptions)]
+    public static vec4 operator+(vec4 a, vec4 b)
+    {
+        return vmath.add(a, b);
+    }
+
+    [MethodImpl(vmath.MethodInlineOptions)]
+    public static vec4 operator-(vec4 a, vec4 b)
+    {
+        return vmath.sub(a, b);
+    }
+
+    [MethodImpl(vmath.MethodInlineOptions)]
+    public static vec4 operator*(vec4 a, vec4 b)
+    {
+        return vmath.mul(a, b);
+    }
+
+    [MethodImpl(vmath.MethodInlineOptions)]
+    public static vec4 operator/(vec4 a, vec4 b)
+    {
+        return vmath.div(a, b);
+    }
+
+    [MethodImpl(vmath.MethodInlineOptions)]
+    public static vec4 operator+(vec4 v, float s)
+    {
+        return vmath.add(v, s);
+    }
+
+    [MethodImpl(vmath.MethodInlineOptions)]
+    public static vec4 operator+(float s, vec4 v)
+    {
+        return vmath.add(s, v);
+    }
+
+    [MethodImpl(vmath.MethodInlineOptions)]
+    public static vec4 operator-(vec4 v, float s)
+    {
+        return vmath.sub(v, s);
+    }
+
+    [MethodImpl(vmath.MethodInlineOptions)]
+    public static vec4 operator-(float s, vec4 v)
+    {
+        return vmath.sub(s, v);
+    }
+
+    [MethodImpl(vmath.MethodInlineOptions)]
+    public static vec4 operator*(vec4 v, float s)
+    {
+        return vmath.mul(v, s);
+    }
+
+    [MethodImpl(vmath.MethodInlineOptions)]
+    public static vec4 operator*(float s, vec4 v)
+    {
+        return vmath.mul(s, v);
+    }
+
+    [MethodImpl(vmath.MethodInlineOptions)]
+    public static vec4 operator/(vec4 v, float s)
+    {
+        return vmath.div(v, s);
+    }
+
+    [MethodImpl(vmath.MethodInlineOptions)]
+    public static vec4 operator/(float s, vec4 v)
+    {
+        return vmath.div(s, v);
+    }
+
+    [MethodImpl(vmath.MethodInlineOptions)]
+    public static bool operator==(vec4 a, vec4 b)
+    {
+        return a.Equals(b);
+    }
+
+    [MethodImpl(vmath.MethodInlineOptions)]
+    public static bool operator!=(vec4 a, vec4 b)
+    {
+        return !a.Equals(b);
+    }
+    #endregion
+
+    #if VMATH_UNITY
+    public static implicit operator UnityEngine.Vector4(vec4 v)
+    {
+        return new UnityEngine.Vector4(v.x, v.y, v.z, v.w);
+    }
+    #endif
+
+    #region ToString
+    public override string ToString()
+    {
+        return string.Format("vec4({0:R}, {1:R}, {2:R}, {3:R})", x, y, z, w);
+    }
+
+    public string ToString(string format, IFormatProvider formatProvider)
+    {
+        return string.Format(format, 
+            x.ToString(format, formatProvider),
+            y.ToString(format, formatProvider), 
+            z.ToString(format, formatProvider), 
+            w.ToString(format, formatProvider));
+    }
+    #endregion
+}
+
+[System.Serializable]
+[DebuggerTypeProxy(typeof(DebuggerProxy))]
+public struct mat2 : IFormattable
+{
+    #region DebuggerProxy
+    internal sealed class DebuggerProxy
+    {
         public float m00;
         public float m01;
         public float m10;
         public float m11;
 
-        [MethodImpl(MethodInlineOptions)]
-        public mat2(float m00, float m01, float m10, float m11)
+        public DebuggerProxy(mat2 m)
         {
-            this.m00 = m00;
-            this.m01 = m01;
-            this.m10 = m10;
-            this.m11 = m11;
+            m00 = m.m00;
+            m01 = m.m01;
+            m10 = m.m10;
+            m11 = m.m11;
         }
+    }
+    #endregion
+    
+    public float m00;
+    public float m01;
+    public float m10;
+    public float m11;
 
-        [MethodImpl(MethodInlineOptions)]
-        public mat2(float s)
-        {
-            m00 = m01 = m10 = m11 = s;
-        }
-
-        #region ToString
-        public override string ToString()
-        {
-            return string.Format("mat2({0:R}, {1:R}, {2:R}, {3:R})", m00, m01, m10, m11);
-        }
-
-        public string ToString(string format, IFormatProvider formatProvider)
-        {
-            return string.Format(format, 
-                m00.ToString(format, formatProvider), 
-                m01.ToString(format, formatProvider),
-                m10.ToString(format, formatProvider),
-                m11.ToString(format, formatProvider));
-        }
-        #endregion
+    #region ToString
+    public override string ToString()
+    {
+        return string.Format("mat2({0:R}, {1:R}, {2:R}, {3:R})", m00, m01, m10, m11);
     }
 
-    [System.Serializable]
-    [DebuggerTypeProxy(typeof(DebuggerProxy))]
-    public struct mat3 : IFormattable
+    public string ToString(string format, IFormatProvider formatProvider)
     {
-        #region DebuggerProxy
-        internal sealed class DebuggerProxy
-        {
-            public float m00;
-            public float m01;
-            public float m10;
-            public float m11;
+        return string.Format(format, 
+            m00.ToString(format, formatProvider), 
+            m01.ToString(format, formatProvider),
+            m10.ToString(format, formatProvider),
+            m11.ToString(format, formatProvider));
+    }
+    #endregion
+}
 
-            public DebuggerProxy(mat3 m)
-            {
-                m00 = m.m00;
-                m01 = m.m01;
-                m10 = m.m10;
-                m11 = m.m11;
-            }
-        }
-        #endregion
-
+[System.Serializable]
+[DebuggerTypeProxy(typeof(DebuggerProxy))]
+public struct mat3 : IFormattable
+{
+    #region DebuggerProxy
+    internal sealed class DebuggerProxy
+    {
         public float m00;
         public float m01;
-        public float m02;
         public float m10;
         public float m11;
-        public float m12;
-        public float m20;
-        public float m21;
-        public float m22;
 
-        #region ToString
-        public override string ToString()
+        public DebuggerProxy(mat3 m)
         {
-            return string.Format("mat2({0:R}, {1:R}, {2:R}, {3:R})", m00, m01, m10, m11);
+            m00 = m.m00;
+            m01 = m.m01;
+            m10 = m.m10;
+            m11 = m.m11;
         }
-
-        public string ToString(string format, IFormatProvider formatProvider)
-        {
-            return string.Format(format,
-                m00.ToString(format, formatProvider),
-                m01.ToString(format, formatProvider),
-                m10.ToString(format, formatProvider),
-                m11.ToString(format, formatProvider));
-        }
-        #endregion
     }
+    #endregion
+
+    public float m00;
+    public float m01;
+    public float m02;
+    public float m10;
+    public float m11;
+    public float m12;
+    public float m20;
+    public float m21;
+    public float m22;
+
+    #region ToString
+    public override string ToString()
+    {
+        return string.Format("mat2({0:R}, {1:R}, {2:R}, {3:R})", m00, m01, m10, m11);
+    }
+
+    public string ToString(string format, IFormatProvider formatProvider)
+    {
+        return string.Format(format,
+            m00.ToString(format, formatProvider),
+            m01.ToString(format, formatProvider),
+            m10.ToString(format, formatProvider),
+            m11.ToString(format, formatProvider));
+    }
+    #endregion
+}
+
+public static class vmath
+{
+    public const MethodImplOptions MethodInlineOptions = (MethodImplOptions)0x100;
+
+    #region Constructors
+    [MethodImpl(MethodInlineOptions)]
+    public static vec2 vec2()
+    {
+        vec2 result = new vec2();
+        return result;
+    }
+
+    [MethodImpl(MethodInlineOptions)]
+    public static vec2 vec2(float s)
+    {
+        vec2 result;
+        result.x = s;
+        result.y = s;
+        return result;
+    }
+
+    [MethodImpl(MethodInlineOptions)]
+    public static vec2 vec2(float x, float y)
+    {
+        vec2 result;
+        result.x = x;
+        result.y = y;
+        return result;
+    }
+
+    [MethodImpl(MethodInlineOptions)]
+    public static vec3 vec3()
+    {
+        vec3 result = new vec3();
+        return result;
+    }
+
+    [MethodImpl(MethodInlineOptions)]
+    public static vec3 vec3(float s)
+    {
+        vec3 result;
+        result.x = s;
+        result.y = s;
+        result.z = s;
+        return result;
+    }
+
+    [MethodImpl(MethodInlineOptions)]
+    public static vec3 vec3(float x, float y, float z = 0.0f)
+    {
+        vec3 result;
+        result.x = x;
+        result.y = y;
+        result.z = z;
+        return result;
+    }
+    
+    [MethodImpl(MethodInlineOptions)]
+    public static vec3 vec3(vec2 v, float z = 0.0f)
+    {
+        vec3 result;
+        result.x = v.x;
+        result.y = v.y;
+        result.z = z;
+        return result;
+    }
+
+    [MethodImpl(MethodInlineOptions)]
+    public static vec4 vec4()
+    {
+        vec4 result = new vec4();
+        return result;
+    }
+
+    [MethodImpl(MethodInlineOptions)]
+    public static vec4 vec4(float s)
+    {
+        vec4 result;
+        result.x = s;
+        result.y = s;
+        result.z = s;
+        result.w = s;
+        return result;
+    }
+
+    [MethodImpl(MethodInlineOptions)]
+    public static vec4 vec4(float x, float y, float z, float w)
+    {
+        vec4 result;
+        result.x = x;
+        result.y = y;
+        result.z = z;
+        result.w = w;
+        return result;
+    }
+    
+    [MethodImpl(MethodInlineOptions)]
+    public static vec4 vec4(vec2 v, float z = 0.0f, float w = 0.0f)
+    {
+        vec4 result;
+        result.x = v.x;
+        result.y = v.y;
+        result.z = z;
+        result.w = w;
+        return result;
+    }
+
+    [MethodImpl(MethodInlineOptions)]
+    public static vec4 vec4(vec3 v, float w = 0.0f)
+    {
+        vec4 result;
+        result.x = v.x;
+        result.y = v.y;
+        result.z = v.z;
+        result.w = w;
+        return result;
+    }
+    #endregion Constructors
 
     #region vec2 functions
-    [MethodImpl(MethodInlineOptions)]
+    [MethodImpl(vmath.MethodInlineOptions)]
     public static vec2 add(vec2 a, vec2 b)
     {
-        return new vec2(a.x + b.x, a.y + b.y);
+        return vec2(a.x + b.x, a.y + b.y);
     }
 
-    [MethodImpl(MethodInlineOptions)]
+    [MethodImpl(vmath.MethodInlineOptions)]
     public static vec2 sub(vec2 a, vec2 b)
     {
-        return new vec2(a.x - b.x, a.y - b.y);
+        return vec2(a.x - b.x, a.y - b.y);
     }
 
     [MethodImpl(MethodInlineOptions)]
     public static vec2 mul(vec2 a, vec2 b)
     {
-        return new vec2(a.x * b.x, a.y * b.y);
+        return vec2(a.x * b.x, a.y * b.y);
     }
 
     [MethodImpl(MethodInlineOptions)]
     public static vec2 div(vec2 a, vec2 b)
     {
-        return new vec2(a.x / b.x, a.y / b.y);
+        return vec2(a.x / b.x, a.y / b.y);
     }
 
     [MethodImpl(MethodInlineOptions)]
     public static vec2 add(vec2 v, float s)
     {
-        return add(v, new vec2(s));
+        return add(v, vec2(s));
     }
 
     [MethodImpl(MethodInlineOptions)]
     public static vec2 add(float s, vec2 v)
     {
-        return add(v, new vec2(s));
+        return add(vec2(s), v);
     }
 
     [MethodImpl(MethodInlineOptions)]
     public static vec2 sub(vec2 v, float s)
     {
-        return add(v, new vec2(s));
+        return sub(v, vec2(s));
+    }
+
+    [MethodImpl(MethodInlineOptions)]
+    public static vec2 sub(float s, vec2 v)
+    {
+        return sub(vec2(s), v);
     }
 
     [MethodImpl(MethodInlineOptions)]
     public static vec2 mul(vec2 v, float s)
     {
-        return mul(v, new vec2(s));
+        return mul(v, vec2(s));
     }
 
     [MethodImpl(MethodInlineOptions)]
     public static vec2 mul(float s, vec2 v)
     {
-        return mul(v, new vec2(s));
+        return mul(vec2(s), v);
     }
 
     [MethodImpl(MethodInlineOptions)]
     public static vec2 div(vec2 v, float s)
     {
-        return div(v, new vec2(s));
+        return div(v, vec2(s));
+    }
+
+    [MethodImpl(MethodInlineOptions)]
+    public static vec2 div(float s, vec2 v)
+    {
+        return div(vec2(s), v);
     }
 
     [MethodImpl(MethodInlineOptions)]
     public static vec2 neg(vec2 v)
     {  
-        return new vec2(-v.x, -v.y);
+        return vec2(-v.x, -v.y);
     }
 
     [MethodImpl(MethodInlineOptions)]
@@ -645,7 +817,7 @@ public static class vmath
         if (lsqr != 1.0f && lsqr > 0.0f)
         {
             float l = 1.0f / (float)Math.Sqrt(lsqr);
-            return new vec2(v.x * l, v.y * l);
+            return vec2(v.x * l, v.y * l);
         }
         else
         {
@@ -659,67 +831,79 @@ public static class vmath
     [MethodImpl(MethodInlineOptions)]
     public static vec3 add(vec3 a, vec3 b)
     {
-        return new vec3(a.x + b.x, a.y + b.y, a.z + b.z);
+        return vec3(a.x + b.x, a.y + b.y, a.z + b.z);
     }
 
     [MethodImpl(MethodInlineOptions)]
     public static vec3 sub(vec3 a, vec3 b)
     {
-        return new vec3(a.x - b.x, a.y - b.y, a.z - b.z);
+        return vec3(a.x - b.x, a.y - b.y, a.z - b.z);
     }
 
     [MethodImpl(MethodInlineOptions)]
     public static vec3 mul(vec3 a, vec3 b)
     {
-        return new vec3(a.x * b.x, a.y * b.y, a.z * b.z);
+        return vec3(a.x * b.x, a.y * b.y, a.z * b.z);
     }
 
     [MethodImpl(MethodInlineOptions)]
     public static vec3 div(vec3 a, vec3 b)
     {
-        return new vec3(a.x / b.x, a.y / b.y, a.z / b.z);
+        return vec3(a.x / b.x, a.y / b.y, a.z / b.z);
     }
 
     [MethodImpl(MethodInlineOptions)]
     public static vec3 add(vec3 v, float s)
     {
-        return add(v, new vec3(s));
+        return add(v, vec3(s));
     }
 
     [MethodImpl(MethodInlineOptions)]
     public static vec3 add(float s, vec3 v)
     {
-        return add(v, new vec3(s));
+        return add(vec3(s), v);
     }
 
     [MethodImpl(MethodInlineOptions)]
     public static vec3 sub(vec3 v, float s)
     {
-        return add(v, new vec3(s));
+        return add(v, vec3(s));
+    }
+
+    [MethodImpl(MethodInlineOptions)]
+    public static vec3 sub(float s, vec3 v)
+    {
+        return add(vec3(s), v);
     }
 
     [MethodImpl(MethodInlineOptions)]
     public static vec3 mul(vec3 v, float s)
     {
-        return mul(v, new vec3(s));
+        return mul(v, vec3(s));
     }
 
     [MethodImpl(MethodInlineOptions)]
     public static vec3 mul(float s, vec3 v)
     {
-        return mul(v, new vec3(s));
+        return mul(v, vec3(s));
     }
 
     [MethodImpl(MethodInlineOptions)]
     public static vec3 div(vec3 v, float s)
     {
-        return div(v, new vec3(s));
+        return div(v, vec3(s));
+    }
+
+    [MethodImpl(MethodInlineOptions)]
+    public static vec3 div(float s, vec3 v)
+    {
+        return div(vec3(s), v);
     }
 
     [MethodImpl(MethodInlineOptions)]
     public static vec3 neg(vec3 v)
     {  
-        return new vec3(-v.x, -v.y, -v.z);
+        return vec3(-v.x, -v.y, -v.z);
     }
 
     [MethodImpl(MethodInlineOptions)]
@@ -765,7 +949,7 @@ public static class vmath
         if (lsqr != 1.0f && lsqr > 0.0f)
         {
             float l = 1.0f / (float)Math.Sqrt(lsqr);
-            return new vec3(v.x * l, v.y * l, v.z * l);
+            return vec3(v.x * l, v.y * l, v.z * l);
         }
         else
         {
@@ -780,55 +964,79 @@ public static class vmath
     [MethodImpl(MethodInlineOptions)]
     public static vec4 add(vec4 a, vec4 b)
     {
-        return new vec4(a.x + b.x, a.y + b.y, a.z + b.z, a.w + b.w);
+        return vec4(a.x + b.x, a.y + b.y, a.z + b.z, a.w + b.w);
     }
 
     [MethodImpl(MethodInlineOptions)]
     public static vec4 sub(vec4 a, vec4 b)
     {
-        return new vec4(a.x - b.x, a.y - b.y, a.z - b.z, a.w - b.w);
+        return vec4(a.x - b.x, a.y - b.y, a.z - b.z, a.w - b.w);
     }
 
     [MethodImpl(MethodInlineOptions)]
     public static vec4 mul(vec4 a, vec4 b)
     {
-        return new vec4(a.x * b.x, a.y * b.y, a.z * b.z, a.w * b.w);
+        return vec4(a.x * b.x, a.y * b.y, a.z * b.z, a.w * b.w);
     }
 
     [MethodImpl(MethodInlineOptions)]
     public static vec4 div(vec4 a, vec4 b)
     {
-        return new vec4(a.x / b.x, a.y / b.y, a.z / b.z, a.w / b.w);
+        return vec4(a.x / b.x, a.y / b.y, a.z / b.z, a.w / b.w);
     }
 
     [MethodImpl(MethodInlineOptions)]
     public static vec4 add(vec4 v, float s)
     {
-        return add(v, new vec4(s));
+        return add(v, vec4(s));
     }
 
     [MethodImpl(MethodInlineOptions)]
     public static vec4 sub(vec4 v, float s)
     {
-        return add(v, new vec4(s));
+        return sub(v, vec4(s));
     }
 
     [MethodImpl(MethodInlineOptions)]
     public static vec4 mul(vec4 v, float s)
     {
-        return mul(v, new vec4(s));
+        return mul(v, vec4(s));
     }
 
     [MethodImpl(MethodInlineOptions)]
     public static vec4 div(vec4 v, float s)
     {
-        return div(v, new vec4(s));
+        return div(v, vec4(s));
+    }
+
+    [MethodImpl(MethodInlineOptions)]
+    public static vec4 add(float s, vec4 v)
+    {
+        return add(vec4(s), v);
+    }
+
+    [MethodImpl(MethodInlineOptions)]
+    public static vec4 sub(float s, vec4 v)
+    {
+        return sub(vec4(s), v);
+    }
+
+    [MethodImpl(MethodInlineOptions)]
+    public static vec4 mul(float s, vec4 v)
+    {
+        return mul(vec4(s), v);
+    }
+
+    [MethodImpl(MethodInlineOptions)]
+    public static vec4 div(float s, vec4 v)
+    {
+        return div(vec4(s), v);
     }
 
     [MethodImpl(MethodInlineOptions)]
     public static vec4 neg(vec4 v)
     {  
-        return new vec4(-v.x, -v.y, -v.z, -v.w);
+        return vec4(-v.x, -v.y, -v.z, -v.w);
     }
 
     [MethodImpl(MethodInlineOptions)]
@@ -874,7 +1082,7 @@ public static class vmath
         if (lsqr != 1.0f && lsqr > 0.0f)
         {
             float l = 1.0f / (float)Math.Sqrt(lsqr);
-            return new vec4(v.x * l, v.y * l, v.z * l, v.w * l);
+            return vec4(v.x * l, v.y * l, v.z * l, v.w * l);
         }
         else
         {

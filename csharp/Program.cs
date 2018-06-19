@@ -7,11 +7,19 @@ namespace csharp
     {
         static void Main(string[] args)
         {
-            vec2 a = new vec2(1, 2);
-            vec2 b = new vec2(3, 4);
+            vec2 a = vec2(1, 2);
+            vec2 b = vec2(3, 4);
             vec2 c = add(a, b);
+            vec2 d = a + b;
 
-            Console.WriteLine(string.Format("add({0}, {1}): {2}", a, b, c));
+            if (c == d)
+            {
+                Console.WriteLine(string.Format("add({0}, {1}): {2}", a, b, c));
+            }
+            else
+            {
+                 Console.WriteLine("Test failed");
+            }
         }
     }
 }
