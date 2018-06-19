@@ -5,7 +5,7 @@ namespace csharp
 {
     class Program
     {
-        static void Main(string[] args)
+        static void vec2_test()
         {
             vec2 a = vec2(1, 2);
             vec2 b = vec2(3, 4);
@@ -18,8 +18,13 @@ namespace csharp
             }
             else
             {
-                 Console.WriteLine("Test failed");
+                Console.WriteLine("Test failed");
             }
+        }
+
+        static void Main(string[] args)
+        {
+            vec2_test();
         }
     }
 }

@@ -140,6 +140,33 @@ public struct vec2 : IFormattable
     }
     #endregion
 
+    #region Indexor
+    public float this[int index]
+    {
+        get
+        {
+            Debug.Assert(index > -1 && index < 2);
+            switch (index)
+            {
+                case  0: return x;
+                case  1: return y;
+                default: return 0;
+            }
+        }
+
+        set
+        {
+            Debug.Assert(index > -1 && index < 2);
+            switch (index)
+            {
+                case  0: x = value; break;
+                case  1: y = value; break;
+                default: break;
+            }
+        }
+    }
+    #endregion
+
     #if VMATH_UNITY
     public static implicit operator UnityEngine.Vector2(vec2 v)
     {
@@ -295,6 +322,35 @@ public struct vec3 : IFormattable
     public static bool operator!=(vec3 a, vec3 b)
     {
         return !a.Equals(b);
+    }
+    #endregion
+
+    #region Indexor
+    public float this[int index]
+    {
+        get
+        {
+            Debug.Assert(index > -1 && index < 3);
+            switch (index)
+            {
+                case  0: return x;
+                case  1: return y;
+                case  2: return z;
+                default: return 0;
+            }
+        }
+
+        set
+        {
+            Debug.Assert(index > -1 && index < 3);
+            switch (index)
+            {
+                case  0: x = value; break;
+                case  1: y = value; break;
+                case  2: z = value; break;
+                default: break;
+            }
+        }
     }
     #endregion
 
@@ -459,6 +515,37 @@ public struct vec4 : IFormattable
     }
     #endregion
 
+    #region Indexor
+    public float this[int index]
+    {
+        get
+        {
+            Debug.Assert(index > -1 && index < 4);
+            switch (index)
+            {
+                case  0: return x;
+                case  1: return y;
+                case  2: return z;
+                case  3: return w;
+                default: return 0;
+            }
+        }
+
+        set
+        {
+            Debug.Assert(index > -1 && index < 4);
+            switch (index)
+            {
+                case  0: x = value; break;
+                case  1: y = value; break;
+                case  2: z = value; break;
+                case  3: w = value; break;
+                default: break;
+            }
+        }
+    }
+    #endregion
+
     #if VMATH_UNITY
     public static implicit operator UnityEngine.Vector4(vec4 v)
     {
@@ -510,6 +597,37 @@ public struct quat : IFormattable
     public float z;
     public float w;
 
+    #region Indexor
+    public float this[int index]
+    {
+        get
+        {
+            Debug.Assert(index > -1 && index < 4);
+            switch (index)
+            {
+                case  0: return x;
+                case  1: return y;
+                case  2: return z;
+                case  3: return w;
+                default: return 0;
+            }
+        }
+
+        set
+        {
+            Debug.Assert(index > -1 && index < 4);
+            switch (index)
+            {
+                case  0: x = value; break;
+                case  1: y = value; break;
+                case  2: z = value; break;
+                case  3: w = value; break;
+                default: break;
+            }
+        }
+    }
+    #endregion
+
     #region ToString
     public override string ToString()
     {
@@ -553,6 +671,47 @@ public struct mat2 : IFormattable
     public float m01;
     public float m10;
     public float m11;
+
+    #region Indexor
+    public vec2 this[int index]
+    {
+        get
+        {
+            Debug.Assert(index > -1 && index < 2);
+            switch (index)
+            {
+                case  0: return vmath.vec2(m00, m01);
+                case  1: return vmath.vec2(m10, m11);
+                default: return vmath.vec2(  0,   0);
+            }
+        }
+
+        set
+        {
+            Debug.Assert(index > -1 && index < 2);
+            switch (index)
+            {
+                case  0: m00 = value.x; m01 = value.y; break;
+                case  1: m10 = value.x; m11 = value.y; break;
+                default: break;
+            }
+        }
+    }
+
+    public float this[int i, int j]
+    {
+        get
+        {
+            return this[i][j];
+        }
+        set
+        {
+            vec2 v = this[i];
+            v[j] = value;
+            this[i] = v;
+        }
+    }
+    #endregion
 
     #region ToString
     public override string ToString()
@@ -612,6 +771,49 @@ public struct mat3 : IFormattable
     public float m20;
     public float m21;
     public float m22;
+
+    #region Indexor
+    public vec3 this[int index]
+    {
+        get
+        {
+            Debug.Assert(index > -1 && index < 3);
+            switch (index)
+            {
+                case  0: return vmath.vec3(m00, m01, m02);
+                case  1: return vmath.vec3(m10, m11, m12);
+                case  2: return vmath.vec3(m20, m21, m22);
+                default: return vmath.vec3(  0,   0,   0);
+            }
+        }
+
+        set
+        {
+            Debug.Assert(index > -1 && index < 3);
+            switch (index)
+            {
+                case  0: m00 = value.x; m01 = value.y; m02 = value.z; break;
+                case  1: m10 = value.x; m11 = value.y; m12 = value.z; break;
+                case  2: m20 = value.x; m21 = value.y; m22 = value.z; break;
+                default: break;
+            }
+        }
+    }
+
+    public float this[int i, int j]
+    {
+        get
+        {
+            return this[i][j];
+        }
+        set
+        {
+            vec3 v = this[i];
+            v[j] = value;
+            this[i] = v;
+        }
+    }
+    #endregion
 
     #region ToString
     public override string ToString()
@@ -686,7 +888,6 @@ public struct mat4 : IFormattable
     }
     #endregion
 
-
     public float m00;
     public float m01;
     public float m02;
@@ -703,6 +904,51 @@ public struct mat4 : IFormattable
     public float m31;
     public float m32;
     public float m33;
+
+    #region Indexor
+    public vec4 this[int index]
+    {
+        get
+        {
+            Debug.Assert(index > -1 && index < 4);
+            switch (index)
+            {
+                case  0: return vmath.vec4(m00, m01, m02, m03);
+                case  1: return vmath.vec4(m10, m11, m12, m13);
+                case  2: return vmath.vec4(m20, m21, m22, m23);
+                case  3: return vmath.vec4(m30, m31, m32, m33);
+                default: return vmath.vec4(  0,   0,   0,   0);
+            }
+        }
+
+        set
+        {
+            Debug.Assert(index > -1 && index < 3);
+            switch (index)
+            {
+                case  0: m00 = value.x; m01 = value.y; m02 = value.z; m03 = value.w; break;
+                case  1: m10 = value.x; m11 = value.y; m12 = value.z; m13 = value.w; break;
+                case  2: m20 = value.x; m21 = value.y; m22 = value.z; m23 = value.w; break;
+                case  3: m30 = value.x; m31 = value.y; m32 = value.z; m33 = value.w; break;
+                default: break;
+            }
+        }
+    }
+
+    public float this[int i, int j]
+    {
+        get
+        {
+            return this[i][j];
+        }
+        set
+        {
+            vec4 v = this[i];
+            v[j] = value;
+            this[i] = v;
+        }
+    }
+    #endregion
 
 
     #region ToString
@@ -1600,6 +1846,25 @@ public static class vmath
             /* Row 4 */
             0, 0, 0, 1.0f
         );
+    }
+
+    [MethodImpl(MethodInlineOptions)]
+    public static mat4 rotate(vec3 axis, float angle)
+    {
+        return rotate(axis.x, axis.y, axis.z, angle);
+    }
+
+    [MethodImpl(MethodInlineOptions)]
+    public static mat4 rotate(vec4 axisangle)
+    {
+        return rotate(axisangle.x, axisangle.y, axisangle.z, axisangle.w);
+    }
+
+    [MethodImpl(MethodInlineOptions)]
+    public static mat4 rotate(quat q)
+    {
+        vec4 axisangle = vec4();
+        return rotate(axisangle);
     }
 
     [MethodImpl(MethodInlineOptions)]
