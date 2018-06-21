@@ -10,7 +10,8 @@
 #define __VMATH_H__
 
 #define VMATH_LIBNAME "libvmath"
-#define VMATH_VERSION "v1.1.1" 
+#define VMATH_VERSION "v1.1.1"
+#define VMATH_VERCODE 10101 
 
 /**
  * Include dependencies
