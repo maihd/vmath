@@ -1766,6 +1766,30 @@ __vmath__ vec2_t vec2_clamplength(vec2_arg_t v, float min, float max)
     return vec2(v.x * factor, v.y * factor);
 }
 
+__vmath__ vec2_t vec2_minf(vec2_arg_t a, float b)
+{
+    return vec2(
+        minf(a.x, b),
+        minf(a.y, b)
+    );
+}
+
+__vmath__ vec2_t vec2_maxf(vec2_arg_t a, float b)
+{
+    return vec2(
+        maxf(a.x, b),
+        maxf(a.y, b)
+    );
+}
+
+__vmath__ vec2_t vec2_clampf(vec2_arg_t v, float min, float max)
+{
+    return vec2(
+        clampf(v.x, min, max),
+        clampf(v.y, min, max)
+    );
+}
+
 /* END OF VMATH_BUILD_VEC2 */
 #endif
 
@@ -2088,6 +2112,33 @@ __vmath__ vec3_t vec3_clamplength(vec3_arg_t v, float min, float max)
     return vec3(v.x * factor, v.y * factor, v.z * factor);
 }
 
+__vmath__ vec3_t vec3_minf(vec3_arg_t a, float b)
+{
+    return vec3(
+        minf(a.x, b),
+        minf(a.y, b),
+        minf(a.z, b)
+    );
+}
+
+__vmath__ vec3_t vec3_maxf(vec3_arg_t a, float b)
+{
+    return vec3(
+        maxf(a.x, b),
+        maxf(a.y, b),
+        maxf(a.z, b)
+    );
+}
+
+__vmath__ vec3_t vec3_clampf(vec3_arg_t v, float min, float max)
+{
+    return vec3(
+        clampf(v.x, min, max),
+        clampf(v.y, min, max),
+        clampf(v.z, min, max)
+    );
+}
+
 /* END OF VMATH_BUILD_VEC3 */
 #endif
 
@@ -2387,6 +2438,36 @@ __vmath__ vec4_t vec4_clamplength(vec4_arg_t v, float min, float max)
     const float factor = newlen / oldlen;
 
     return vec4(v.x * factor, v.y * factor, v.z * factor, v.w * factor);
+}
+
+__vmath__ vec4_t vec4_minf(vec4_arg_t a, float b)
+{
+    return vec4(
+        minf(a.x, b),
+        minf(a.y, b),
+        minf(a.z, b),
+        minf(a.w, b)
+    );
+}
+
+__vmath__ vec4_t vec4_maxf(vec4_arg_t a, float b)
+{
+    return vec4(
+        maxf(a.x, b),
+        maxf(a.y, b),
+        maxf(a.z, b),
+        maxf(a.w, b)
+    );
+}
+
+__vmath__ vec4_t vec4_clampf(vec4_arg_t v, float min, float max)
+{
+    return vec4(
+        clampf(v.x, min, max),
+        clampf(v.y, min, max),
+        clampf(v.z, min, max),
+        clampf(v.w, min, max)
+    );
 }
 
 /* END OF VMATH_BUILD_VEC4 */
@@ -3557,6 +3638,32 @@ __vmath__ vec2_t clamplength(const vec2_t& v, float min, float max)
 {
     return vec2_clamplength(v, min, max);
 }
+
+__vmath__ vec2_t min(const vec2_t& a, float b)
+{
+    return vec2_minf(a, b);
+}                 
+
+__vmath__ vec2_t max(const vec2_t& a, float b)
+{
+    return vec2_maxf(a, b);
+}
+
+__vmath__ vec2_t min(float a, const vec2_t& b)
+{
+    return vec2_minf(b, a);
+}
+
+__vmath__ vec2_t max(float a, const vec2_t& b)
+{
+    return vec2_maxf(b, a);
+}
+
+__vmath__ vec2_t clamp(const vec2_t& v, float min, float max)
+{
+    return vec2_clampf(v, min, max);
+}
+
 /* END OF VMATH_BUILD_VEC2 */
 #endif
 
@@ -3689,6 +3796,31 @@ __vmath__ vec3_t clamplength(const vec3_t& v, float min, float max)
     return vec3_clamplength(v, min, max);
 }
 
+__vmath__ vec3_t min(const vec3_t& a, float b)
+{
+    return vec3_minf(a, b);
+}
+
+__vmath__ vec3_t max(const vec3_t& a, float b)
+{
+    return vec3_maxf(a, b);
+}
+
+__vmath__ vec3_t min(float a, const vec3_t& b)
+{
+    return vec3_minf(b, a);
+}
+
+__vmath__ vec3_t max(float a, const vec3_t& b)
+{
+    return vec3_maxf(b, a);
+}
+
+__vmath__ vec3_t clamp(const vec3_t& v, float min, float max)
+{
+    return vec3_clampf(v, min, max);
+}
+
 /* END OF VMATH_BUILD_VEC3 */
 #endif
 
@@ -3814,6 +3946,31 @@ __vmath__ vec4_t clamp(const vec4_t& v, const vec4_t& min, const vec4_t& max)
 __vmath__ vec4_t clamplength(const vec4_t& v, float min, float max)
 {
     return vec4_clamplength(v, min, max);
+}
+
+__vmath__ vec4_t min(const vec4_t& a, float b)
+{
+    return vec4_minf(a, b);
+}
+
+__vmath__ vec4_t max(const vec4_t& a, float b)
+{
+    return vec4_maxf(a, b);
+}
+
+__vmath__ vec4_t min(float a, const vec4_t& b)
+{
+    return vec4_minf(b, a);
+}
+
+__vmath__ vec4_t max(float a, const vec4_t& b)
+{
+    return vec4_maxf(b, a);
+}
+
+__vmath__ vec4_t clamp(const vec4_t& v, float min, float max)
+{
+    return vec4_clampf(v, min, max);
 }
 
 /* END OF VMATH_BUILD_VEC4 */
