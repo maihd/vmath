@@ -1514,6 +1514,21 @@ __vmath__ float degrees(float r)
     return r * f;
 }
 
+__vmath__ float minf(float a, float b)
+{
+    return a < b ? a : b;
+}
+
+__vmath__ float maxf(float a, float b)
+{
+    return a > b ? a : b;
+}
+
+__vmath__ float clampf(float v, float min, float max)
+{
+    return v < min ? min : (v > max ? max : v);
+}
+
 /**************************
  * Vector2D
  **************************/
@@ -1704,6 +1719,51 @@ __vmath__ vec2_t vec2_reflect(vec2_arg_t v, vec2_arg_t n)
 {
     /* equation: ref = v - 2 * n * dot(v, n) */
     return vec2_sub(v, vec2_mulf(n, 2 * vec2_dot(n, v)));
+}
+
+/**
+ *
+ */
+__vmath__ vec2_t vec2_min(vec2_arg_t a, vec2_arg_t b)
+{
+    return vec2(
+        minf(a.x, b.x),
+        minf(a.y, b.y)
+    );
+}
+
+/**
+ *
+ */
+__vmath__ vec2_t vec2_max(vec2_arg_t a, vec2_arg_t b)
+{
+    return vec2(
+        maxf(a.x, b.x),
+        maxf(a.y, b.y)
+    );
+}
+
+/**
+ *
+ */
+__vmath__ vec2_t vec2_clamp(vec2_arg_t v, vec2_arg_t min, vec2_arg_t max)
+{
+    return vec2(
+        clampf(v.x, min.x, max.x),
+        clampf(v.y, min.y, max.y)
+    );
+}
+
+/**
+ *
+ */
+__vmath__ vec2_t vec2_clamplength(vec2_arg_t v, float min, float max)
+{
+    const float oldlen = vec2_length(v);
+    const float newlen = clampf(oldlen, min, max);
+    const float factor = newlen / oldlen;
+
+    return vec2(v.x * factor, v.y * factor);
 }
 
 /* END OF VMATH_BUILD_VEC2 */
@@ -1980,6 +2040,54 @@ __vmath__ vec3_t vec3_reflect(vec3_arg_t v, vec3_arg_t n)
     return vec3_sub(v, vec3_mulf(n, 2 * vec3_dot(n, v)));
 }
 
+/**
+*
+*/
+__vmath__ vec3_t vec3_min(vec3_arg_t a, vec3_arg_t b)
+{
+    return vec3(
+        minf(a.x, b.x),
+        minf(a.y, b.y),
+        minf(a.z, b.z)
+    );
+}
+
+/**
+*
+*/
+__vmath__ vec3_t vec3_max(vec3_arg_t a, vec3_arg_t b)
+{
+    return vec3(
+        maxf(a.x, b.x),
+        maxf(a.y, b.y),
+        maxf(a.z, b.z)
+    );
+}
+
+/**
+*
+*/
+__vmath__ vec3_t vec3_clamp(vec3_arg_t v, vec3_arg_t min, vec3_arg_t max)
+{
+    return vec3(
+        clampf(v.x, min.x, max.x),
+        clampf(v.y, min.y, max.y),
+        clampf(v.z, min.z, max.z)
+    );
+}
+
+/**
+*
+*/
+__vmath__ vec3_t vec3_clamplength(vec3_arg_t v, float min, float max)
+{
+    const float oldlen = vec3_length(v);
+    const float newlen = clampf(oldlen, min, max);
+    const float factor = newlen / oldlen;
+
+    return vec3(v.x * factor, v.y * factor, v.z * factor);
+}
+
 /* END OF VMATH_BUILD_VEC3 */
 #endif
 
@@ -2228,6 +2336,57 @@ __vmath__ vec4_t vec4_reflect(vec4_arg_t v, vec4_arg_t n)
 {
     /* equation: ref = v - 2 * n * dot(v, n) */
     return vec4_sub(v, vec4_mulf(n, 2 * vec4_dot(n, v)));
+}
+
+/**
+*
+*/
+__vmath__ vec4_t vec4_min(vec4_arg_t a, vec4_arg_t b)
+{
+    return vec4(
+        minf(a.x, b.x),
+        minf(a.y, b.y),
+        minf(a.z, b.z),
+        minf(a.w, b.w)
+    );
+}
+
+/**
+*
+*/
+__vmath__ vec4_t vec4_max(vec4_arg_t a, vec4_arg_t b)
+{
+    return vec4(
+        maxf(a.x, b.x),
+        maxf(a.y, b.y),
+        maxf(a.z, b.z),
+        maxf(a.w, b.w)
+    );
+}
+
+/**
+*
+*/
+__vmath__ vec4_t vec4_clamp(vec4_arg_t v, vec4_arg_t min, vec4_arg_t max)
+{
+    return vec4(
+        clampf(v.x, min.x, max.x),
+        clampf(v.y, min.y, max.y),
+        clampf(v.z, min.z, max.z),
+        clampf(v.w, min.w, max.w)
+    );
+}
+
+/**
+*
+*/
+__vmath__ vec4_t vec4_clamplength(vec4_arg_t v, float min, float max)
+{
+    const float oldlen = vec4_length(v);
+    const float newlen = clampf(oldlen, min, max);
+    const float factor = newlen / oldlen;
+
+    return vec4(v.x * factor, v.y * factor, v.z * factor, v.w * factor);
 }
 
 /* END OF VMATH_BUILD_VEC4 */
@@ -3378,6 +3537,26 @@ __vmath__ vec2_t normalize(const vec2_t& v)
 {
     return vec2_normalize(v);
 }
+
+__vmath__ vec2_t min(const vec2_t& a, const vec2_t& b)
+{
+    return vec2_min(a, b);
+}
+
+__vmath__ vec2_t max(const vec2_t& a, const vec2_t& b)
+{
+    return vec2_max(a, b);
+}
+
+__vmath__ vec2_t clamp(const vec2_t& v, const vec2_t& min, const vec2_t& max)
+{
+    return vec2_clamp(v, min, max);
+}
+
+__vmath__ vec2_t clamplength(const vec2_t& v, float min, float max)
+{
+    return vec2_clamplength(v, min, max);
+}
 /* END OF VMATH_BUILD_VEC2 */
 #endif
 
@@ -3490,6 +3669,26 @@ __vmath__ vec3_t normalize(const vec3_t& v)
     return vec3_normalize(v);
 }
 
+__vmath__ vec3_t min(const vec3_t& a, const vec3_t& b)
+{
+    return vec3_min(a, b);
+}
+
+__vmath__ vec3_t max(const vec3_t& a, const vec3_t& b)
+{
+    return vec3_max(a, b);
+}
+
+__vmath__ vec3_t clamp(const vec3_t& v, const vec3_t& min, const vec3_t& max)
+{
+    return vec3_clamp(v, min, max);
+}
+
+__vmath__ vec3_t clamplength(const vec3_t& v, float min, float max)
+{
+    return vec3_clamplength(v, min, max);
+}
+
 /* END OF VMATH_BUILD_VEC3 */
 #endif
 
@@ -3595,6 +3794,26 @@ __vmath__ vec4_t reflect(const vec4_t& v, const vec4_t& n)
 __vmath__ vec4_t normalize(const vec4_t& v)
 {
     return vec4_normalize(v);
+}
+
+__vmath__ vec4_t min(const vec4_t& a, const vec4_t& b)
+{
+    return vec4_min(a, b);
+}
+
+__vmath__ vec4_t max(const vec4_t& a, const vec4_t& b)
+{
+    return vec4_max(a, b);
+}
+
+__vmath__ vec4_t clamp(const vec4_t& v, const vec4_t& min, const vec4_t& max)
+{
+    return vec4_clamp(v, min, max);
+}
+
+__vmath__ vec4_t clamplength(const vec4_t& v, float min, float max)
+{
+    return vec4_clamplength(v, min, max);
 }
 
 /* END OF VMATH_BUILD_VEC4 */
