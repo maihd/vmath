@@ -5,7 +5,7 @@
 2. One single header file library
 3. C/C++ inline pure functions
 4. Plain-old-data types, code and data are separated.
-5. SIMD support: SSE , NEON
+5. SIMD support: SSE, NEON
 6. Multi-platforms: Intel, ARM
 7. C++ operators/functions overloading
 8. GLSL-like API design (C++ only)
@@ -28,7 +28,7 @@ mat4_t model    = mat4_mul(mat4_mul(mat4_translatev3(position),
                            mat4_scalev3(scale));
 
 /* Perspective matrix with 45 degree fov */
-mat4_t proj = mat4_perspective(M_PI * 0.25f, WIDTH / HEIGHT, 0.0f, 100.0f);
+mat4_t proj = mat4_perspective(radians(45), WIDTH / HEIGHT, 0.0f, 100.0f);
 
 ... apply matrix to render ...
 ```
@@ -66,7 +66,8 @@ mat4 proj = perspective(M_PI * 0.25f, WIDTH / HEIGHT, 0.0f, 100.0f);
 ```
 
 ## Project use vmath
-1. MaiHD's OpenGL examples, (https://github.com/maihd/opengl.git)
+1. MaiHD's OpenGL examples (https://github.com/maihd/opengl.git)
+2. MaiHD's tween functions library (https://github.com/maihd/tween.git)
 
 ## Metadata
 1. License: NULL
