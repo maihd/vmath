@@ -1529,6 +1529,17 @@ __vmath__ float clampf(float v, float min, float max)
     return v < min ? min : (v > max ? max : v);
 }
 
+__vmath__ float stepf(float a, float b, float t)
+{
+    return (a + (b - a) * t);
+}
+
+__vmath__ float smoothstepf(float a, float b, float t)
+{
+    float t = clampf((t - a) / (b - a), 0.0f, 1.0f);
+    return t * t * t * ((t * 6 - 15) + 10);
+}
+
 /**************************
  * Vector2D
  **************************/
@@ -1787,6 +1798,38 @@ __vmath__ vec2_t vec2_clampf(vec2_arg_t v, float min, float max)
     return vec2(
         clampf(v.x, min, max),
         clampf(v.y, min, max)
+    );
+}
+
+__vmath__ vec2_t vec2_step(vec2_arg_t a, vec2_arg_t b, vec2_arg_t t)
+{
+    return vec2(
+        stepf(a.x, b.x, t.x),
+        stepf(a.y, b.y, t.y)  
+    );
+}
+
+__vmath__ vec2_t vec2_smoothstep(vec2_arg_t a, vec2_arg_t b, vec2_arg_t t)
+{
+    return vec2(
+        smoothstepf(a.x, b.x, t.x),
+        smoothstepf(a.y, b.y, t.y)  
+    );
+}
+
+__vmath__ vec2_t vec2_stepf(vec2_arg_t a, vec2_arg_t b, float t)
+{
+    return vec2(
+        stepf(a.x, b.x, t),
+        stepf(a.y, b.y, t)  
+    );
+}
+
+__vmath__ vec2_t vec2_smoothstepf(vec2_arg_t a, vec2_arg_t b, float t)
+{
+    return vec2(
+        smoothstepf(a.x, b.x, t),
+        smoothstepf(a.y, b.y, t)  
     );
 }
 
@@ -2139,6 +2182,42 @@ __vmath__ vec3_t vec3_clampf(vec3_arg_t v, float min, float max)
     );
 }
 
+__vmath__ vec3_t vec3_step(vec3_arg_t a, vec3_arg_t b, vec3_arg_t t)
+{
+    return vec3(
+        stepf(a.x, b.x, t.x),
+        stepf(a.y, b.y, t.y),
+        stepf(a.z, b.z, t.z)  
+    );
+}
+
+__vmath__ vec3_t vec3_smoothstep(vec3_arg_t a, vec3_arg_t b, vec3_arg_t t)
+{
+    return vec3(
+        smoothstepf(a.x, b.x, t.x),
+        smoothstepf(a.y, b.y, t.y),
+        smoothstepf(a.z, b.z, t.z)  
+    );
+}
+
+__vmath__ vec3_t vec3_stepf(vec3_arg_t a, vec3_arg_t b, float t)
+{
+    return vec3(
+        stepf(a.x, b.x, t),
+        stepf(a.y, b.y, t),
+        stepf(a.z, b.z, t)  
+    );
+}
+
+__vmath__ vec3_t vec3_smoothstepf(vec3_arg_t a, vec3_arg_t b, float t)
+{
+    return vec3(
+        smoothstepf(a.x, b.x, t),
+        smoothstepf(a.y, b.y, t), 
+        smoothstepf(a.z, b.z, t)  
+    );
+}
+
 /* END OF VMATH_BUILD_VEC3 */
 #endif
 
@@ -2467,6 +2546,46 @@ __vmath__ vec4_t vec4_clampf(vec4_arg_t v, float min, float max)
         clampf(v.y, min, max),
         clampf(v.z, min, max),
         clampf(v.w, min, max)
+    );
+}
+
+__vmath__ vec4_t vec4_step(vec4_arg_t a, vec4_arg_t b, vec4_arg_t t)
+{
+    return vec4(
+        stepf(a.x, b.x, t.x),
+        stepf(a.y, b.y, t.y),
+        stepf(a.z, b.z, t.z),
+        stepf(a.w, b.w, t.w)
+    );
+}
+
+__vmath__ vec4_t vec4_smoothstep(vec4_arg_t a, vec4_arg_t b, vec4_arg_t t)
+{
+    return vec4(
+        smoothstepf(a.x, b.x, t.x),
+        smoothstepf(a.y, b.y, t.y),
+        smoothstepf(a.z, b.z, t.z),
+        smoothstepf(a.w, b.w, t.w)  
+    );
+}
+
+__vmath__ vec4_t vec4_stepf(vec4_arg_t a, vec4_arg_t b, float t)
+{
+    return vec4(
+        stepf(a.x, b.x, t),
+        stepf(a.y, b.y, t),
+        stepf(a.z, b.z, t),
+        stepf(a.w, b.w, t)  
+    );
+}
+
+__vmath__ vec4_t vec4_smoothstepf(vec4_arg_t a, vec4_arg_t b, float t)
+{
+    return vec4(
+        smoothstepf(a.x, b.x, t),
+        smoothstepf(a.y, b.y, t), 
+        smoothstepf(a.z, b.z, t),
+        smoothstepf(a.w, b.w, t)
     );
 }
 
@@ -3664,6 +3783,26 @@ __vmath__ vec2_t clamp(const vec2_t& v, float min, float max)
     return vec2_clampf(v, min, max);
 }
 
+__vmath__ vec2_t step(const vec2_t& a, const vec2_t& b, const vec2_t& t)
+{
+    return vec2_step(a, b, t);
+}
+
+__vmath__ vec2_t step(const vec2_t& a, const vec2_t& b, float t)
+{
+    return vec2_stepf(a, b, t);
+}
+
+__vmath__ vec2_t smoothstep(const vec2_t& a, const vec2_t& b, const vec2_t& t)
+{
+    return vec2_smoothstep(a, b, t);
+}
+
+__vmath__ vec2_t smoothstep(const vec2_t& a, const vec2_t& b, float t)
+{
+    return vec2_smoothstepf(a, b, t);
+}
+
 /* END OF VMATH_BUILD_VEC2 */
 #endif
 
@@ -3821,6 +3960,26 @@ __vmath__ vec3_t clamp(const vec3_t& v, float min, float max)
     return vec3_clampf(v, min, max);
 }
 
+__vmath__ vec3_t step(const vec3_t& a, const vec3_t& b, const vec3_t& t)
+{
+    return vec3_step(a, b, t);
+}
+
+__vmath__ vec3_t step(const vec3_t& a, const vec3_t& b, float t)
+{
+    return vec3_stepf(a, b, t);
+}
+
+__vmath__ vec3_t smoothstep(const vec3_t& a, const vec3_t& b, const vec3_t& t)
+{
+    return vec3_smoothstep(a, b, t);
+}
+
+__vmath__ vec3_t smoothstep(const vec3_t& a, const vec3_t& b, float t)
+{
+    return vec3_smoothstepf(a, b, t);
+}
+
 /* END OF VMATH_BUILD_VEC3 */
 #endif
 
@@ -3971,6 +4130,26 @@ __vmath__ vec4_t max(float a, const vec4_t& b)
 __vmath__ vec4_t clamp(const vec4_t& v, float min, float max)
 {
     return vec4_clampf(v, min, max);
+}
+
+__vmath__ vec4_t step(const vec4_t& a, const vec4_t& b, const vec4_t& t)
+{
+    return vec4_step(a, b, t);
+}
+
+__vmath__ vec4_t step(const vec4_t& a, const vec4_t& b, float t)
+{
+    return vec4_stepf(a, b, t);
+}
+
+__vmath__ vec4_t smoothstep(const vec4_t& a, const vec4_t& b, const vec4_t& t)
+{
+    return vec4_smoothstep(a, b, t);
+}
+
+__vmath__ vec4_t smoothstep(const vec4_t& a, const vec4_t& b, float t)
+{
+    return vec4_smoothstepf(a, b, t);
 }
 
 /* END OF VMATH_BUILD_VEC4 */
