@@ -1565,15 +1565,15 @@ __vmath__ float normalizef(float x)
     return 1.0f;
 }
 
-__vmath__ float faceforwardf(float n, float i, float nref)
-{
-    return dotf(i, nref) < 0.0f ? n : -n;
-}
-
 __vmath__ float reflectf(float v, float n)
 {
     /* equation: ref = v - 2 * n * dot(v, n) */
     return v - 2 * n * dotf(v, n);
+}
+
+__vmath__ float faceforwardf(float n, float i, float nref)
+{
+    return dotf(i, nref) < 0.0f ? n : -n;
 }
 
 __vmath__ float refractf(float v, float n, float eta)
@@ -1892,6 +1892,20 @@ __vmath__ vec2_t vec2_mixf(vec2_arg_t a, vec2_arg_t b, float t)
         mixf(a.x, b.x, t),
         mixf(a.y, b.y, t)
     );
+}
+
+__vmath__ vec2_t vec2_faceforward(vec2_arg_t n, vec2_arg_t i, vec2_arg_t nref)
+{
+    return vec2_dot(i, nref) < 0.0f ? n : vec2_neg(n);
+}
+
+__vmath__ vec2_t vec2_refract(vec2_arg_t v, vec2_arg_t n, float eta)
+{
+    float k = 1.0f - eta * eta * (1.0f - vec2_dot(n, v) * vec2_dot(n, v));
+    if (k < 0.0f)
+        return vec2(0.0f, 0.0f);
+    else
+        return vec2_sub(vec2_mulf(v, eta), vec2_mulf(v, (eta * vec2_dot(n, v) + vmath_fsqrt(k))));
 }
 
 /* END OF VMATH_BUILD_VEC2 */
@@ -2297,6 +2311,20 @@ __vmath__ vec3_t vec3_mixf(vec3_arg_t a, vec3_arg_t b, float t)
     );
 }
 
+__vmath__ vec3_t vec3_faceforward(vec3_arg_t n, vec3_arg_t i, vec3_arg_t nref)
+{
+    return vec3_dot(i, nref) < 0.0f ? n : vec3_neg(n);
+}
+
+__vmath__ vec3_t vec3_refract(vec3_arg_t v, vec3_arg_t n, float eta)
+{
+    float k = 1.0f - eta * eta * (1.0f - vec3_dot(n, v) * vec3_dot(n, v));
+    if (k < 0.0f)
+        return vec3(0.0f, 0.0f, 0.0f);
+    else
+        return vec3_sub(vec3_mulf(v, eta), vec3_mulf(v, (eta * vec3_dot(n, v) + vmath_fsqrt(k))));
+}
+
 /* END OF VMATH_BUILD_VEC3 */
 #endif
 
@@ -2686,6 +2714,20 @@ __vmath__ vec4_t vec4_mixf(vec4_arg_t a, vec4_arg_t b, float t)
         mixf(a.z, b.z, t),
         mixf(a.w, b.w, t)
     );
+}
+
+__vmath__ vec4_t vec4_faceforward(vec4_arg_t n, vec4_arg_t i, vec4_arg_t nref)
+{
+    return vec4_dot(i, nref) < 0.0f ? n : vec4_neg(n);
+}
+
+__vmath__ vec4_t vec4_refract(vec4_arg_t v, vec4_arg_t n, float eta)
+{
+    float k = 1.0f - eta * eta * (1.0f - vec4_dot(n, v) * vec4_dot(n, v));
+    if (k < 0.0f)
+        return vec4(0.0f, 0.0f, 0.0f, 0.0f);
+    else
+        return vec4_sub(vec4_mulf(v, eta), vec4_mulf(v, (eta * vec4_dot(n, v) + vmath_fsqrt(k))));
 }
 
 /* END OF VMATH_BUILD_VEC4 */
@@ -3734,6 +3776,74 @@ __vmath__ mat4_t mat4_inverse(mat4_arg_t m)
 #if defined(__cplusplus) && VMATH_FUNCTION_OVERLOADING != 0
 
 /**************************
+ * Float functions
+ **************************/
+__vmath__ float dot(float a, float b)
+{
+    return dotf(a, b);
+}
+
+__vmath__ float length(float x)
+{
+    return lengthf(x);
+}
+
+__vmath__ float distance(float a, float b)
+{
+    return distancef(a, b);
+}
+
+__vmath__ float normalize(float x)
+{
+    return 1.0f;
+}
+
+__vmath__ float min(float a, float b)
+{
+    return minf(a, b);
+}
+
+__vmath__ float max(float a, float b)
+{
+    return maxf(a, b);
+}
+
+__vmath__ float mix(float a, float b, float t)
+{
+    return mixf(a, b, t);
+}
+
+__vmath__ float step(float a, float b, float t)
+{
+    return stepf(a, b, t);
+}
+
+__vmath__ float smoothstep(float a, float b, float t)
+{
+    return smoothstepf(a, b, t);
+}
+
+__vmath__ float clamp(float v, float min, float max)
+{
+    return clampf(v, min, max);
+}
+
+__vmath__ float reflect(float i, float n)
+{
+    return reflectf(i, n);
+}
+
+__vmath__ float refract(float i, float n, float eta)
+{
+    return refractf(i, n, eta);
+}
+
+__vmath__ float faceforward(float n, float i, float nref)
+{
+    return faceforwardf(n, i, nref);
+}
+
+/**************************
  * Vector2D functions
  **************************/
 #if VMATH_BUILD_VEC2
@@ -3910,6 +4020,16 @@ __vmath__ vec2_t mix(const vec2_t& a, const vec2_t& b, const vec2_t& t)
 __vmath__ vec2_t mix(const vec2_t& a, const vec2_t& b, float t)
 {
     return vec2_mixf(a, b, t);
+}
+
+__vmath__ vec2_t refract(const vec2_t& i, const vec2_t& n, float eta)
+{
+    return vec2_refract(i, n, eta);
+}
+
+__vmath__ vec2_t faceforward(const vec2_t& n, const vec2_t& i, const vec2_t& nref)
+{
+    return vec2_faceforward(n, i, nref);
 }
 
 /* END OF VMATH_BUILD_VEC2 */
@@ -4099,6 +4219,16 @@ __vmath__ vec3_t mix(const vec3_t& a, const vec3_t& b, float t)
     return vec3_mixf(a, b, t);
 }
 
+__vmath__ vec3_t refract(const vec3_t& i, const vec3_t& n, float eta)
+{
+    return vec3_refract(i, n, eta);
+}
+
+__vmath__ vec3_t faceforward(const vec3_t& n, const vec3_t& i, const vec3_t& nref)
+{
+    return vec3_faceforward(n, i, nref);
+}
+
 /* END OF VMATH_BUILD_VEC3 */
 #endif
 
@@ -4279,6 +4409,16 @@ __vmath__ vec4_t mix(const vec4_t& a, const vec4_t& b, const vec4_t& t)
 __vmath__ vec4_t mix(const vec4_t& a, const vec4_t& b, float t)
 {
     return vec4_mixf(a, b, t);
+}
+
+__vmath__ vec4_t refract(const vec4_t& i, const vec4_t& n, float eta)
+{
+    return vec4_refract(i, n, eta);
+}
+
+__vmath__ vec4_t faceforward(const vec4_t& n, const vec4_t& i, const vec4_t& nref)
+{
+    return vec4_faceforward(n, i, nref);
 }
 
 /* END OF VMATH_BUILD_VEC4 */
