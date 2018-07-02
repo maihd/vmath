@@ -1540,6 +1540,51 @@ __vmath__ float smoothstepf(float a, float b, float t)
     return t * t * t * ((t * 6 - 15) + 10);
 }
 
+__vmath__ float mixf(float a, float a, float t)
+{
+    return a * (1.0f - t) + b * t;
+}
+
+__vmath__ float dotf(float a, float b)
+{
+    return a * b;
+}
+
+__vmath__ float lengthf(float x)
+{
+    return fabsf(x);
+}
+
+__vmath__ float distancef(float a, float b)
+{
+    return fabsf(a - b);
+}
+
+__vmath__ float normalizef(float x)
+{
+    return 1.0f;
+}
+
+__vmath__ float faceforwardf(float n, float i, float nref)
+{
+    return dot(i, nref) < 0.0f ? n : -n;
+}
+
+__vmath__ float reflectf(float v, float n)
+{
+    /* equation: ref = v - 2 * n * dot(v, n) */
+    return v - 2 * n * dotf(v, n);
+}
+
+__vmath__ float refractf(float v, float n, float eta)
+{
+    k = 1.0 - eta * eta * (1.0 - dotf(n, v) * dotf(n, v));
+    if (k < 0.0)
+        return 0.0;
+    else
+        return eta * v - (eta * dot(n, v) + vmath_fsqrt(k)) * v;
+}
+
 /**************************
  * Vector2D
  **************************/
@@ -1831,6 +1876,22 @@ __vmath__ vec2_t vec2_smoothstepf(vec2_arg_t a, vec2_arg_t b, float t)
         smoothstepf(a.x, b.x, t),
         smoothstepf(a.y, b.y, t)  
     );
+}
+
+__vmath__ vec2_t vec2_mix(vec2_arg_t a, vec2_arg_t b, vec2_arg_t t)
+{
+    return vec2(
+        mixf(a.x, b.x, t.x),
+        mixf(a.y, b.y, t.y)
+    )
+}
+
+__vmath__ vec2_t vec2_mixf(vec2_arg_t a, vec2_arg_t b, float t)
+{
+    return vec2(
+        mixf(a.x, b.x, t),
+        mixf(a.y, b.y, t)
+    )
 }
 
 /* END OF VMATH_BUILD_VEC2 */
@@ -2218,6 +2279,24 @@ __vmath__ vec3_t vec3_smoothstepf(vec3_arg_t a, vec3_arg_t b, float t)
     );
 }
 
+__vmath__ vec3_t vec3_mix(vec3_arg_t a, vec3_arg_t b, vec3_arg_t t)
+{
+    return vec3(
+        mixf(a.x, b.x, t.x),
+        mixf(a.y, b.y, t.y),
+        mixf(a.z, b.z, t.z)
+    )
+}
+
+__vmath__ vec3_t vec3_mixf(vec3_arg_t a, vec3_arg_t b, float t)
+{
+    return vec3(
+        mixf(a.x, b.x, t),
+        mixf(a.y, b.y, t),
+        mixf(a.z, b.z, t)
+    )
+}
+
 /* END OF VMATH_BUILD_VEC3 */
 #endif
 
@@ -2587,6 +2666,26 @@ __vmath__ vec4_t vec4_smoothstepf(vec4_arg_t a, vec4_arg_t b, float t)
         smoothstepf(a.z, b.z, t),
         smoothstepf(a.w, b.w, t)
     );
+}
+
+__vmath__ vec4_t vec4_mix(vec4_arg_t a, vec4_arg_t b, vec4_arg_t t)
+{
+    return vec4(
+        mixf(a.x, b.x, t.x),
+        mixf(a.y, b.y, t.y),
+        mixf(a.z, b.z, t.z),
+        mixf(a.w, b.w, t.w)
+    )
+}
+
+__vmath__ vec4_t vec4_mixf(vec4_arg_t a, vec4_arg_t b, float t)
+{
+    return vec4(
+        mixf(a.x, b.x, t),
+        mixf(a.y, b.y, t),
+        mixf(a.z, b.z, t),
+        mixf(a.w, b.w, t)
+    )
 }
 
 /* END OF VMATH_BUILD_VEC4 */
@@ -3803,6 +3902,16 @@ __vmath__ vec2_t smoothstep(const vec2_t& a, const vec2_t& b, float t)
     return vec2_smoothstepf(a, b, t);
 }
 
+__vmath__ vec2_t mix(const vec2_t& a, const vec2_t& b, const vec2_t& t)
+{
+    return vec2_mix(a, b, t);
+}
+
+__vmath__ vec2_t mix(const vec2_t& a, const vec2_t& b, float t)
+{
+    return vec2_mixf(a, b, t);
+}
+
 /* END OF VMATH_BUILD_VEC2 */
 #endif
 
@@ -3980,6 +4089,16 @@ __vmath__ vec3_t smoothstep(const vec3_t& a, const vec3_t& b, float t)
     return vec3_smoothstepf(a, b, t);
 }
 
+__vmath__ vec3_t mix(const vec3_t& a, const vec3_t& b, const vec3_t& t)
+{
+    return vec3_mix(a, b, t);
+}
+
+__vmath__ vec3_t mix(const vec3_t& a, const vec3_t& b, float t)
+{
+    return vec3_mixf(a, b, t);
+}
+
 /* END OF VMATH_BUILD_VEC3 */
 #endif
 
@@ -4150,6 +4269,16 @@ __vmath__ vec4_t smoothstep(const vec4_t& a, const vec4_t& b, const vec4_t& t)
 __vmath__ vec4_t smoothstep(const vec4_t& a, const vec4_t& b, float t)
 {
     return vec4_smoothstepf(a, b, t);
+}
+
+__vmath__ vec4_t mix(const vec4_t& a, const vec4_t& b, const vec4_t& t)
+{
+    return vec4_mix(a, b, t);
+}
+
+__vmath__ vec4_t mix(const vec4_t& a, const vec4_t& b, float t)
+{
+    return vec4_mixf(a, b, t);
 }
 
 /* END OF VMATH_BUILD_VEC4 */
