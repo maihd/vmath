@@ -1540,7 +1540,7 @@ __vmath__ float smoothstepf(float a, float b, float t)
     return t * t * t * ((t * 6 - 15) + 10);
 }
 
-__vmath__ float mixf(float a, float a, float t)
+__vmath__ float mixf(float a, float b, float t)
 {
     return a * (1.0f - t) + b * t;
 }
@@ -1567,7 +1567,7 @@ __vmath__ float normalizef(float x)
 
 __vmath__ float faceforwardf(float n, float i, float nref)
 {
-    return dot(i, nref) < 0.0f ? n : -n;
+    return dotf(i, nref) < 0.0f ? n : -n;
 }
 
 __vmath__ float reflectf(float v, float n)
@@ -1578,11 +1578,11 @@ __vmath__ float reflectf(float v, float n)
 
 __vmath__ float refractf(float v, float n, float eta)
 {
-    k = 1.0 - eta * eta * (1.0 - dotf(n, v) * dotf(n, v));
+    float k = 1.0 - eta * eta * (1.0 - dotf(n, v) * dotf(n, v));
     if (k < 0.0)
         return 0.0;
     else
-        return eta * v - (eta * dot(n, v) + vmath_fsqrt(k)) * v;
+        return eta * v - (eta * dotf(n, v) + vmath_fsqrt(k)) * v;
 }
 
 /**************************
@@ -1883,7 +1883,7 @@ __vmath__ vec2_t vec2_mix(vec2_arg_t a, vec2_arg_t b, vec2_arg_t t)
     return vec2(
         mixf(a.x, b.x, t.x),
         mixf(a.y, b.y, t.y)
-    )
+    );
 }
 
 __vmath__ vec2_t vec2_mixf(vec2_arg_t a, vec2_arg_t b, float t)
@@ -1891,7 +1891,7 @@ __vmath__ vec2_t vec2_mixf(vec2_arg_t a, vec2_arg_t b, float t)
     return vec2(
         mixf(a.x, b.x, t),
         mixf(a.y, b.y, t)
-    )
+    );
 }
 
 /* END OF VMATH_BUILD_VEC2 */
@@ -2285,7 +2285,7 @@ __vmath__ vec3_t vec3_mix(vec3_arg_t a, vec3_arg_t b, vec3_arg_t t)
         mixf(a.x, b.x, t.x),
         mixf(a.y, b.y, t.y),
         mixf(a.z, b.z, t.z)
-    )
+    );
 }
 
 __vmath__ vec3_t vec3_mixf(vec3_arg_t a, vec3_arg_t b, float t)
@@ -2294,7 +2294,7 @@ __vmath__ vec3_t vec3_mixf(vec3_arg_t a, vec3_arg_t b, float t)
         mixf(a.x, b.x, t),
         mixf(a.y, b.y, t),
         mixf(a.z, b.z, t)
-    )
+    );
 }
 
 /* END OF VMATH_BUILD_VEC3 */
@@ -2675,7 +2675,7 @@ __vmath__ vec4_t vec4_mix(vec4_arg_t a, vec4_arg_t b, vec4_arg_t t)
         mixf(a.y, b.y, t.y),
         mixf(a.z, b.z, t.z),
         mixf(a.w, b.w, t.w)
-    )
+    );
 }
 
 __vmath__ vec4_t vec4_mixf(vec4_arg_t a, vec4_arg_t b, float t)
@@ -2685,7 +2685,7 @@ __vmath__ vec4_t vec4_mixf(vec4_arg_t a, vec4_arg_t b, float t)
         mixf(a.y, b.y, t),
         mixf(a.z, b.z, t),
         mixf(a.w, b.w, t)
-    )
+    );
 }
 
 /* END OF VMATH_BUILD_VEC4 */
