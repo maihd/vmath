@@ -1536,7 +1536,7 @@ __vmath__ float stepf(float a, float b, float t)
 
 __vmath__ float smoothstepf(float a, float b, float t)
 {
-    float t = clampf((t - a) / (b - a), 0.0f, 1.0f);
+    t = clampf((t - a) / (b - a), 0.0f, 1.0f);
     return t * t * t * ((t * 6 - 15) + 10);
 }
 
