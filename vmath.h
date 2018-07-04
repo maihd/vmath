@@ -10,8 +10,8 @@
 #define __VMATH_H__
 
 #define VMATH_LIBNAME "libvmath"
-#define VMATH_VERSION "v1.1.1"
-#define VMATH_VERCODE 10101 
+#define VMATH_VERSION "v1.1.2"
+#define VMATH_VERCODE 10102 
 
 /**
  * Include dependencies
@@ -3774,6 +3774,9 @@ __vmath__ mat4_t mat4_inverse(mat4_arg_t m)
 * @region: Functions overloading
 **************************/
 #if defined(__cplusplus) && VMATH_FUNCTION_OVERLOADING != 0
+
+#undef min
+#undef max
 
 /**************************
  * Float functions
