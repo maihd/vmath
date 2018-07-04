@@ -1578,9 +1578,9 @@ __vmath__ float faceforwardf(float n, float i, float nref)
 
 __vmath__ float refractf(float v, float n, float eta)
 {
-    float k = 1.0 - eta * eta * (1.0 - dotf(n, v) * dotf(n, v));
-    if (k < 0.0)
-        return 0.0;
+    float k = 1.0f - eta * eta * (1.0f - dotf(n, v) * dotf(n, v));
+    if (k < 0.0f)
+        return 0.0f;
     else
         return eta * v - (eta * dotf(n, v) + vmath_fsqrt(k)) * v;
 }
