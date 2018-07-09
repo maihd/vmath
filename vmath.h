@@ -841,10 +841,10 @@ public: /* Constructors */
         const float s2 = sinf(p);
         const float s3 = sinf(r);
 
-        x = s1 * s2 * c3 + c1 * c2 * s3;
-        y = s1 * c2 * c3 + c1 * s2 * s3;
-        z = c1 * s2 * c3 - s1 * c2 * s3;
-        w = c1 * c2 * c3 - s1 * s2 * s3;
+        this->x = s1 * s2 * c3 + c1 * c2 * s3;
+        this->y = s1 * c2 * c3 + c1 * s2 * s3;
+        this->z = c1 * s2 * c3 - s1 * c2 * s3;
+        this->w = c1 * c2 * c3 - s1 * s2 * s3;
     }
 
     __vmath_ctor__ operator vec3() const
@@ -970,12 +970,6 @@ public: /* Constructors */
         : mat2(s, 0, 
                0, s) {}
 
-#if 0
-    __vmath_ctor__ explicit mat2(const float* s)
-        : mat2(s[0], s[1], 
-               s[2], s[3]) {}
-#endif
-
     __vmath_ctor__ mat2(float m00, float m01, float m10, float m11)
         : m00(m00), m01(m01)
         , m10(m10), m11(m11) {}
@@ -1036,14 +1030,7 @@ public: /* Constructors */
     __vmath_ctor__ explicit mat3(float s)
         : mat3(s, 0, 0, 
                0, s, 0,
-               0, 0, s) {} 
-
-#if 0
-    __vmath_ctor__ explicit mat3(const float* s)
-        : mat3(s[0], s[1], s[2], 
-               s[3], s[4], s[5],
-               s[6], s[7], s[8]) {}
-#endif
+               0, 0, s) {}
 
     __vmath_ctor__ mat3(float m00, float m01, float m02, 
                         float m10, float m11, float m12,
@@ -1061,16 +1048,16 @@ public: /* Constructors */
     __vmath_ctor__ operator const float*() const { return pure.data; }
 
 public: /* Operators */
-    __vmath_mthd__ vec3& operator[](int index)
+    __vmath_mthd__ float& operator[](int index)
     {
         assert(index >= 0 || index < 3);
-        return *(vec3*)(pure.m + index);
+        return pure.data[index];
     }
 
-    __vmath_mthd__ const vec3& operator[](int index) const
+    __vmath_mthd__ float operator[](int index) const
     {
         assert(index >= 0 || index < 3);
-        return *(const vec3*)(pure.m + index);
+        return pure.data[index];
     }
 
 private:
@@ -1105,14 +1092,6 @@ public: /* Constructors */
                0, s, 0, 0,
                0, 0, s, 0,
                0, 0, 0, s) {}
-
-#if 0
-    __vmath_ctor__ explicit mat4(const float* s)
-        : mat4(s[ 0], s[ 1], s[ 2], s[ 3],
-               s[ 4], s[ 5], s[ 6], s[ 7],
-               s[ 8], s[ 9], s[10], s[11],
-               s[12], s[13], s[14], s[15]) {}
-#endif
 
     __vmath_ctor__ mat4(float m00, float m01, float m02, float m03, 
                         float m10, float m11, float m12, float m13,
