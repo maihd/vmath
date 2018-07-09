@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <assert.h>
 
+#include <Windows.h>
+
 #define VMATH_FAST_MATH 0 // Fast math cause non-totally exact result
 #include "../vmath.h"
 

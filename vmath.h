@@ -10,8 +10,8 @@
 #define __VMATH_H__
 
 #define VMATH_LIBNAME "libvmath"
-#define VMATH_VERSION "v1.1.1"
-#define VMATH_VERCODE 10101 
+#define VMATH_VERSION "v1.1.2"
+#define VMATH_VERCODE 10102 
 
 /**
  * Include dependencies
@@ -1557,9 +1557,9 @@ __vmath__ float faceforwardf(float n, float i, float nref)
 
 __vmath__ float refractf(float v, float n, float eta)
 {
-    float k = 1.0 - eta * eta * (1.0 - dotf(n, v) * dotf(n, v));
-    if (k < 0.0)
-        return 0.0;
+    float k = 1.0f - eta * eta * (1.0f - dotf(n, v) * dotf(n, v));
+    if (k < 0.0f)
+        return 0.0f;
     else
         return eta * v - (eta * dotf(n, v) + vmath_fsqrt(k)) * v;
 }
@@ -3753,6 +3753,9 @@ __vmath__ mat4_t mat4_inverse(mat4_arg_t m)
 * @region: Functions overloading
 **************************/
 #if defined(__cplusplus) && VMATH_FUNCTION_OVERLOADING != 0
+
+#undef min
+#undef max
 
 /**************************
  * Float functions
