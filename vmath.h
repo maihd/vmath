@@ -1532,6 +1532,11 @@ __vmath__ float dotf(float a, float b)
     return a * b;
 }
 
+__vmath__ float rsqrtf(float x)
+{
+    return vmath_rsqrt(x);
+}
+
 __vmath__ float lengthf(float x)
 {
     return fabsf(x);
@@ -1561,10 +1566,9 @@ __vmath__ float faceforwardf(float n, float i, float nref)
 __vmath__ float refractf(float v, float n, float eta)
 {
     float k = 1.0f - eta * eta * (1.0f - dotf(n, v) * dotf(n, v));
-    if (k < 0.0f)
-        return 0.0f;
-    else
-        return eta * v - (eta * dotf(n, v) + vmath_fsqrt(k)) * v;
+    return k < 0.0f 
+        ? 0.0f 
+        : eta * v - (eta * dotf(n, v) + vmath_fsqrt(k)) * v;
 }
 
 /**************************
@@ -3075,7 +3079,7 @@ __vmath__ mat2_t mat2_inverse(mat2_arg_t m)
 /**
  *
  */
-__vmath__ vec2_t mat2_transform(mat2_arg_t m, vec2_arg_t v)
+__vmath__ vec2_t mat2_mulv2(mat2_arg_t m, vec2_arg_t v)
 {
     return vec2(
         vec2_dot(vec2(m.m00, m.m01), v),
@@ -3256,9 +3260,9 @@ __vmath__ mat3_t mat3_inverse(mat3_arg_t m)
 }
 
 /**
- * Apply transform (Matrix3x3) for Vector3D
+ * Multiplication between Matrix3x3 and Vector3D
  */
-__vmath__ vec3_t mat3_transform(mat3_arg_t m, vec3_arg_t v)
+__vmath__ vec3_t mat3_mulv3(mat3_arg_t m, vec3_arg_t v)
 {
     const vec3_t c0 = vec3(m.m00, m.m10, m.m20);
     const vec3_t c1 = vec3(m.m01, m.m11, m.m21);
@@ -3481,9 +3485,9 @@ __vmath__ mat4_t mat4_rotateq(quat_arg_t q)
 }
 
 /**
- * Apply transform (Matrix4x4) for Vector4D
+ * Multiplication between Matrix4x4 and Vector4D
  */
-__vmath__ vec4_t mat4_transform(mat4_arg_t m, vec4_arg_t v)
+__vmath__ vec4_t mat4_mulv4(mat4_arg_t m, vec4_arg_t v)
 {
     const vec4_t c0 = vec4(m.m00, m.m10, m.m20, m.m30);
     const vec4_t c1 = vec4(m.m01, m.m11, m.m21, m.m31);
@@ -3496,6 +3500,15 @@ __vmath__ vec4_t mat4_transform(mat4_arg_t m, vec4_arg_t v)
     const float w = vec4_dot(c3, v);
 
     return vec4(x, y, z, w);
+}
+
+/**
+ * Multiplication between Matrix4x4 and Vector3D
+ */
+__vmath__ vec3_t mat4_mulv3(mat4_arg_t m, vec3_arg_t v)
+{
+    vec4_t v4 = mat4_mulv4(m, vec4(v.x, v.y, v.z, 1.0f));
+    return vec3(v4.x / v4.w, v4.y / v4.w, v4.z / v4.w);
 }
 
 /**
@@ -3530,10 +3543,10 @@ __vmath__ mat4_t mat4_sub(mat4_arg_t a, mat4_arg_t b)
 __vmath__ mat4_t mat4_mul(mat4_arg_t a, mat4_arg_t b)
 {
     mat4_t r;
-    r.rows[0] = mat4_transform(a, b.rows[0]);
-    r.rows[1] = mat4_transform(a, b.rows[1]);
-    r.rows[2] = mat4_transform(a, b.rows[2]);
-    r.rows[3] = mat4_transform(a, b.rows[3]);
+    r.rows[0] = mat4_mulv4(a, b.rows[0]);
+    r.rows[1] = mat4_mulv4(a, b.rows[1]);
+    r.rows[2] = mat4_mulv4(a, b.rows[2]);
+    r.rows[3] = mat4_mulv4(a, b.rows[3]);
     return r;
 }
 
@@ -4517,7 +4530,7 @@ __vmath__ mat2_t mul(float s, const mat2_t& m)
 
 __vmath__ vec2_t mul(const mat2_t& m, const vec2_t& v)
 {
-    return mat2_transform(m, v);
+    return mat2_mulv2(m, v);
 }
 
 __vmath__ mat2_t inverse(const mat2_t& m)
@@ -4569,7 +4582,7 @@ __vmath__ mat3_t mul(float s, const mat3_t& m)
 
 __vmath__ vec3_t mul(const mat3_t& m, const vec3_t& v)
 {
-    return mat3_transform(m, v);
+    return mat3_mulv3(m, v);
 }
 
 __vmath__ mat3_t inverse(const mat3_t& m)
@@ -4619,9 +4632,14 @@ __vmath__ mat4_t mul(float s, const mat4_t& m)
     return mat4_mulf(m, s);
 }
 
+__vmath__ vec3_t mul(const mat4_t& m, const vec3_t& v)
+{
+    return mat4_mulv3(m, v);
+}
+
 __vmath__ vec4_t mul(const mat4_t& m, const vec4_t& v)
 {
-    return mat4_transform(m, v);
+    return mat4_mulv4(m, v);
 }
 
 __vmath__ mat4_t inverse(const mat4_t& m)
@@ -4707,28 +4725,6 @@ __vmath__ mat4_t translate(float x, float y)
 __vmath__ mat4_t translate(float x, float y, float z)
 {
     return mat4_translate3f(x, y, z);
-}
-
-/**
- * Apply transform (Matrix4x4) for Vector3D
- */
-__vmath__ vec3_t mat4_transform(const mat4_t& m, const vec3_t& v)
-{
-    const vec4_t c0 = vec4(m.m00, m.m10, m.m20, m.m30);
-    const vec4_t c1 = vec4(m.m01, m.m11, m.m21, m.m31);
-    const vec4_t c2 = vec4(m.m02, m.m12, m.m22, m.m32);
-    /* const vec4_t c3 = vec4(m.m03, m.m13, m.m23, m.m33);
-     */
-
-    const float x = vec4_dot(c0, vec4(v));
-    const float y = vec4_dot(c1, vec4(v));
-    const float z = vec4_dot(c2, vec4(v));
-    return vec3(x, y, z);
-}
-
-__vmath__ vec3_t mul(const mat4_t& m, const vec3_t& v)
-{
-    return mat4_transform(m, v);
 }
 
 /* END OF VMATH_BUILD_MAT4 */
@@ -5307,7 +5303,7 @@ __vmath__ mat2_t& operator/=(mat2_t& a, float b)
 
 __vmath__ vec2_t operator*(const mat2_t& a, const vec2_t& b)
 {
-    return mat2_transform(a, b);
+    return mat2_mulv2(a, b);
 }
 
 /* END OF VMATH_BUILD_MAT3 */
@@ -5411,7 +5407,7 @@ __vmath__ mat3_t& operator/=(mat3_t& a, float b)
 
 __vmath__ vec3_t operator*(const mat3_t& a, const vec3_t& b)
 {
-    return mat3_transform(a, b);
+    return mat3_mulv3(a, b);
 }
 
 /* END OF VMATH_BUILD_MAT3 */
@@ -5499,12 +5495,12 @@ __vmath__ mat4_t operator/=(mat4_t& a, float b)
 
 __vmath__ vec3_t operator*(const mat4_t& a, const vec3_t& b)
 {
-    return mat4_transform(a, b);
+    return mat4_mulv3(a, b);
 }
 
 __vmath__ vec4_t operator*(const mat4_t& a, const vec4_t& b)
 {
-    return mat4_transform(a, b);
+    return mat4_mulv4(a, b);
 }
 
 /* END OF VMATH_BUILD_MAT4 */
