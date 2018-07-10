@@ -75,8 +75,8 @@ mat4 proj = perspective(M_PI * 0.25f, WIDTH / HEIGHT, 0.0f, 100.0f);
 3. Editor: Emacs (used) + VSCode + Visual Studio Community
 
 ## FAQ
-Q. Why plain-old data?<br/>
-A. First, C and C++ are both supported. Second, Data-oriented design. Lastly, design based on GLSL.<br/>
-<br/>  
-Q. Are GLSL-like types (name without _t postfix), C++ object-oriented type?<br/>
-A. Shortly, yes. Long answer, we cannot naming functions with data types' name. The types, are defined separate from default types (name with _t postfix), and has implicit conversion.<br/>
+#### Why plain-old data?
+First, C and C++ are both supported. Second, Data-oriented design. Lastly, design based on GLSL.
+  
+#### Are GLSL-like types (name without _t postfix), C++ object-oriented type?
+Shortly, yes. Long answer, we cannot naming functions with data types' name. The types, are defined separate from default types (name with _t postfix), and has implicit conversion.
