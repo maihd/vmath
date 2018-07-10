@@ -3063,8 +3063,7 @@ __vmath__ mat2_t mat2_transpose(mat2_arg_t m)
  */
 __vmath__ float mat2_det(mat2_arg_t m)
 {
-    (void)m;
-    return 0.0f;
+    return m.m00 * m.m11 - m.m01 * m.m10;
 }
 
 /**
@@ -3072,8 +3071,16 @@ __vmath__ float mat2_det(mat2_arg_t m)
  */
 __vmath__ mat2_t mat2_inverse(mat2_arg_t m)
 {
-    (void)m;
-    return MAT2_IDENTITY;
+    float d = mat2_det(m);
+    if (d != 0.0f)
+    {
+        d = 1.0f / d;
+        return mat2(m.m11 * d, m.m01 * d, m.m10 * d, m.m00 * d);
+    }
+    else
+    {
+        return m;
+    }
 }
 
 /**
