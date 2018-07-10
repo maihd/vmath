@@ -828,11 +828,14 @@ public: /* Constructors */
     __vmath_ctor__ quat(float x, float y, float z, float w) : vec4(::vec4(x, y, z, w)) {}
 
     __vmath_ctor__ explicit quat(const vec3_t& euler) : quat(euler.x, euler.y, euler.z) {}
-    __vmath_ctor__ quat(float r, float p, float y)
+    __vmath_ctor__ quat(float x, float y, float z)
     {
-        r *= 0.5f;
-        p *= 0.5f;
-        y *= 0.5f;
+        float r;
+        float p;
+
+        r = z * 0.5f;
+        p = x * 0.5f;
+        y = y * 0.5f; // Now y min yaw
 
         const float c1 = cosf(y);
         const float c2 = cosf(p);
@@ -2808,11 +2811,14 @@ __vmath__ quat_t quat_normalize(quat_arg_t q)
  * Create a quaternion with euler coordinate
  * @return: result quaternion
  */
-__vmath__ quat_t quat_euler(float r, float p, float y)
+__vmath__ quat_t quat_euler(float x, float y, float z)
 {
-    r *= 0.5f;
-    p *= 0.5f;
-    y *= 0.5f;
+    float r;
+    float p;
+
+    r = z * 0.5f;
+    p = x * 0.5f;
+    y = y * 0.5f; // Now y min yaw
 
     const float c1 = cosf(y);
     const float c2 = cosf(p);
