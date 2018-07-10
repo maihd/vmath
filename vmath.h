@@ -2929,7 +2929,7 @@ __vmath__ quat_t quat_mul(quat_arg_t a, quat_arg_t b)
 /**
  * Get euler values present in Vector3D   
  */
-__vmath__ vec3_t euler(quat_arg_t q)
+__vmath__ vec3_t quat_toeuler(quat_arg_t q)
 {
     float s = 2.0f * (q.w * q.x + q.y * q.z);
     float c = 1.0f - 2.0f * (q.x * q.x + q.y * q.y);
@@ -4449,6 +4449,35 @@ __vmath__ quat_t neg(const quat_t& q)
 __vmath__ quat_t inverse(const quat_t& q)
 {
     return quat_inverse(q);
+}
+
+/**
+ * Make euler angle, present in quaternion
+ */
+__vmath__ quat_t euler(float x, float y, float z)
+{
+    return quat_euler(x, y, z);
+}
+
+/**
+ * Make euler angle, present in quaternion
+ */
+__vmath__ quat_t euler(const vec3_t& v)
+{
+    return quat_eulerv3(v);
+}
+
+__vmath__ vec3_t toeuler(const quat_t& q)
+{
+    return quat_toeuler(q);
+}
+
+/**
+ * Convert quaternion to axis-angle presentation
+ */
+__vmath__ vec4_t toaxis(const quat_t& q)
+{
+    return quat_toaxis(q);
 }
 #endif
 
