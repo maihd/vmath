@@ -10,8 +10,8 @@
 #define __VMATH_H__
 
 #define VMATH_LIBNAME "libvmath"
-#define VMATH_VERSION "v1.1.2"
-#define VMATH_VERCODE 10102 
+#define VMATH_VERSION "v1.1.3"
+#define VMATH_VERCODE 10103 
 
 /**
  * Include dependencies
@@ -1519,7 +1519,7 @@ __vmath__ float stepf(float a, float b, float t)
 __vmath__ float smoothstepf(float a, float b, float t)
 {
     t = clampf((t - a) / (b - a), 0.0f, 1.0f);
-    return t * t * t * ((t * 6 - 15) + 10);
+    return t * t * (3 - 2 * t);
 }
 
 __vmath__ float mixf(float a, float b, float t)
