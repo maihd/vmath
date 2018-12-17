@@ -24,29 +24,23 @@
  * Custom modifier
  */
 #if !defined(__cplusplus)
-
-# if   defined(__GNUC__) /* GCC with strict-ansi */
+# if defined(__GNUC__) /* GCC with strict-ansi */
 #  define __vmath_inline__ __inline__
 # elif defined(_MSC_VER) /* Windows MSVC */
 #  define __vmath_inline__ __inline
 # else
 #  define __vmath_inline__
 # endif
-
 # define __vmath_nothrow__ 
-
 #else
-
 # define __vmath_inline__ inline
-
-# if   defined(__GNUC__)
+# if defined(__GNUC__)
 #  define __vmath_nothrow__ __attribute((nothrow))
 # elif defined(_MSC_VER) /* Windows MSVC */
 #  define __vmath_nothrow__ __declspec(nothrow)
 # else
 #  define __vmath_nothrow__
 # endif
-
 #endif
 
 #ifdef __GNUC__ /* GCC */
@@ -56,8 +50,8 @@
 #endif
 #define __vmath__ /*{space}*/ __vmath_attr__ static __vmath_inline__ 
 
-#ifndef PI
-#define PI 3.14159265358979f
+#ifndef VMATH_PI
+#define VMATH_PI 3.14159265358979f
 #endif 
 
 /**
@@ -97,6 +91,14 @@
 
 #ifndef VMATH_GLSL_LIKE
 #define VMATH_GLSL_LIKE 1
+#endif
+
+#ifndef VMATH_FAST_MATH
+#define VMATH_FAST_MATH 1
+#endif
+
+#ifndef VMATH_DEFINE_STATIC_ASSERT
+#define VMATH_DEFINE_STATIC_ASSERT 1
 #endif
 
 #ifndef VMATH_OPERATOR_OVERLOADING
@@ -192,11 +194,14 @@
  * Static assert support
  */
 #include <assert.h>
-#if !defined(__cplusplus) && !defined(static_assert)    
+#if VMATH_DEFINE_STATIC_ASSERT && !defined(__cplusplus) && !defined(static_assert)
+#define HAVE_STATIC_ASSERT
 #define STATIC_ASSERT_CONCAT_IN(a, b)  a ## b
 #define STATIC_ASSERT_CONCAT(a, b)     STATIC_ASSERT_CONCAT_IN(a, b)
 #define STATIC_ASSERT_GENSYM()         STATIC_ASSERT_CONCAT(__SA, __LINE__)
 #define static_assert(exp, msg) struct STATIC_ASSERT_GENSYM() { char test[(exp) ? 0 : -1]; }
+#elif !defined(HAVE_STATIC_ASSERT)
+#define HAVE_STATIC_ASSERT
 #endif
 
 /**
@@ -367,6 +372,7 @@ typedef union vmath_mat4
     float  data[16];
 } mat4_t;
 
+#ifdef HAVE_STATIC_ASSERT
 static_assert(sizeof(vec2_t) == sizeof(float2_t)  , "Size of vec2_t is not valid");
 static_assert(sizeof(vec3_t) == sizeof(float3_t)  , "Size of vec3_t is not valid");
 static_assert(sizeof(vec4_t) == sizeof(float4_t)  , "Size of vec3_t is not valid");
@@ -374,24 +380,25 @@ static_assert(sizeof(quat_t) == sizeof(float4_t)  , "Size of quat_t is not valid
 static_assert(sizeof(mat2_t) == 4  * sizeof(float), "Size of mat2_t is not valid");
 static_assert(sizeof(mat3_t) == 9  * sizeof(float), "Size of mat3_t is not valid");
 static_assert(sizeof(mat4_t) == 16 * sizeof(float), "Size of mat4_t is not valid");
+#endif
 
 #if defined(__cplusplus)
-typedef const vec2_t& vec2_arg_t;
-typedef const vec2_t& vec2_arg_t;
-typedef const vec3_t& vec3_arg_t;
-typedef const vec4_t& vec4_arg_t;
-typedef const quat_t& quat_arg_t;
-typedef const mat2_t& mat2_arg_t;
-typedef const mat3_t& mat3_arg_t;
-typedef const mat4_t& mat4_arg_t;
+#define vec2_arg_t const vec2_t&
+#define vec2_arg_t const vec2_t&
+#define vec3_arg_t const vec3_t&
+#define vec4_arg_t const vec4_t&
+#define quat_arg_t const quat_t&
+#define mat2_arg_t const mat2_t&
+#define mat3_arg_t const mat3_t&
+#define mat4_arg_t const mat4_t&
 #else
-typedef vec2_t        vec2_arg_t;
-typedef vec3_t        vec3_arg_t;
-typedef vec4_t        vec4_arg_t;
-typedef quat_t        quat_arg_t;
-typedef mat2_t        mat2_arg_t;
-typedef mat3_t        mat3_arg_t;
-typedef mat4_t        mat4_arg_t;
+#define vec2_arg_t vec2_t
+#define vec3_arg_t vec3_t
+#define vec4_arg_t vec4_t
+#define quat_arg_t quat_t
+#define mat2_arg_t mat2_t
+#define mat3_arg_t mat3_t
+#define mat4_arg_t mat4_t
 #endif
 
 /********
@@ -469,10 +476,6 @@ static const mat4_t MAT4_IDENTITY = {
 };
 
 /* END OF VMATH_CONSTANTS */
-#endif
-
-#ifndef VMATH_FAST_MATH
-#define VMATH_FAST_MATH 1
 #endif
 
 #if (VMATH_FAST_MATH != 0)
@@ -857,7 +860,7 @@ public: /* Constructors */
         const float r = atan2f(s, c);
 
         s = 2.0f * (w * y - z * x);
-        const float p = fabsf(s >= 1.0f) >= 1.0f ? copysignf(PI * 0.5f, s) : s;
+        const float p = fabsf(s >= 1.0f) >= 1.0f ? copysignf(VMATH_PI * 0.5f, s) : s;
 
         s = 2.0f * (w * z + y * x);
         c = 1.0f - 2.0f * (y * y + z * z);
@@ -1486,13 +1489,13 @@ __vmath__ mat4_t mat4(const float* data)
  *******************************/
 __vmath__ float radians(float d)
 {
-    const float f = PI / 180.0f;
+    const float f = VMATH_PI / 180.0f;
     return d * f;
 }
 
 __vmath__ float degrees(float r)
 {
-    const float f = 180.0f / PI;
+    const float f = 180.0f / VMATH_PI;
     return r * f;
 }
 
@@ -2940,7 +2943,7 @@ __vmath__ vec3_t quat_toeuler(quat_arg_t q)
     const float r = atan2f(s, c);
 
     s = 2.0f * (q.w * q.y - q.z * q.x);
-    const float p = fabsf(s >= 1.0f) >= 1.0f ? copysignf(PI * 0.5f, s) : s;
+    const float p = fabsf(s >= 1.0f) >= 1.0f ? copysignf(VMATH_PI * 0.5f, s) : s;
 
     s = 2.0f * (q.w * q.z + q.y * q.x);
     c = 1.0f - 2.0f * (q.y * q.y + q.z * q.z);
