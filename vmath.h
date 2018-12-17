@@ -150,26 +150,30 @@
 #endif
 
 #if defined(__SSE__) || defined(__SSE2__) || defined(__SSE3__)
+# undef  VMATH_SSE_SUPPORT
 # define VMATH_SSE_SUPPORT 1
 #endif
 
 #if defined(__SSE4_1__) || defined(__SSE4_2__) || defined(__SSE_MATH__)
-//# define VMATH_SSE_SUPPORT 1
+# undef  VMATH_SSE_SUPPORT
+# define VMATH_SSE_SUPPORT 1
 #endif
 
 #if defined(_MSC_VER) && (defined(_M_IX86) || defined(_M_IX64))
 # if defined(_M_HYBRID_X86_ARM64)
+#  undef  VMATH_SSE_SUPPORT
 #  define VMATH_SSE_SUPPORT 0
 # else
+#  undef  VMATH_SSE_SUPPORT
 #  define VMATH_SSE_SUPPORT 1
 # endif
 #endif
 
 #if VMATH_SSE_SUPPORT
 # include <mmintrin.h>
-# include <smmintrin.h>
+//# include <smmintrin.h>
 //# include <xmmintrin.h>
-//# include <emmintrin.h>
+# include <emmintrin.h>
 # ifndef VMATH_SSE_ENABLE
 #  define VMATH_SSE_ENABLE 1
 # endif
@@ -2496,7 +2500,7 @@ __vmath__ float vec4_dot(vec4_arg_t a, vec4_arg_t b)
     vec4_t v;
     v.data = vmulq_f32(a.data, b.data);
     return v.x + v.y + v.z + v.w;
-#elif VMATH_SSE_ENABLE
+#elif VMATH_SSE_ENABLE && 0
     return _mm_cvtss_f32(_mm_dp_ps(a.data, b.data, 0xf1));
 #else
     return a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w;
@@ -2540,7 +2544,7 @@ __vmath__ float vec4_distancesquared(vec4_arg_t a, vec4_arg_t b)
  */
 __vmath__ vec4_t vec4_normalize(vec4_arg_t v)
 {
-#if VMATH_SSE_ENABLE
+#if VMATH_SSE_ENABLE && 0
     vec4_t r;
     r.data = _mm_mul_ps(v.data, _mm_rsqrt_ps(_mm_dp_ps(v.data, v.data, 0xff)));
     return r;
@@ -2993,7 +2997,7 @@ __vmath__ mat2_t mat2_sub(mat2_arg_t a, mat2_arg_t b)
  */
 __vmath__ mat2_t mat2_mul(mat2_arg_t a, mat2_arg_t b)
 {
-#if VMATH_SSE_ENABLE
+#if VMATH_SSE_ENABLE && 0
     mat2_t r;
 
     const __m128 tmp  = _mm_shuffle_ps(
