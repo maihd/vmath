@@ -70,9 +70,9 @@ mat4 proj = perspective(M_PI * 0.25f, WIDTH / HEIGHT, 0.0f, 100.0f);
 2. MaiHD's tween functions library (https://github.com/maihd/tween.git)
 
 ## Metadata
-1. License: NULL
+1. License: Public domain
 2. Copyright: MaiHD @ ${HOME}, 2017 - 2018
-3. Editor: Emacs (used) + VSCode + Visual Studio Community
+3. Editors: Emacs (used) + VSCode + Visual Studio Community
 
 ## FAQ
 #### Why plain-old data?
