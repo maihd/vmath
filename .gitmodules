@@ -1,0 +1,3 @@
+[submodule "csfx"]
+    path = test/csfx
+    url = https://github.com/maihd/csfx.git

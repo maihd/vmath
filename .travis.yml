@@ -1,0 +1,12 @@
+# Safelist
+branches:
+  only:
+    - master
+    - stable
+
+matrix:
+  include:
+    # c - linux
+    - os: linux
+      language: c
+      script: cd test && make travis && ./test
