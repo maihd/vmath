@@ -154,7 +154,7 @@
 #endif
 
 #if defined(__SSE4_1__) || defined(__SSE4_2__) || defined(__SSE_MATH__)
-# define VMATH_SSE_SUPPORT 1
+//# define VMATH_SSE_SUPPORT 1
 #endif
 
 #if defined(_MSC_VER) && (defined(_M_IX86) || defined(_M_IX64))
