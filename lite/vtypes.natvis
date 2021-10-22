@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+  <Type Name="vec2">
+    <DisplayString>{x}, {y}</DisplayString>
+  </Type>
+  
+  <Type Name="vec3">
+    <DisplayString>{x}, {y}, {z}</DisplayString>
+  </Type>
+
+  <Type Name="vec4">
+    <DisplayString>{x}, {y}, {z}, {w}</DisplayString>
+  </Type>
+
+  <Type Name="ivec2">
+    <DisplayString>{x}, {y}</DisplayString>
+  </Type>
+
+  <Type Name="ivec3">
+    <DisplayString>{x}, {y}, {z}</DisplayString>
+  </Type>
+
+  <Type Name="ivec4">
+    <DisplayString>{x}, {y}, {z}, {w}</DisplayString>
+  </Type>
+
+  <Type Name="uvec2">
+    <DisplayString>{x}, {y}</DisplayString>
+  </Type>
+
+  <Type Name="uvec3">
+    <DisplayString>{x}, {y}, {z}</DisplayString>
+  </Type>
+
+  <Type Name="uvec4">
+    <DisplayString>{x}, {y}, {z}, {w}</DisplayString>
+  </Type>
+  
+  <Type Name="mat2">
+    <DisplayString>{rows[0]}, {rows[1]}}</DisplayString>
+  </Type>
+  
+  <Type Name="mat3">
+    <DisplayString>{rows[0]}, {rows[1]}, {rows[2]}}</DisplayString>
+  </Type>
+
+  <Type Name="mat4">
+    <DisplayString>{rows[0]}, {rows[1]}, {rows[2]}, {rows[3]}}</DisplayString>
+  </Type>
+</AutoVisualizer>
